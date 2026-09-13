@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "32193547743",
+    "project_id": "sigma-midcal",
+    "storage_bucket": "sigma-midcal.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32193547743:android:19e07552e9327f22b8c86a",
+        "android_client_info": {
+          "package_name": "com.sigma.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6ZyndCAoElDsooHufUXPCvNSWJPx9knI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32193547743:android:f39a249c86fe279cb8c86a",
+        "android_client_info": {
+          "package_name": "com.sigma.seller"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6ZyndCAoElDsooHufUXPCvNSWJPx9knI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
