@@ -78,7 +78,16 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                         color: Theme.of(context).textTheme.bodyLarge?.color))),
           ]),
           const SizedBox(height: 16),
-          Wrap(spacing: 10, runSpacing: 10, children: [
+          LayoutBuilder(builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 700 ? 4 : 2;
+            return GridView.count(
+              crossAxisCount: columns,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: columns == 4 ? 1.25 : 1.18,
+              children: [
             _Metric(
                 icon: Icons.check_circle_outline,
                 label: getTranslated('active_products', context) ??
@@ -99,9 +108,6 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                     'Total wallet balance',
                 value: PriceConverter.convertPrice(context, walletTotal),
                 onTap: () => openFinance('balance')),
-          ]),
-          const SizedBox(height: 10),
-          Wrap(spacing: 10, runSpacing: 10, children: [
             _Metric(
                 icon: Icons.shopping_bag_outlined,
                 label:
@@ -143,7 +149,9 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                     'Total shipping due',
                 value: PriceConverter.convertPrice(context, shippingDueTotal),
                 onTap: () => openFinance('shipping')),
-          ]),
+              ],
+            );
+          }),
           if (dueRows.isNotEmpty) ...[
             const Divider(height: 24),
             Text(getTranslated('finance_order_dues', context) ??
@@ -160,8 +168,13 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                 )),
           ],
           const SizedBox(height: 14),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            OutlinedButton.icon(
+          LayoutBuilder(builder: (context, constraints) {
+            final itemWidth = constraints.maxWidth >= 620
+                ? (constraints.maxWidth - 16) / 3
+                : (constraints.maxWidth - 8) / 2;
+            Widget item(Widget child) => SizedBox(width: itemWidth, height: 52, child: child);
+            return Wrap(spacing: 8, runSpacing: 8, children: [
+            item(OutlinedButton.icon(
                 onPressed: () async {
                   await Navigator.push(
                       context,
@@ -172,8 +185,8 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                 },
                 icon: const Icon(Icons.add_card),
                 label: Text(getTranslated('fund_purchase_balance', context) ??
-                    'Fund purchase balance')),
-            OutlinedButton.icon(
+                    'Fund purchase balance'))),
+            item(OutlinedButton.icon(
                 onPressed: () async {
                   await Navigator.push(
                       context,
@@ -184,30 +197,30 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                 },
                 icon: const Icon(Icons.shield_outlined),
                 label: Text(getTranslated('fund_insurance_balance', context) ??
-                    'Fund insurance balance')),
-            OutlinedButton.icon(
+                    'Fund insurance balance'))),
+            item(OutlinedButton.icon(
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (_) => const SellerPackageScreen())),
                 icon: const Icon(Icons.campaign),
                 label: Text(getTranslated('advertising_packages', context) ??
-                    'Advertising packages')),
-            OutlinedButton.icon(
+                    'Advertising packages'))),
+            item(OutlinedButton.icon(
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (_) => const OrderScreen(fromHome: true))),
                 icon: const Icon(Icons.receipt_long_outlined),
                 label:
-                    Text(getTranslated('review_orders', context) ?? 'Orders')),
-            OutlinedButton.icon(
+                    Text(getTranslated('review_orders', context) ?? 'Orders'))),
+            item(OutlinedButton.icon(
                 onPressed: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const WalletScreen())),
                 icon: const Icon(Icons.shield_outlined),
                 label: Text(getTranslated('finance_my_wallet', context) ??
-                    'Insurance & shipping')),
-            FilledButton.icon(
+                    'Insurance & shipping'))),
+            item(FilledButton.icon(
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -215,8 +228,9 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                             const AddProductTabView(fromHome: true))),
                 icon: const Icon(Icons.add_box_outlined),
                 label: Text(
-                    getTranslated('add_product', context) ?? 'Add product')),
-          ]),
+                    getTranslated('add_product', context) ?? 'Add product'))),
+          ]);
+          }),
         ]),
       );
     });
@@ -240,9 +254,7 @@ class _Metric extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
-          width: MediaQuery.sizeOf(context).width >= 700
-              ? (MediaQuery.sizeOf(context).width - 94) / 4
-              : (MediaQuery.sizeOf(context).width - 74) / 2,
+          width: double.infinity,
           constraints: const BoxConstraints(minHeight: 104),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(

@@ -16,7 +16,8 @@ import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class SellerProfileScreen extends StatefulWidget {
-  const SellerProfileScreen({super.key});
+  final bool showBackButton;
+  const SellerProfileScreen({super.key, this.showBackButton = true});
 
   @override
   State<SellerProfileScreen> createState() => _SellerProfileScreenState();
@@ -39,7 +40,8 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBarWidget(
-          isBackButtonExist: true, title: getTranslated('my_profile', context)),
+          isBackButtonExist: widget.showBackButton,
+          title: getTranslated('my_profile', context)),
       body: Consumer2<ProfileController, WalletController>(
           builder: (context, profile, wallet, _) {
         final seller = profile.userInfoModel;

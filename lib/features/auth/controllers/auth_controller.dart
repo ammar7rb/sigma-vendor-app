@@ -297,7 +297,12 @@ class AuthController with ChangeNotifier {
   Future<ApiResponse> registration(BuildContext context, RegisterModel registerModel) async {
     _isLoading = true;
     notifyListeners();
-    ApiResponse response = await authServiceInterface.registration(_sellerProfileImage, _shopLogo, _shopBanner, secondaryBanner, registerModel);
+    ApiResponse response;
+    try {
+      response = await authServiceInterface.registration(_sellerProfileImage, _shopLogo, _shopBanner, secondaryBanner, registerModel);
+    } catch (error) {
+      response = ApiResponse.withError(error.toString());
+    }
 
     if(response.response?.statusCode == 200) {
       _isLoading = false;
@@ -331,11 +336,14 @@ class AuthController with ChangeNotifier {
     _registrationPoliciesLoaded = false;
     notifyListeners();
     final response = await authServiceInterface.requiredRegistrationPolicies() as ApiResponse;
-    if (response.response?.statusCode == 200 && response.response?.data is Map) {
-      final data = response.response!.data as Map;
+    if (response.response?.statusCode == 200) {
+      final raw = response.response!.data;
+      final data = raw is String ? jsonDecode(raw) as Map : raw as Map;
       _requiredRegistrationPolicies = List<Map<String, dynamic>>.from((data['policies'] ?? []).map((item) => Map<String, dynamic>.from(item)));
-      _registrationPoliciesLoaded = true;
+    } else {
+      _requiredRegistrationPolicies = [];
     }
+    _registrationPoliciesLoaded = true;
     notifyListeners();
   }
 

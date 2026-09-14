@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_button_widget.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
@@ -10,6 +11,7 @@ import 'package:sixvalley_vendor_app/features/auth/domain/models/register_model.
 import 'package:sixvalley_vendor_app/features/auth/screens/seller_registration_verification_screen.dart';
 import 'package:sixvalley_vendor_app/features/auth/widgets/seller_auth_header.dart';
 import 'package:sixvalley_vendor_app/helper/email_checker.dart';
+import 'package:sixvalley_vendor_app/helper/egypt_phone_helper.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/main.dart';
 
@@ -33,13 +35,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void _submit(AuthController auth) {
-    final phone =
-        auth.phoneController.text.trim().replaceFirst(RegExp(r'^0'), '');
+    final phone = EgyptPhoneHelper.normalizeLocal(auth.phoneController.text);
     if (!auth.registrationPoliciesLoaded) {
       _warning('registration_policies_loading', 'جاري تحميل السياسات');
     } else if (EmailChecker.isNotValid(auth.emailController.text.trim())) {
       _warning('email_is_ot_valid', 'أدخل بريدًا إلكترونيًا صحيحًا');
-    } else if (!RegExp(r'^1[0-25][0-9]{8}$').hasMatch(phone)) {
+    } else if (!EgyptPhoneHelper.isValidLocal(phone)) {
       _warning('phone_number_is_not_valid', 'أدخل رقم هاتف مصري صحيحًا');
     } else if (auth.passwordController.text.length < 8) {
       _warning(
@@ -52,7 +53,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           'يجب الموافقة على الشروط والسياسات');
     } else {
       final model = RegisterModel(
-        phone: '+20$phone',
+        phone: EgyptPhoneHelper.toInternational(phone),
         email: auth.emailController.text.trim(),
         password: auth.passwordController.text,
         confirmPassword: auth.confirmPasswordController.text,
@@ -76,7 +77,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               MaterialPageRoute(
                   builder: (_) => SellerRegistrationVerificationScreen(
                         registrationReference: reference,
-                        mobileNumber: '+20$phone',
+                        mobileNumber: EgyptPhoneHelper.toInternational(phone),
                         otpRequired: data['otp']?['required'] != false,
                         resendAfter: data['otp']?['resend_after'] as int? ?? 0,
                         supportTicketRequired: data['eligibility']
@@ -147,12 +148,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         Expanded(
                             child: CustomTextFieldWidget(
                                 border: true,
-                                hintText: '10xxxxxxxx',
+                                hintText: '01xxxxxxxxx',
                                 controller: auth.phoneController,
                                 focusNode: auth.phoneNode,
                                 nextNode: auth.passwordNode,
                                 isPhoneNumber: true,
                                 textInputType: TextInputType.phone,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(11),
+                                ],
                                 textInputAction: TextInputAction.next)),
                       ]),
                       const SizedBox(height: 16),

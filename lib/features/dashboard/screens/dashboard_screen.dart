@@ -21,6 +21,7 @@ import 'package:sixvalley_vendor_app/utill/images.dart';
 import 'package:sixvalley_vendor_app/features/home/screens/home_page_screen.dart';
 import 'package:sixvalley_vendor_app/features/menu/widgets/vendor_menu_widget.dart';
 import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
+import 'package:sixvalley_vendor_app/features/profile/screens/seller_profile_screen.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 import 'package:sixvalley_vendor_app/features/pos/screens/pos_screen.dart';
 
@@ -86,6 +87,7 @@ class DashboardScreenState extends State<DashboardScreen> {
         });
       }),
       const OrderScreen(),
+      const SellerProfileScreen(showBackButton: false),
     ];
 
     NetworkInfo.checkConnectivity(context);
@@ -127,10 +129,11 @@ class DashboardScreenState extends State<DashboardScreen> {
             boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
           ),
           child: Row(
-              children: List.generate(3, (index) {
+              children: List.generate(4, (index) {
             final data = [
               (Icons.home_outlined, getTranslated('home', context)),
               (Icons.receipt_long_outlined, getTranslated('my_order', context)),
+              (Icons.person_outline_rounded, getTranslated('profile', context)),
               (Icons.grid_view_rounded, getTranslated('menu', context)),
             ][index];
             return Expanded(
@@ -139,7 +142,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               label: data.$2 ?? '',
               selected: _pageIndex == index,
               onTap: () {
-                if (index != 2) {
+                if (index != 3) {
                   setPage(index);
                 } else {
                   showModalBottomSheet(

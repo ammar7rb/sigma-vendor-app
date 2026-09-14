@@ -201,7 +201,7 @@ class AuthRepository implements AuthRepositoryInterface{
       print('=====> ${request.url.path}\n${request.fields}');
     }
 
-    http.StreamedResponse response = await request.send();
+    http.StreamedResponse response = await request.send().timeout(const Duration(seconds: 30));
     var res = await http.Response.fromStream(response);
     if (kDebugMode) {
       print('=====Response body is here==>${res.body}');

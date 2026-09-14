@@ -129,19 +129,30 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                           return key == null ? null : tr(key);
                         }),
                     const SizedBox(height: 16),
-                    Wrap(spacing: 8, children: [
-                      ChoiceChip(
-                          label: Text(tr('offline_payment')),
-                          selected: offline,
-                          onSelected: disabled
-                              ? null
-                              : (_) => setState(() => offline = true)),
-                      ChoiceChip(
-                          label: Text(tr('pay_online')),
-                          selected: !offline,
-                          onSelected: disabled
-                              ? null
-                              : (_) => setState(() => offline = false)),
+                    Text(tr('payment_method'),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 10),
+                    Row(children: [
+                      Expanded(
+                          child: _PaymentChoiceCard(
+                              icon: Icons.account_balance_wallet_outlined,
+                              title: tr('wallet_or_transfer'),
+                              subtitle: tr('wallet_or_transfer_hint'),
+                              selected: offline,
+                              onTap: disabled
+                                  ? null
+                                  : () => setState(() => offline = true))),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          child: _PaymentChoiceCard(
+                              icon: Icons.credit_card_rounded,
+                              title: tr('visa_mastercard'),
+                              subtitle: tr('secure_online_payment'),
+                              selected: !offline,
+                              onTap: disabled
+                                  ? null
+                                  : () => setState(() => offline = false))),
                     ]),
                     const SizedBox(height: 16),
                     if (offline) ...[
@@ -216,15 +227,16 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                         Text(tr('no_digital_payment_method')),
                       for (final item in balance.paymentGateways)
                         Card(
+                            clipBehavior: Clip.antiAlias,
                             child: ListTile(
                                 leading: Icon(gateway == item.keyName
                                     ? Icons.radio_button_checked
                                     : Icons.radio_button_off),
+                                trailing: const Icon(Icons.credit_card_rounded),
                                 title: Text(item.title),
                                 onTap: disabled
                                     ? null
-                                    : () => setState(
-                                        () => gateway = item.keyName))),
+                                    : () => setState(() => gateway = item.keyName))),
                     ],
                     const SizedBox(height: 16),
                     FilledButton.icon(
@@ -323,4 +335,59 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
       if (mounted) setState(() => sending = false);
     }
   }
+}
+
+class _PaymentChoiceCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback? onTap;
+  const _PaymentChoiceCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: selected
+            ? Theme.of(context).primaryColor.withValues(alpha: .09)
+            : Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(
+              color: selected
+                  ? Theme.of(context).primaryColor
+                  : Theme.of(context).dividerColor,
+              width: selected ? 1.6 : 1),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(icon, color: Theme.of(context).primaryColor),
+                const Spacer(),
+                Icon(selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                    color: selected
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).hintColor),
+              ]),
+              const SizedBox(height: 12),
+              Text(title,
+                  maxLines: 2,
+                  style: const TextStyle(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Text(subtitle,
+                  maxLines: 2,
+                  style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor)),
+            ]),
+          ),
+        ),
+      );
 }

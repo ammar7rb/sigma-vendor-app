@@ -16,11 +16,12 @@ void main() {
     expect(menu, contains("'refund_requests'"));
   });
 
-  test('bottom navigation has three destinations and refund lives in menu', () {
+  test('bottom navigation exposes profile and keeps refund in menu', () {
     final dashboard =
         File('lib/features/dashboard/screens/dashboard_screen.dart')
             .readAsStringSync();
-    expect(dashboard, contains('List.generate(3'));
+    expect(dashboard, contains('List.generate(4'));
+    expect(dashboard, contains('SellerProfileScreen(showBackButton: false)'));
     expect(dashboard, isNot(contains('RefundScreen')));
     expect(dashboard, isNot(contains('Icons.assignment_return_outlined')));
   });
