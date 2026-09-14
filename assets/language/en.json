@@ -1813,5 +1813,8 @@
   "seller_pending_products": "Pending products",
   "seller_insurance_available": "Available insurance balance",
   "fund_purchase_balance": "Deposit to purchase balance",
-  "fund_insurance_balance": "Deposit to insurance balance"
+  "fund_insurance_balance": "Deposit to insurance balance",
+  "review_required_policies": "Review the required policies before accepting",
+  "policy_version": "Version",
+  "policy_content_unavailable": "Policy content is currently unavailable"
 }

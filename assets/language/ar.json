@@ -1813,5 +1813,8 @@
   "seller_pending_products": "المنتجات المعلقة",
   "seller_insurance_available": "رصيد التأمين المتاح",
   "fund_purchase_balance": "إيداع في رصيد المشتريات",
-  "fund_insurance_balance": "إيداع في رصيد التأمين"
+  "fund_insurance_balance": "إيداع في رصيد التأمين",
+  "review_required_policies": "راجع السياسات المطلوبة واضغط على كل سياسة لقراءة تفاصيلها قبل الموافقة",
+  "policy_version": "الإصدار",
+  "policy_content_unavailable": "محتوى السياسة غير متاح حاليًا"
 }

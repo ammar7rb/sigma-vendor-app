@@ -10,6 +10,8 @@ import 'package:sixvalley_vendor_app/features/auth/controllers/auth_controller.d
 import 'package:sixvalley_vendor_app/features/auth/domain/models/register_model.dart';
 import 'package:sixvalley_vendor_app/features/auth/screens/seller_registration_verification_screen.dart';
 import 'package:sixvalley_vendor_app/features/auth/widgets/seller_auth_header.dart';
+import 'package:sixvalley_vendor_app/features/auth/widgets/required_registration_policy_links.dart';
+import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
 import 'package:sixvalley_vendor_app/helper/email_checker.dart';
 import 'package:sixvalley_vendor_app/helper/egypt_phone_helper.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
@@ -94,6 +96,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void _warning(String key, String fallback) =>
       showCustomSnackBarWidget(tr(key, fallback), context,
           sanckBarType: SnackBarType.warning);
+
+  List<Map<String, dynamic>> _displayPolicies(AuthController auth) {
+    if (auth.requiredRegistrationPolicies.isNotEmpty) {
+      return auth.requiredRegistrationPolicies;
+    }
+
+    const policySlugs = {'terms-and-conditions', 'privacy-policy'};
+    final pages = context.read<SplashController>().defaultBusinessPages ?? [];
+    return pages
+        .where((page) => policySlugs.contains(page.slug))
+        .map((page) => <String, dynamic>{
+              'title': page.title,
+              'content': page.description,
+              'version': '',
+            })
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +211,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               tr('agree_to_terms_privacy_and_confidentiality',
                                   'أوافق على الشروط وسياسة الخصوصية'),
                               style: Theme.of(context).textTheme.bodySmall)),
+                      RequiredRegistrationPolicyLinks(
+                        policies: _displayPolicies(auth),
+                      ),
                       const SizedBox(height: 14),
                       auth.isLoading || !auth.registrationPoliciesLoaded
                           ? const Center(child: CircularProgressIndicator())
