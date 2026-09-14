@@ -78,7 +78,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   builder: (_) => SellerRegistrationVerificationScreen(
                         registrationReference: reference,
                         mobileNumber: EgyptPhoneHelper.toInternational(phone),
-                        otpRequired: data['otp']?['required'] != false,
+                        otpRequired: data['eligibility']?['verification']
+                                ?['otp_required'] ==
+                            true,
                         resendAfter: data['otp']?['resend_after'] as int? ?? 0,
                         supportTicketRequired: data['eligibility']
                                 ?['verification']?['support_ticket_required'] ==

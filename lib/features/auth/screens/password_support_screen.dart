@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/utill/app_constants.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
+import 'package:sixvalley_vendor_app/helper/egypt_phone_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PasswordSupportScreen extends StatefulWidget {
@@ -106,9 +107,11 @@ class _PasswordSupportScreenState extends State<PasswordSupportScreen> {
         if (_ticket == null) ...{
           'name': _name.text.trim(),
           'email': _email.text.trim(),
-          'mobile_number': _phone.text.trim()
+          'mobile_number': EgyptPhoneHelper.toInternational(_phone.text)
         },
-        'message': _message.text.trim(),
+        'message': _ticket == null
+            ? tr('password_reset_auto_message')
+            : _message.text.trim(),
         for (int i = 0; i < _files.length; i++)
           'attachments[$i]': await MultipartFile.fromFile(_files[i].path!,
               filename: _files[i].name),
@@ -251,40 +254,60 @@ class _PasswordSupportScreenState extends State<PasswordSupportScreen> {
                                                   : () => setState(() =>
                                                       _files.remove(file))))
                                           .toList())),
-                            TextFormField(
-                                controller: _message,
-                                enabled: !_busy,
-                                minLines: 1,
-                                maxLines: 4,
-                                maxLength: 5000,
-                                decoration: InputDecoration(
-                                    counterText: '',
-                                    filled: true,
-                                    fillColor: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    hintText: tr('write_activation_message'),
-                                    prefixIcon: IconButton(
-                                        onPressed: _busy ? null : _pickFiles,
-                                        icon: const Icon(
-                                            Icons.add_circle_outline_rounded)),
-                                    suffixIcon: IconButton.filled(
-                                        tooltip: tr('send'),
-                                        onPressed: _busy ? null : _send,
-                                        icon: _busy
-                                            ? const SizedBox(
-                                                width: 18,
-                                                height: 18,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                        color: Colors.white))
-                                            : const Icon(Icons.send_rounded)),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                        borderSide: BorderSide.none)),
-                                validator: (v) => v == null || v.trim().isEmpty
-                                    ? tr('required')
-                                    : null),
+                            if (_ticket == null)
+                              SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: FilledButton.icon(
+                                  onPressed: _busy ? null : _send,
+                                  icon: _busy
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white))
+                                      : const Icon(Icons.support_agent_rounded),
+                                  label: Text(tr('send_to_password_support')),
+                                ),
+                              )
+                            else
+                              TextFormField(
+                                  controller: _message,
+                                  enabled: !_busy,
+                                  minLines: 1,
+                                  maxLines: 4,
+                                  maxLength: 5000,
+                                  decoration: InputDecoration(
+                                      counterText: '',
+                                      filled: true,
+                                      fillColor: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      hintText: tr('write_activation_message'),
+                                      prefixIcon: IconButton(
+                                          onPressed: _busy ? null : _pickFiles,
+                                          icon: const Icon(Icons
+                                              .add_circle_outline_rounded)),
+                                      suffixIcon: IconButton.filled(
+                                          tooltip: tr('send'),
+                                          onPressed: _busy ? null : _send,
+                                          icon: _busy
+                                              ? const SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Colors.white))
+                                              : const Icon(Icons.send_rounded)),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          borderSide: BorderSide.none)),
+                                  validator: (v) =>
+                                      v == null || v.trim().isEmpty
+                                          ? tr('required')
+                                          : null),
                           ])),
                     ]))),
       );
@@ -301,13 +324,18 @@ class _PasswordSupportScreenState extends State<PasswordSupportScreen> {
                   labelText: tr(label),
                   counterText: '',
                   border: const OutlineInputBorder()),
-              validator: (v) => v == null ||
-                      v.trim().isEmpty ||
-                      (label == 'email' &&
-                          !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-                              .hasMatch(v.trim()))
-                  ? tr('required')
-                  : null));
+              validator: (v) {
+                final value = v?.trim() ?? '';
+                if (value.isEmpty) return tr('required');
+                if (label == 'email' &&
+                    !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) {
+                  return tr('invalid_email');
+                }
+                if (label == 'phone' && !EgyptPhoneHelper.isValidLocal(value)) {
+                  return tr('enter_valid_egyptian_mobile');
+                }
+                return null;
+              }));
   Widget _bubble(String body, bool mine) => Align(
       alignment: mine
           ? AlignmentDirectional.centerEnd
