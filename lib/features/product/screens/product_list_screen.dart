@@ -17,7 +17,12 @@ import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class ProductListMenuScreen extends StatefulWidget {
   final bool fromNotification;
-  const ProductListMenuScreen({super.key, this.fromNotification = false});
+  final bool fromDashboard;
+  const ProductListMenuScreen({
+    super.key,
+    this.fromNotification = false,
+    this.fromDashboard = false,
+  });
   @override
   State<ProductListMenuScreen> createState() => _ProductListMenuScreenState();
 }
@@ -61,7 +66,9 @@ class _ProductListMenuScreenState extends State<ProductListMenuScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
-        if (widget.fromNotification) {
+        if (widget.fromDashboard) {
+          return;
+        } else if (widget.fromNotification) {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: (BuildContext context) => const DashboardScreen(),
@@ -76,8 +83,11 @@ class _ProductListMenuScreenState extends State<ProductListMenuScreen> {
       child: Scaffold(
         appBar: CustomAppBarWidget(
           title: getTranslated('product_list', context),
+          isBackButtonExist: !widget.fromDashboard,
           onBackPressed: () {
-            if (widget.fromNotification) {
+            if (widget.fromDashboard) {
+              return;
+            } else if (widget.fromNotification) {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (BuildContext context) =>

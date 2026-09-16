@@ -64,20 +64,29 @@ class _OrderScreenState extends State<OrderScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-                child: Row(children: [
-                  Expanded(
-                      child: OrderTypeButton(
-                          text: getTranslated(
-                              'seller_journey_active_orders', context),
-                          index: 10)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: OrderTypeButton(
-                          text: getTranslated(
-                                  'insurance_pending_orders', context) ??
-                              'Insurance pending',
-                          index: 9)),
-                ]),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: [
+                    OrderTypeButton(
+                        text: getTranslated('all', context), index: 0),
+                    const SizedBox(width: 8),
+                    OrderTypeButton(
+                        text: getTranslated(
+                            'seller_journey_active_orders', context),
+                        index: 10),
+                    const SizedBox(width: 8),
+                    OrderTypeButton(
+                        text: getTranslated(
+                                'insurance_pending_orders', context) ??
+                            'Insurance pending',
+                        index: 9),
+                    const SizedBox(width: 8),
+                    OrderTypeButton(
+                        text: getTranslated('disputed_orders', context) ??
+                            'Disputes',
+                        index: 11),
+                  ]),
+                ),
               ),
               order.orderModel != null
                   ? orderList!.isNotEmpty

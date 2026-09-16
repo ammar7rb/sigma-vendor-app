@@ -11,85 +11,155 @@ import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.da
 
 import 'package:sixvalley_vendor_app/features/bank_info/widgets/bank_info_widget.dart';
 
-class BankInfoScreen extends StatelessWidget {
+class BankInfoScreen extends StatefulWidget {
   const BankInfoScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Provider.of<BankInfoController>(context, listen: false).setWarningValue(true,isUpdate: false);
-    return Scaffold(
-      appBar: CustomAppBarWidget(title:getTranslated('bank_info', context), isBackButtonExist: true,),
-        body: Consumer<BankInfoController>(
-          builder: (context, bankProvider, child) {
-            String name = bankProvider.bankInfo!.holderName?? '';
-            String bank = bankProvider.bankInfo!.bankName?? '';
-            String branch = bankProvider.bankInfo!.branch?? '';
-            String accountNo = bankProvider.bankInfo!.accountNo?? '';
-            return Column(children: [
+  State<BankInfoScreen> createState() => _BankInfoScreenState();
+}
 
-              bankProvider.showWarning?
-                Padding(
-                  padding:  const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeMedium),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                      color: Theme.of(context).primaryColor.withValues(alpha:0.05),
-                      border: Border.all(width: 0.5, color: Theme.of(context).primaryColor.withValues(alpha:0.20))
-                    ),
-                    child: Row( crossAxisAlignment:CrossAxisAlignment.center, children: [
-                      SizedBox(width: 20, height: 20, child: Image.asset(Images.bulb)),
-                      const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                      Expanded(
-                        child: Text(getTranslated('you_should_fill_up', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall,
-                          color: Provider.of<ThemeController>(context, listen: false).darkTheme?
-                          Theme.of(context).hintColor: Theme.of(context).primaryColor),
-                          maxLines: 2, overflow: TextOverflow.ellipsis,
+class _BankInfoScreenState extends State<BankInfoScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final controller = context.read<BankInfoController>();
+      controller.setWarningValue(true, isUpdate: false);
+      controller.getBankInfo(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: CustomAppBarWidget(
+          title: getTranslated('bank_info', context),
+          isBackButtonExist: true,
+        ),
+        body: Consumer<BankInfoController>(
+            builder: (context, bankProvider, child) {
+          if (bankProvider.isLoading && bankProvider.bankInfo == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final bankInfo = bankProvider.bankInfo;
+          String name = bankInfo?.holderName ?? '';
+          String bank = bankInfo?.bankName ?? '';
+          String branch = bankInfo?.branch ?? '';
+          String accountNo = bankInfo?.accountNo ?? '';
+          return Column(
+            children: [
+              bankProvider.showWarning
+                  ? Padding(
+                      padding:
+                          const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: Dimensions.paddingSizeDefault,
+                            vertical: Dimensions.paddingSizeMedium),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                Dimensions.paddingSizeSmall),
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.05),
+                            border: Border.all(
+                                width: 0.5,
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.20))),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: Image.asset(Images.bulb)),
+                            const SizedBox(
+                                width: Dimensions.paddingSizeExtraSmall),
+                            Expanded(
+                              child: Text(
+                                getTranslated('you_should_fill_up', context)!,
+                                style: robotoRegular.copyWith(
+                                    fontSize: Dimensions.fontSizeExtraSmall,
+                                    color: Provider.of<ThemeController>(context,
+                                                listen: false)
+                                            .darkTheme
+                                        ? Theme.of(context).hintColor
+                                        : Theme.of(context).primaryColor),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(
+                                width: Dimensions.paddingSizeExtraSmall),
+                            InkWell(
+                                onTap: () {
+                                  bankProvider.setWarningValue(false,
+                                      isUpdate: true);
+                                },
+                                child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: Image.asset(Images.crossIcon))),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                      InkWell(
-                        onTap: () {
-                          bankProvider.setWarningValue(false, isUpdate: true);
-                        },
-                        child: SizedBox(width: 20, height: 20, child: Image.asset(Images.crossIcon))),
+                    )
+                  : const SizedBox(),
+              !bankProvider.showWarning
+                  ? const SizedBox(height: Dimensions.paddingSizeSmall)
+                  : const SizedBox(),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => BankEditingScreen(
+                            sellerModel: bankProvider.bankInfo))),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: Dimensions.paddingSizeDefault),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(Dimensions.paddingSizeSmall),
+                      border: Border.all(
+                          width: 0.5,
+                          color: Theme.of(context)
+                              .primaryColor
+                              .withValues(alpha: 0.20)),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: Dimensions.paddingSizeDefault,
+                        vertical: Dimensions.paddingSizeSmall),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(getTranslated('edit_info', context)!,
+                            style: robotoRegular.copyWith(
+                                fontSize: Dimensions.fontSizeLarge,
+                                color: Provider.of<ThemeController>(context,
+                                            listen: false)
+                                        .darkTheme
+                                    ? Theme.of(context).hintColor
+                                    : Theme.of(context).primaryColor)),
+                        SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: Image.asset(Images.editIcon))
                       ],
                     ),
                   ),
-                ) : const SizedBox(),
-
-
-              !bankProvider.showWarning ?
-                  const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
-
-                GestureDetector(
-                  onTap: ()=>Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => BankEditingScreen(sellerModel: bankProvider.bankInfo))),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                        border: Border.all(width: 0.5, color: Theme.of(context).primaryColor.withValues(alpha:0.20)),
-                      ),
-                      padding:  const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        Text(getTranslated('edit_info', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge,
-                            color: Provider.of<ThemeController>(context, listen: false).darkTheme?
-                            Theme.of(context).hintColor: Theme.of(context).primaryColor)),
-                        
-                        SizedBox(height: 16, width: 16, child: Image.asset(Images.editIcon))
-                      ],),
-                    ),
-                  ),
                 ),
-
-                BankInfoWidget(name: name,bank: bank,branch: branch,accountNo: accountNo,),
-              ],
-            );
-          }
-        ));
+              ),
+              BankInfoWidget(
+                name: name,
+                bank: bank,
+                branch: branch,
+                accountNo: accountNo,
+              ),
+            ],
+          );
+        }));
   }
 }
-
-

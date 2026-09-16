@@ -15,7 +15,6 @@ import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.da
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
 
 class BankEditingScreen extends StatefulWidget {
-
   final ProfileInfoModel? sellerModel;
   const BankEditingScreen({super.key, required this.sellerModel});
   @override
@@ -23,11 +22,10 @@ class BankEditingScreen extends StatefulWidget {
 }
 
 class BankEditingScreenState extends State<BankEditingScreen> {
-
-  TextEditingController? _bankNameController ;
-  TextEditingController? _branchController ;
-  TextEditingController? _holderNameController ;
-  TextEditingController? _accountController ;
+  TextEditingController? _bankNameController;
+  TextEditingController? _branchController;
+  TextEditingController? _holderNameController;
+  TextEditingController? _accountController;
   final FocusNode _bankNameNode = FocusNode();
   final FocusNode _branchNode = FocusNode();
   final FocusNode _holderNameNode = FocusNode();
@@ -36,51 +34,68 @@ class BankEditingScreenState extends State<BankEditingScreen> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
   Future<void> _updateUserAccount() async {
     String bankName = _bankNameController!.text.trim();
     String branchName = _branchController!.text.trim();
     String holderName = _holderNameController!.text.trim();
     String account = _accountController!.text.trim();
 
-    if(Provider.of<BankInfoController>(context, listen: false).bankInfo!.bankName == _bankNameController!.text
-        && Provider.of<BankInfoController>(context, listen: false).bankInfo!.branch == _branchController!.text
-        && Provider.of<BankInfoController>(context, listen: false).bankInfo!.holderName == _holderNameController!.text
-        && Provider.of<BankInfoController>(context, listen: false).bankInfo!.accountNo == _accountController!.text
-    ) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getTranslated('change_something', context)!),
-          backgroundColor:  Theme.of(context).colorScheme.error));
-    }else if (bankName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getTranslated('enter_bank_name', context)!),
+    final bankInfo =
+        Provider.of<BankInfoController>(context, listen: false).bankInfo;
+    if (bankInfo != null &&
+        bankInfo.bankName == _bankNameController!.text &&
+        bankInfo.branch == _branchController!.text &&
+        bankInfo.holderName == _holderNameController!.text &&
+        bankInfo.accountNo == _accountController!.text) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(getTranslated('change_something', context)!),
           backgroundColor: Theme.of(context).colorScheme.error));
-    }else if (branchName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getTranslated('enter_branch_name', context)!),
+    } else if (bankName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(getTranslated('enter_bank_name', context)!),
           backgroundColor: Theme.of(context).colorScheme.error));
-    }else if (holderName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getTranslated('enter_holder_name', context)!),
+    } else if (branchName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(getTranslated('enter_branch_name', context)!),
           backgroundColor: Theme.of(context).colorScheme.error));
-    }else if (account.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getTranslated('enter_account_no', context)!),
+    } else if (holderName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(getTranslated('enter_holder_name', context)!),
           backgroundColor: Theme.of(context).colorScheme.error));
-    }else {
-      ProfileInfoModel updateUserInfoModel = Provider.of<BankInfoController>(context, listen: false).bankInfo!;
+    } else if (account.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(getTranslated('enter_account_no', context)!),
+          backgroundColor: Theme.of(context).colorScheme.error));
+    } else {
+      ProfileInfoModel updateUserInfoModel = bankInfo ?? ProfileInfoModel();
       updateUserInfoModel.bankName = _bankNameController?.text ?? "";
       updateUserInfoModel.branch = _branchController?.text ?? "";
       updateUserInfoModel.holderName = _holderNameController?.text ?? '';
       updateUserInfoModel.accountNo = _accountController?.text ?? '';
-      ProfileInfoModel userInfo = Provider.of<ProfileController>(context, listen: false).userInfoModel!;
+      ProfileInfoModel userInfo =
+          Provider.of<ProfileController>(context, listen: false).userInfoModel!;
       ProfileBody sellerBody = ProfileBody(
-        sMethod: '_put', fName: userInfo.fName, lName: userInfo.lName, image: userInfo.image,
-        bankName: _bankNameController?.text ?? "", branch: _branchController?.text ?? "", accountNo: _accountController?.text ?? '',
+        sMethod: '_put',
+        fName: userInfo.fName,
+        lName: userInfo.lName,
+        image: userInfo.image,
+        bankName: _bankNameController?.text ?? "",
+        branch: _branchController?.text ?? "",
+        accountNo: _accountController?.text ?? '',
         holderName: _holderNameController?.text ?? '',
       );
 
-      await Provider.of<BankInfoController>(context, listen: false).updateBankInfo(context,
-        updateUserInfoModel, sellerBody, Provider.of<AuthController>(context, listen: false).getUserToken(),
-      ).then((response) {
-        if(response!.isSuccess) {
+      await Provider.of<BankInfoController>(context, listen: false)
+          .updateBankInfo(
+        context,
+        updateUserInfoModel,
+        sellerBody,
+        Provider.of<AuthController>(context, listen: false).getUserToken(),
+      )
+          .then((response) {
+        if (response!.isSuccess) {
           Navigator.pop(Get.context!);
-        }else {
+        } else {
           showCustomSnackBarWidget(response.message, Get.context!);
         }
       });
@@ -95,11 +110,10 @@ class BankEditingScreenState extends State<BankEditingScreen> {
     _branchController = TextEditingController();
     _holderNameController = TextEditingController();
     _accountController = TextEditingController();
-    _bankNameController!.text = widget.sellerModel!.bankName ?? '';
-    _branchController!.text = widget.sellerModel!.branch ?? '';
-    _holderNameController!.text = widget.sellerModel!.holderName ?? '';
-    _accountController!.text = widget.sellerModel!.accountNo ?? '';
-
+    _bankNameController!.text = widget.sellerModel?.bankName ?? '';
+    _branchController!.text = widget.sellerModel?.branch ?? '';
+    _holderNameController!.text = widget.sellerModel?.holderName ?? '';
+    _accountController!.text = widget.sellerModel?.accountNo ?? '';
   }
 
   @override
@@ -115,17 +129,21 @@ class BankEditingScreenState extends State<BankEditingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: CustomAppBarWidget(title: getTranslated('bank_info', context),),
+      appBar: CustomAppBarWidget(
+        title: getTranslated('bank_info', context),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
         child: Consumer<AuthController>(
           builder: (context, authProvider, child) => Form(
             key: _formKeyLogin,
-            child: ListView(physics: const BouncingScrollPhysics(), children: [
-
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              children: [
                 Text(getTranslated('holder_name', context)!,
-                    style: titilliumRegular.copyWith(fontSize: Dimensions.fontSizeDefault,
-                      color: Theme.of(context).hintColor)),
+                    style: titilliumRegular.copyWith(
+                        fontSize: Dimensions.fontSizeDefault,
+                        color: Theme.of(context).hintColor)),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
 
                 CustomTextFieldWidget(
@@ -140,8 +158,9 @@ class BankEditingScreenState extends State<BankEditingScreen> {
                 const SizedBox(height: Dimensions.paddingSizeDefault),
 
                 Text(getTranslated('bank_name', context)!,
-                    style: titilliumRegular.copyWith(fontSize: Dimensions.fontSizeDefault,
-                      color: Theme.of(context).hintColor)),
+                    style: titilliumRegular.copyWith(
+                        fontSize: Dimensions.fontSizeDefault,
+                        color: Theme.of(context).hintColor)),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
 
                 CustomTextFieldWidget(
@@ -156,7 +175,10 @@ class BankEditingScreenState extends State<BankEditingScreen> {
                 const SizedBox(height: Dimensions.paddingSizeLarge),
 
                 Text(getTranslated('branch_name', context)!,
-                    style: titilliumRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).hintColor,)),
+                    style: titilliumRegular.copyWith(
+                      fontSize: Dimensions.fontSizeDefault,
+                      color: Theme.of(context).hintColor,
+                    )),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
 
                 CustomTextFieldWidget(
@@ -170,13 +192,15 @@ class BankEditingScreenState extends State<BankEditingScreen> {
                 const SizedBox(height: Dimensions.paddingSizeDefault),
 
                 Text(getTranslated('account_no', context)!,
-                    style: titilliumRegular.copyWith(fontSize: Dimensions.fontSizeDefault,
-                      color: Theme.of(context).hintColor,)),
+                    style: titilliumRegular.copyWith(
+                      fontSize: Dimensions.fontSizeDefault,
+                      color: Theme.of(context).hintColor,
+                    )),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
 
                 CustomTextFieldWidget(
                   border: true,
-                  hintText:  getTranslated('account_no_hint', context),
+                  hintText: getTranslated('account_no_hint', context),
                   controller: _accountController,
                   focusNode: _accountNode,
                   textInputAction: TextInputAction.done,
@@ -186,11 +210,16 @@ class BankEditingScreenState extends State<BankEditingScreen> {
                 const SizedBox(height: Dimensions.paddingSizeButton),
 
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                  child: !Provider.of<BankInfoController>(context).isLoading ?
-                  CustomButtonWidget(onTap: _updateUserAccount,
-                      btnTxt: getTranslated('save', context)) :
-                  Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor))),
+                  margin: const EdgeInsets.symmetric(
+                      vertical: Dimensions.paddingSizeSmall),
+                  child: !Provider.of<BankInfoController>(context).isLoading
+                      ? CustomButtonWidget(
+                          onTap: _updateUserAccount,
+                          btnTxt: getTranslated('save', context))
+                      : Center(
+                          child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).primaryColor))),
                 ),
               ],
             ),

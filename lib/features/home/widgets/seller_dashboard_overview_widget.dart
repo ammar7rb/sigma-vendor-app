@@ -8,6 +8,7 @@ import 'package:sixvalley_vendor_app/features/wallet/screens/seller_balance_fund
 import 'package:sixvalley_vendor_app/features/wallet/screens/wallet_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
 import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
+import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
@@ -86,69 +87,88 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
-              childAspectRatio: columns == 4 ? 1.25 : 1.18,
+              mainAxisExtent: columns == 4 ? 164 : 178,
               children: [
-            _Metric(
-                icon: Icons.check_circle_outline,
-                label: getTranslated('active_products', context) ??
-                    'Active products',
-                value: (products['active'] ?? 0).toString()),
-            _Metric(
-                icon: Icons.pending_actions_outlined,
-                label: getTranslated('seller_pending_products', context) ??
-                    'Pending products',
-                value: '${products['under_review'] ?? 0}'),
-            _Metric(
-                icon: Icons.receipt_long_outlined,
-                label: getTranslated('review_orders', context) ?? 'Orders',
-                value: '${sales['orders_count'] ?? 0}'),
-            _Metric(
-                icon: Icons.account_balance_wallet_outlined,
-                label: getTranslated('seller_wallet_total', context) ??
-                    'Total wallet balance',
-                value: PriceConverter.convertPrice(context, walletTotal),
-                onTap: () => openFinance('balance')),
-            _Metric(
-                icon: Icons.shopping_bag_outlined,
-                label:
-                    getTranslated('seller_purchase_balance_total', context) ??
+                _Metric(
+                    icon: Icons.check_circle_outline,
+                    label: getTranslated('active_products', context) ??
+                        'Active products',
+                    value: (products['active'] ?? 0).toString(),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ProductListMenuScreen()))),
+                _Metric(
+                    icon: Icons.pending_actions_outlined,
+                    label: getTranslated('seller_pending_products', context) ??
+                        'Pending products',
+                    value: '${products['under_review'] ?? 0}',
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ProductListMenuScreen()))),
+                _Metric(
+                    icon: Icons.receipt_long_outlined,
+                    label: getTranslated('review_orders', context) ?? 'Orders',
+                    value: '${sales['orders_count'] ?? 0}',
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                const OrderScreen(fromHome: true)))),
+                _Metric(
+                    icon: Icons.account_balance_wallet_outlined,
+                    label: getTranslated('seller_wallet_total', context) ??
+                        'Total wallet balance',
+                    value: PriceConverter.convertPrice(context, walletTotal),
+                    onTap: () => openFinance('balance')),
+                _Metric(
+                    icon: Icons.shopping_bag_outlined,
+                    label: getTranslated(
+                            'seller_purchase_balance_total', context) ??
                         'Total purchase balance',
-                value: PriceConverter.convertPrice(context, purchaseBalance),
-                onTap: () => openFinance('balance')),
-            _Metric(
-                icon: Icons.payments_outlined,
-                label: getTranslated('total_sales', context) ?? 'Total sales',
-                value: PriceConverter.convertPrice(
-                    context, double.tryParse('${sales['total_amount']}') ?? 0),
-                onTap: () => openFinance('orders')),
-            _Metric(
-                icon: Icons.account_balance_outlined,
-                label: getTranslated('seller_withdrawable_balance', context) ??
-                    'Available to withdraw',
-                value: PriceConverter.convertPrice(context, withdrawable),
-                onTap: () => openFinance('balance')),
-            _Metric(
-                icon: Icons.hourglass_top_rounded,
-                label: getTranslated('seller_due_balance_total', context) ??
-                    'Total due balance',
-                value: PriceConverter.convertPrice(
-                    context,
-                    double.tryParse('${balances['pending_from_platform']}') ??
-                        0),
-                onTap: () => openFinance('orders')),
-            _Metric(
-                icon: Icons.shield_outlined,
-                label:
-                    getTranslated('seller_insurance_balance_total', context) ??
+                    value:
+                        PriceConverter.convertPrice(context, purchaseBalance),
+                    onTap: () => openFinance('balance')),
+                _Metric(
+                    icon: Icons.payments_outlined,
+                    label:
+                        getTranslated('total_sales', context) ?? 'Total sales',
+                    value: PriceConverter.convertPrice(context,
+                        double.tryParse('${sales['total_amount']}') ?? 0),
+                    onTap: () => openFinance('orders')),
+                _Metric(
+                    icon: Icons.account_balance_outlined,
+                    label:
+                        getTranslated('seller_withdrawable_balance', context) ??
+                            'Available to withdraw',
+                    value: PriceConverter.convertPrice(context, withdrawable),
+                    onTap: () => openFinance('balance')),
+                _Metric(
+                    icon: Icons.hourglass_top_rounded,
+                    label: getTranslated('seller_due_balance_total', context) ??
+                        'Total due balance',
+                    value: PriceConverter.convertPrice(
+                        context,
+                        double.tryParse(
+                                '${balances['pending_from_platform']}') ??
+                            0),
+                    onTap: () => openFinance('orders')),
+                _Metric(
+                    icon: Icons.shield_outlined,
+                    label: getTranslated(
+                            'seller_insurance_balance_total', context) ??
                         'Total insurance balance',
-                value: PriceConverter.convertPrice(context, insuranceTotal),
-                onTap: () => openFinance('insurance')),
-            _Metric(
-                icon: Icons.local_shipping_outlined,
-                label: getTranslated('seller_shipping_due_total', context) ??
-                    'Total shipping due',
-                value: PriceConverter.convertPrice(context, shippingDueTotal),
-                onTap: () => openFinance('shipping')),
+                    value: PriceConverter.convertPrice(context, insuranceTotal),
+                    onTap: () => openFinance('insurance')),
+                _Metric(
+                    icon: Icons.local_shipping_outlined,
+                    label:
+                        getTranslated('seller_shipping_due_total', context) ??
+                            'Total shipping due',
+                    value:
+                        PriceConverter.convertPrice(context, shippingDueTotal),
+                    onTap: () => openFinance('shipping')),
               ],
             );
           }),
@@ -172,64 +192,66 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
             final itemWidth = constraints.maxWidth >= 620
                 ? (constraints.maxWidth - 16) / 3
                 : (constraints.maxWidth - 8) / 2;
-            Widget item(Widget child) => SizedBox(width: itemWidth, height: 52, child: child);
+            Widget item(Widget child) =>
+                SizedBox(width: itemWidth, height: 52, child: child);
             return Wrap(spacing: 8, runSpacing: 8, children: [
-            item(OutlinedButton.icon(
-                onPressed: () async {
-                  await Navigator.push(
+              item(OutlinedButton.icon(
+                  onPressed: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const SellerBalanceFundingScreen(
+                                walletTarget: 'operating')));
+                    await wallet.getSellerDashboardOverview();
+                  },
+                  icon: const Icon(Icons.add_card),
+                  label: Text(getTranslated('fund_purchase_balance', context) ??
+                      'Fund purchase balance'))),
+              item(OutlinedButton.icon(
+                  onPressed: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const SellerBalanceFundingScreen(
+                                walletTarget: 'insurance')));
+                    await wallet.getSellerDashboardOverview();
+                  },
+                  icon: const Icon(Icons.shield_outlined),
+                  label: Text(
+                      getTranslated('fund_insurance_balance', context) ??
+                          'Fund insurance balance'))),
+              item(OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const SellerBalanceFundingScreen(
-                              walletTarget: 'operating')));
-                  await wallet.getSellerDashboardOverview();
-                },
-                icon: const Icon(Icons.add_card),
-                label: Text(getTranslated('fund_purchase_balance', context) ??
-                    'Fund purchase balance'))),
-            item(OutlinedButton.icon(
-                onPressed: () async {
-                  await Navigator.push(
+                          builder: (_) => const SellerPackageScreen())),
+                  icon: const Icon(Icons.campaign),
+                  label: Text(getTranslated('advertising_packages', context) ??
+                      'Advertising packages'))),
+              item(OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const SellerBalanceFundingScreen(
-                              walletTarget: 'insurance')));
-                  await wallet.getSellerDashboardOverview();
-                },
-                icon: const Icon(Icons.shield_outlined),
-                label: Text(getTranslated('fund_insurance_balance', context) ??
-                    'Fund insurance balance'))),
-            item(OutlinedButton.icon(
-                onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const SellerPackageScreen())),
-                icon: const Icon(Icons.campaign),
-                label: Text(getTranslated('advertising_packages', context) ??
-                    'Advertising packages'))),
-            item(OutlinedButton.icon(
-                onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const OrderScreen(fromHome: true))),
-                icon: const Icon(Icons.receipt_long_outlined),
-                label:
-                    Text(getTranslated('review_orders', context) ?? 'Orders'))),
-            item(OutlinedButton.icon(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const WalletScreen())),
-                icon: const Icon(Icons.shield_outlined),
-                label: Text(getTranslated('finance_my_wallet', context) ??
-                    'Insurance & shipping'))),
-            item(FilledButton.icon(
-                onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            const AddProductTabView(fromHome: true))),
-                icon: const Icon(Icons.add_box_outlined),
-                label: Text(
-                    getTranslated('add_product', context) ?? 'Add product'))),
-          ]);
+                          builder: (_) => const OrderScreen(fromHome: true))),
+                  icon: const Icon(Icons.receipt_long_outlined),
+                  label: Text(
+                      getTranslated('review_orders', context) ?? 'Orders'))),
+              item(OutlinedButton.icon(
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const WalletScreen())),
+                  icon: const Icon(Icons.shield_outlined),
+                  label: Text(getTranslated('finance_my_wallet', context) ??
+                      'Insurance & shipping'))),
+              item(FilledButton.icon(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              const AddProductTabView(fromHome: true))),
+                  icon: const Icon(Icons.add_box_outlined),
+                  label: Text(
+                      getTranslated('add_product', context) ?? 'Add product'))),
+            ]);
           }),
         ]),
       );

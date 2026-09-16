@@ -66,11 +66,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
       auth.registration(Get.context!, model).then((response) async {
         if (response.response?.statusCode == 200 && mounted) {
-          final data = response.response!.data is String
-              ? jsonDecode(response.response!.data) as Map<String, dynamic>
-              : Map<String, dynamic>.from(response.response!.data);
-          final reference = data['registration_reference'] as String?;
-          if (reference == null) return;
+          dynamic raw = response.response!.data;
+          if (raw is String) raw = jsonDecode(raw);
+          final data = Map<String, dynamic>.from(raw as Map);
+          final reference = '${data['registration_reference'] ?? ''}'.trim();
+          if (reference.isEmpty) {
+            _warning('registration_failed_try_again',
+                'تم إنشاء الحساب لكن تعذر بدء التحقق. حاول تسجيل الدخول.');
+            return;
+          }
           await auth.saveRegistrationReference(reference);
           if (data['token'] is String) await auth.saveUserToken(data['token']);
           if (!mounted) return;
@@ -88,6 +92,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 ?['verification']?['support_ticket_required'] ==
                             true,
                       )));
+        }
+      }).catchError((_) {
+        if (mounted) {
+          _warning('registration_failed_try_again',
+              'تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى.');
         }
       });
     }

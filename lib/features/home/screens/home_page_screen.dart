@@ -18,8 +18,6 @@ import 'package:sixvalley_vendor_app/features/notification/screens/notification_
 import 'package:sixvalley_vendor_app/features/auth/widgets/seller_activation_banner_widget.dart';
 import 'package:sixvalley_vendor_app/features/home/widgets/seller_dashboard_overview_widget.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
-import 'package:sixvalley_vendor_app/features/product/screens/most_popular_product_screen.dart';
-import 'package:sixvalley_vendor_app/features/product/screens/top_selling_product_screen.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 import 'package:sixvalley_vendor_app/localization/controllers/localization_controller.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
@@ -50,8 +48,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     Provider.of<ProductController>(context, listen: false)
         .getStockOutProductList(1, 'en', reload: reload);
 
-    Provider.of<ProductController>(context, listen: false)
-        .getTopSellingProductList(1, context, 'en', reload: reload);
     // Financial, delivery, review, and seller-shipping data are admin-managed.
     // Do not request them from the vendor home screen after their UI was removed.
     Provider.of<NotificationController>(context, listen: false)
@@ -61,8 +57,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     Provider.of<ProductController>(context, listen: false)
         .setShowCookie(true, notify: false);
 
-    Provider.of<ProductController>(context, listen: false)
-        .getMostPopularProductList(1, context, 'en', reload: reload);
     Provider.of<WalletController>(context, listen: false)
         .getSellerDashboardOverview();
   }
@@ -300,10 +294,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       }),
                       const SizedBox(height: Dimensions.paddingSizeSmall),
 
-                      const TopSellingProductScreen(isMain: true),
-                      // const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                      const MostPopularProductScreen(isMain: true),
                       // Earnings charts and delivery rankings are shown to admin only.
                       const SizedBox(height: Dimensions.paddingSizeSmall),
                     ],

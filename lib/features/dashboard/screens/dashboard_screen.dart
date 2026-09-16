@@ -22,8 +22,8 @@ import 'package:sixvalley_vendor_app/features/home/screens/home_page_screen.dart
 import 'package:sixvalley_vendor_app/features/menu/widgets/vendor_menu_widget.dart';
 import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/seller_profile_screen.dart';
+import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
-import 'package:sixvalley_vendor_app/features/pos/screens/pos_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -87,6 +87,7 @@ class DashboardScreenState extends State<DashboardScreen> {
         });
       }),
       const OrderScreen(),
+      const ProductListMenuScreen(fromDashboard: true),
       const SellerProfileScreen(showBackButton: false),
     ];
 
@@ -107,18 +108,6 @@ class DashboardScreenState extends State<DashboardScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const PosScreen(fromMenu: true))),
-          backgroundColor: Theme.of(context).primaryColor,
-          foregroundColor: Colors.white,
-          icon: const Icon(Icons.add_rounded),
-          label: Text(getTranslated('add_order', context) ?? 'Add order',
-              style: const TextStyle(fontWeight: FontWeight.w800)),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         bottomNavigationBar: Container(
           height: 78,
           padding: const EdgeInsets.fromLTRB(6, 7, 6, 5),
@@ -129,10 +118,11 @@ class DashboardScreenState extends State<DashboardScreen> {
             boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
           ),
           child: Row(
-              children: List.generate(4, (index) {
+              children: List.generate(5, (index) {
             final data = [
               (Icons.home_outlined, getTranslated('home', context)),
               (Icons.receipt_long_outlined, getTranslated('my_order', context)),
+              (Icons.inventory_2_outlined, getTranslated('products', context)),
               (Icons.person_outline_rounded, getTranslated('profile', context)),
               (Icons.grid_view_rounded, getTranslated('menu', context)),
             ][index];
@@ -142,7 +132,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               label: data.$2 ?? '',
               selected: _pageIndex == index,
               onTap: () {
-                if (index != 3) {
+                if (index != 4) {
                   setPage(index);
                 } else {
                   showModalBottomSheet(

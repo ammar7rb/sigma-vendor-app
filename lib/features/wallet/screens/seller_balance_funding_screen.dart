@@ -131,28 +131,36 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                             .titleMedium
                             ?.copyWith(fontWeight: FontWeight.w800)),
                     const SizedBox(height: 10),
-                    Row(children: [
-                      Expanded(
-                          child: _PaymentChoiceCard(
-                              icon: Icons.account_balance_wallet_outlined,
-                              title: tr('electronic_wallet_payment'),
-                              subtitle: tr('electronic_wallet_payment_hint'),
-                              selected: channel == 'wallet',
-                              onTap: disabled
-                                  ? null
-                                  : () => setState(() => channel = 'wallet'))),
-                      const SizedBox(width: 10),
-                      Expanded(
-                          child: _PaymentChoiceCard(
-                              icon: Icons.account_balance_rounded,
-                              title: tr('instapay_payment'),
-                              subtitle: tr('instapay_payment_hint'),
-                              selected: channel == 'instapay',
-                              onTap: disabled
-                                  ? null
-                                  : () =>
-                                      setState(() => channel = 'instapay'))),
-                    ]),
+                    LayoutBuilder(builder: (context, constraints) {
+                      final walletChoice = _PaymentChoiceCard(
+                          icon: Icons.account_balance_wallet_outlined,
+                          title: tr('electronic_wallet_payment'),
+                          subtitle: tr('electronic_wallet_payment_hint'),
+                          selected: channel == 'wallet',
+                          onTap: disabled
+                              ? null
+                              : () => setState(() => channel = 'wallet'));
+                      final instaPayChoice = _PaymentChoiceCard(
+                          icon: Icons.account_balance_rounded,
+                          title: tr('instapay_payment'),
+                          subtitle: tr('instapay_payment_hint'),
+                          selected: channel == 'instapay',
+                          onTap: disabled
+                              ? null
+                              : () => setState(() => channel = 'instapay'));
+                      if (constraints.maxWidth < 420) {
+                        return Column(children: [
+                          walletChoice,
+                          const SizedBox(height: 10),
+                          instaPayChoice,
+                        ]);
+                      }
+                      return Row(children: [
+                        Expanded(child: walletChoice),
+                        const SizedBox(width: 10),
+                        Expanded(child: instaPayChoice),
+                      ]);
+                    }),
                     const SizedBox(height: 16),
                     if (!balance.offlinePaymentAvailable ||
                         balance.offlinePaymentMethods.isEmpty)
@@ -324,8 +332,9 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
 
   SellerOfflinePaymentMethod? _methodForChannel(
       SellerBalanceModel balance, String? selectedChannel) {
-    if (selectedChannel == null || balance.offlinePaymentMethods.isEmpty)
+    if (selectedChannel == null || balance.offlinePaymentMethods.isEmpty) {
       return null;
+    }
     final methods = balance.offlinePaymentMethods;
     bool matches(SellerOfflinePaymentMethod method, String needle) {
       final searchable =

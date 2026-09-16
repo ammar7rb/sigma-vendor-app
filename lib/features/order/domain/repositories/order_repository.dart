@@ -31,11 +31,16 @@ class OrderRepository implements OrderRepositoryInterface {
       } else if (status == 'all') {
         queryParameters.remove('order_status');
         queryParameters.remove('order_current_status');
+        queryParameters['status'] = 'all';
       } else if (status == 'active') {
         queryParameters.addAll({
           'order_current_status': jsonEncode(
               ['pending', 'confirmed', 'processing', 'out_for_delivery'])
         });
+      } else if (status == 'disputed') {
+        queryParameters.remove('order_status');
+        queryParameters.remove('order_current_status');
+        queryParameters['seller_disputed_only'] = 1;
       } else {
         queryParameters.addAll({
           'order_current_status': jsonEncode([status])

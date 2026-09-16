@@ -16,11 +16,15 @@ void main() {
     expect(menu, contains("'refund_requests'"));
   });
 
-  test('bottom navigation exposes profile and keeps refund in menu', () {
+  test(
+      'bottom navigation separates products and orders and keeps refund in menu',
+      () {
     final dashboard =
         File('lib/features/dashboard/screens/dashboard_screen.dart')
             .readAsStringSync();
-    expect(dashboard, contains('List.generate(4'));
+    expect(dashboard, contains('List.generate(5'));
+    expect(dashboard, contains('ProductListMenuScreen(fromDashboard: true)'));
+    expect(dashboard, contains('Icons.inventory_2_outlined'));
     expect(dashboard, contains('SellerProfileScreen(showBackButton: false)'));
     expect(dashboard, isNot(contains('RefundScreen')));
     expect(dashboard, isNot(contains('Icons.assignment_return_outlined')));
@@ -85,6 +89,37 @@ void main() {
     for (final path in ['assets/language/ar.json', 'assets/language/en.json']) {
       expect(jsonDecode(File(path).readAsStringSync()),
           isA<Map<String, dynamic>>());
+    }
+  });
+
+  test('all statically referenced translations exist in Arabic and English',
+      () {
+    final translations = {
+      for (final locale in ['ar', 'en'])
+        locale: jsonDecode(
+          File('assets/language/$locale.json').readAsStringSync(),
+        ) as Map<String, dynamic>,
+    };
+    final referencedKeys = <String>{};
+    final keyPattern = RegExp(r'''getTranslated\(\s*['"]([^'"]+)['"]''');
+
+    for (final entity in Directory('lib').listSync(recursive: true)) {
+      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+      final source = entity.readAsStringSync();
+      referencedKeys.addAll(keyPattern
+          .allMatches(source)
+          .map((match) => match.group(1)!)
+          // Interpolated runtime values are not localization keys.
+          .where((key) => RegExp(r'^[a-z][a-z0-9_]*$').hasMatch(key)));
+    }
+
+    for (final locale in translations.keys) {
+      final missing = referencedKeys
+          .where((key) => !translations[locale]!.containsKey(key))
+          .toList()
+        ..sort();
+      expect(missing, isEmpty,
+          reason: 'Missing $locale translations: ${missing.join(', ')}');
     }
   });
 }

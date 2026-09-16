@@ -223,7 +223,8 @@ class MyApp extends StatelessWidget {
                   .copyWith(textScaler: TextScaler.noScaling),
               child: Stack(children: [
                 SafeArea(top: false, child: child!),
-                if (Provider.of<AuthController>(context, listen: false)
+                if (_showSetupGuideOverlay() &&
+                    Provider.of<AuthController>(context, listen: false)
                         .isLoggedIn() &&
                     shopController.shopModel != null &&
                     (100 !=
@@ -386,6 +387,10 @@ class Get {
   static BuildContext? get context => navigatorKey.currentContext;
   static NavigatorState? get navigator => navigatorKey.currentState;
 }
+
+// The legacy global setup-guide badge is intentionally disabled. Seller setup
+// remains available from the menu without covering dashboard or form actions.
+bool _showSetupGuideOverlay() => false;
 
 class TutorialDialogController {
   static final TutorialDialogController _instance =

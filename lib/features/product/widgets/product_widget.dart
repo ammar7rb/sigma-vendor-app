@@ -308,6 +308,10 @@ class _SellerProductCard extends StatelessWidget {
     // manages whether the product itself is active or paused.
     final isActive = product.status == 1 || product.requestStatus != 1;
     final imageUrl = product.thumbnailFullUrl?.path ?? '';
+    final expiry = DateTime.tryParse(product.expiryDate ?? '');
+    final daysToExpiry = expiry?.difference(DateTime.now()).inDays;
+    final isNearExpiry =
+        daysToExpiry != null && daysToExpiry >= 0 && daysToExpiry <= 90;
 
     return InkWell(
       borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
@@ -404,6 +408,18 @@ class _SellerProductCard extends StatelessWidget {
                       : AppDesign.danger,
                   muted: true,
                 ),
+                _StatusChip(
+                  label:
+                      '${getTranslated('orders', context)}: ${product.sellerOrdersCount ?? 0}',
+                  color: AppDesign.primary,
+                  muted: true,
+                ),
+                if (isNearExpiry)
+                  _StatusChip(
+                    label:
+                        getTranslated('near_expiry', context) ?? 'Near expiry',
+                    color: AppDesign.warning,
+                  ),
               ]),
             ]),
           ),
