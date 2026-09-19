@@ -63,6 +63,12 @@ class ThemeChangerWidget extends StatelessWidget {
 
         const SizedBox(height: Dimensions.paddingSizeExtraSmall,),
 
+        SectionItemWidget(icon: Images.logOut, title: 'logout',
+            onTap: () => showModalBottomSheet(context: context,
+                builder: (_) => const SignOutConfirmationDialogWidget())),
+
+        const SizedBox(height: Dimensions.paddingSizeExtraSmall,),
+
         SectionItemWidget(icon: Images.delete, title: 'delete_account',
             onTap: () => showModalBottomSheet(context: context, builder: (_) => const SignOutConfirmationDialogWidget(isDelete: true))),
 

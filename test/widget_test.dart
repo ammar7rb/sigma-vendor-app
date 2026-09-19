@@ -27,6 +27,30 @@ void main() {
         contains(
             "final reference = '\${data['registration_reference'] ?? ''}'.trim()"));
     expect(screen, contains('.catchError((_)'));
+    final repository =
+        File('lib/features/auth/domain/repositories/auth_repository.dart')
+            .readAsStringSync();
+    expect(repository, isNot(contains('request.fields}')),
+        reason: 'Registration must never log password-bearing form fields');
+  });
+
+  test('vendor profile exposes logout before account deletion', () {
+    final profile =
+        File('lib/features/profile/widgets/theme_changer_widget.dart')
+            .readAsStringSync();
+    final logout = profile.indexOf("title: 'logout'");
+    final deletion = profile.indexOf("title: 'delete_account'");
+    expect(logout, greaterThanOrEqualTo(0));
+    expect(deletion, greaterThan(logout));
+    expect(profile, contains('SignOutConfirmationDialogWidget()'));
+  });
+
+  test('vendor splash includes the same animated loading cue as customer app',
+      () {
+    final splash = File('lib/features/splash/screens/splash_screen.dart')
+        .readAsStringSync();
+    expect(splash, contains('LinearProgressIndicator'));
+    expect(splash, contains('FadeTransition'));
   });
 
   test('vendor dashboard actions use seller flows without POS overlays', () {

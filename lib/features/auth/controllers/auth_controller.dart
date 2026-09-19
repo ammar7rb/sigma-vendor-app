@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -286,8 +285,6 @@ class AuthController with ChangeNotifier {
       XFile? image = await ImageValidationHelper.validateAndPickImage(
           source: ImageSource.gallery, context: Get.context!);
 
-      double value = 0;
-
       if (isProfile && image != null) {
         _sellerProfileImage = image;
       } else if (shopLogo && image != null) {
@@ -335,10 +332,9 @@ class AuthController with ChangeNotifier {
           isError: false,
           sanckBarType: SnackBarType.success);
     } else {
-      log("---->log===> ${response.response?.statusCode}/${response.error}/${response.response?.statusMessage}/${response.response?.data}");
       showCustomSnackBarWidget(
         _registrationErrorMessage(response),
-        context,
+        Get.context!,
         sanckBarType: SnackBarType.warning,
       );
     }
@@ -433,8 +429,9 @@ class AuthController with ChangeNotifier {
 
   Future<ApiResponse> loadActivationStatus() async {
     final reference = getRegistrationReference();
-    if (reference.isEmpty)
+    if (reference.isEmpty) {
       return ApiResponse.withError('registration_reference_missing');
+    }
     final response =
         await authServiceInterface.activationStatus(reference) as ApiResponse;
     if (response.response?.statusCode == 200 &&

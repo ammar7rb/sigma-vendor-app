@@ -207,6 +207,25 @@ class SplashScreenState extends State<SplashScreen>
               ),
             ),
           ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 32,
+            child: FadeTransition(
+              opacity: _fade,
+              child: const Center(
+                child: SizedBox(
+                  width: 34,
+                  child: LinearProgressIndicator(
+                    minHeight: 2,
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    backgroundColor: Color(0x30FFFFFF),
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ]),
       ),
     );
