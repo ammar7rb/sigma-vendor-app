@@ -1,0 +1,33 @@
+workflows:
+  android-apk:
+    name: Sigma Vendor Android APK
+    instance_type: linux_x2
+    max_build_duration: 90
+    environment:
+      flutter: stable
+      java: 17
+      ndk: 28.2.13676358
+      vars:
+        BASE_URL: "http://192.168.1.4/ba/public"
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/.gradle/caches
+        - $HOME/.gradle/wrapper
+    scripts:
+      - name: Verify Flutter environment
+        script: |
+          flutter --version
+          flutter doctor -v
+      - name: Install dependencies
+        script: flutter pub get
+      - name: Run automated tests
+        script: flutter test --no-pub
+      - name: Build installable release APK
+        script: |
+          flutter build apk --release --no-pub \
+            --dart-define=BASE_URL="$BASE_URL" \
+            --build-number="$PROJECT_BUILD_NUMBER"
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+      - flutter_drive.log
