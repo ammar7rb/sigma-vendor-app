@@ -12,7 +12,7 @@ class AppConstants {
 
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://192.168.1.4/ba/public',
+    defaultValue: 'https://sigma-eg.net',
   );
 
   static const String loginUri = '/api/v3/seller/auth/login';
