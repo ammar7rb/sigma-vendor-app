@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -153,7 +154,7 @@ class MessageBubbleWidget extends StatelessWidget {
 
       if (directory == null) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Downloading ${mediaList.length} files...'), backgroundColor: Colors.black54, duration: const Duration(seconds: 3)),
+        SnackBar(content: Text(getTranslated('downloading_files', context) ?? ''), backgroundColor: Colors.black54, duration: const Duration(seconds: 3)),
       );
 
       for (var media in mediaList) {

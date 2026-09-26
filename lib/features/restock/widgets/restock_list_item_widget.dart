@@ -183,9 +183,9 @@ class _RestockListItemWidgetState extends State<RestockListItemWidget> {
                                                       }
                                                     }
                                                     if(isEmpty) {
-                                                      showCustomSnackBarWidget('variation_quantity_is_required', sanckBarType: SnackBarType.error, context);
+                                                      showCustomSnackBarWidget(getTranslated('variation_quantity_is_required', context), sanckBarType: SnackBarType.error, context);
                                                     } else if(_stockQuantityController!.text.toString().isEmpty){
-                                                      showCustomSnackBarWidget('product_quantity_is_required', context);
+                                                      showCustomSnackBarWidget(getTranslated('product_quantity_is_required', context), context);
                                                     } else {
                                                       restockProvider.updateRestockProductQuantity(context, widget.product?.id, int.parse(_stockQuantityController!.text.toString()), widget.product!.variation!, index: widget.index);
                                                     }
@@ -202,7 +202,7 @@ class _RestockListItemWidgetState extends State<RestockListItemWidget> {
                                                       title: getTranslated('product_variations', context),
                                                       onYesPressed: () {
                                                         if(_stockQuantityController!.text.toString().isEmpty){
-                                                          showCustomSnackBarWidget('product_quantity_is_required', context);
+                                                          showCustomSnackBarWidget(getTranslated('product_quantity_is_required', context), context);
                                                         } else {
                                                           productProvider.updateRestockProductQuantity(context, widget.product?.id, int.parse(_stockQuantityController!.text.toString()), widget.product!.variation!, index: widget.index);
                                                         }

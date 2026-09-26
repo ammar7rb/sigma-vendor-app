@@ -85,12 +85,12 @@ class _AddNewCouponScreenState extends State<AddNewCouponScreen> {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.lock_outline, size: 40, color: Theme.of(context).colorScheme.error),
               const SizedBox(height: Dimensions.paddingSizeDefault),
-              const Text('Your current package has no coupon quota available.', textAlign: TextAlign.center),
+              Text(getTranslated('coupon_no_quota', context) ?? '', textAlign: TextAlign.center),
               const SizedBox(height: Dimensions.paddingSizeDefault),
               OutlinedButton.icon(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellerPackageScreen())),
                 icon: const Icon(Icons.inventory_2_outlined),
-                label: const Text('View packages'),
+                label: Text(getTranslated('view_packages', context) ?? ''),
               ),
             ]),
           ),
@@ -191,7 +191,7 @@ class _AddNewCouponScreenState extends State<AddNewCouponScreen> {
                           textInputAction: TextInputAction.next,
                           textInputType: TextInputType.text,
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]'))],
-                          hintText: 'Ex: ze5uzkyu0s',
+                          hintText: '${getTranslated('example', context)}: ze5uzkyu0s',
                         ),
                       ],),
                     ),

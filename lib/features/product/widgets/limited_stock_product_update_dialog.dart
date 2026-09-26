@@ -131,7 +131,7 @@ class _LimitedStockQuantityUpdateDialogWidgetState extends State<LimitedStockQua
                                             CustomTextFieldWidget(
                                               variant: true,
                                               border: true,
-                                              hintText: 'Ex: 345',
+                                              hintText: '${getTranslated('example', context)}: 345',
 
                                               controller: resProvider.variationQuantityController[index],
                                               focusNode: resProvider.variationQuantityFocusnode[index],
@@ -167,7 +167,7 @@ class _LimitedStockQuantityUpdateDialogWidgetState extends State<LimitedStockQua
                                       controller: widget.stockQuantityController,
                                       textInputAction: TextInputAction.next,
                                       isAmount: true,
-                                      hintText: 'Ex: 500',
+                                      hintText: '${getTranslated('example', context)}: 500',
                                     ),
                                   ],)),
 

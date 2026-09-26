@@ -16,7 +16,7 @@ class CustomSerachWidget extends StatefulWidget {
   final bool autoFocus;
   final TextStyle? style;
   final bool closeSearchOnSuffixTap;
-  final Color color;
+  final Color? color;
   final List<TextInputFormatter>? inputFormatters;
 
   const CustomSerachWidget({
@@ -29,7 +29,7 @@ class CustomSerachWidget extends StatefulWidget {
     this.prefixIcon,
     this.helpText = "Search...",
 
-    this.color = Colors.white,
+    this.color,
     required this.onSuffixTap,
     this.animationDurationInMilli = 375,
     this.rtl = false,
@@ -78,7 +78,7 @@ class CustomSerachWidgetState extends State<CustomSerachWidget>
         width: (toggle == 0) ? 48.0 : widget.width,
         curve: Curves.easeOut,
         decoration: BoxDecoration(
-          color: widget.color,
+          color: widget.color ?? Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(30.0),
           boxShadow: const [
             BoxShadow(
@@ -102,7 +102,7 @@ class CustomSerachWidgetState extends State<CustomSerachWidget>
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: widget.color,
+                    color: widget.color ?? Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                   child: AnimatedBuilder(
@@ -161,15 +161,15 @@ class CustomSerachWidgetState extends State<CustomSerachWidget>
                       });
                     },
                     onChanged: widget.onChanged as void Function(String)?,
-                    style: widget.style ?? const TextStyle(color: Colors.black),
-                    cursorColor: Colors.black,
+                    style: widget.style ?? TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    cursorColor: Theme.of(context).colorScheme.primary,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.only(bottom: 5),
                       isDense: true,
                       floatingLabelBehavior: FloatingLabelBehavior.never,
                       labelText: widget.helpText,
-                      labelStyle: const TextStyle(
-                        color: Color(0xff5B5B5B),
+                      labelStyle: TextStyle(
+                        color: Theme.of(context).hintColor,
                         fontSize: 17.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -185,7 +185,7 @@ class CustomSerachWidgetState extends State<CustomSerachWidget>
             ),
 
             Material(
-              color: widget.color,
+              color: widget.color ?? Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(30.0),
               child: IconButton(
                 splashRadius: 19.0,

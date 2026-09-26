@@ -5,6 +5,7 @@ import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.da
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/controllers/seller_package_controller.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/domain/models/seller_package_overview_model.dart';
+import 'package:sixvalley_vendor_app/features/seller_package/widgets/transfer_account_details.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/styles.dart';
@@ -32,31 +33,33 @@ class SellerPackagePaymentScreen extends StatelessWidget {
                   style: titilliumSemiBold.copyWith(
                       fontSize: Dimensions.fontSizeLarge)),
               const SizedBox(height: Dimensions.paddingSizeSmall),
-              _PaymentMethodTile(
-                icon: Icons.account_balance_wallet_outlined,
-                title:
-                    getTranslated('electronic_wallet_payment', context) ?? '',
-                subtitle:
-                    getTranslated('submit_proof_for_admin_review', context),
-                onTap: () => Navigator.push(
+              if (_methodFor('wallet') != null)
+                _PaymentMethodTile(
+                  icon: Icons.account_balance_wallet_outlined,
+                  title:
+                      getTranslated('electronic_wallet_payment', context) ?? '',
+                  subtitle:
+                      getTranslated('submit_proof_for_admin_review', context),
+                  onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SellerPackageOfflinePaymentScreen(
-                          plan: plan, method: _methodFor('wallet')),
-                    )),
-              ),
-              _PaymentMethodTile(
-                icon: Icons.account_balance_rounded,
-                title: getTranslated('instapay_payment', context) ?? '',
-                subtitle:
-                    getTranslated('submit_proof_for_admin_review', context),
-                onTap: () => Navigator.push(
+                        builder: (_) => SellerPackageOfflinePaymentScreen(
+                            plan: plan, method: _methodFor('wallet')!)),
+                  ),
+                ),
+              if (_methodFor('instapay') != null)
+                _PaymentMethodTile(
+                  icon: Icons.account_balance_rounded,
+                  title: getTranslated('instapay_payment', context) ?? '',
+                  subtitle:
+                      getTranslated('submit_proof_for_admin_review', context),
+                  onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SellerPackageOfflinePaymentScreen(
-                          plan: plan, method: _methodFor('instapay')),
-                    )),
-              ),
+                        builder: (_) => SellerPackageOfflinePaymentScreen(
+                            plan: plan, method: _methodFor('instapay')!)),
+                  ),
+                ),
             ],
             if (!overview.offlinePaymentAvailable ||
                 overview.offlinePaymentMethods.isEmpty)
@@ -72,21 +75,8 @@ class SellerPackagePaymentScreen extends StatelessWidget {
     );
   }
 
-  SellerOfflinePaymentMethod _methodFor(String channel) {
-    final methods = overview.offlinePaymentMethods;
-    final match = methods.where((method) {
-      final value =
-          '${method.methodName} ${method.methodFields.map((field) => field.inputData).join(' ')}'
-              .toLowerCase();
-      return channel == 'instapay'
-          ? value.contains('insta') || value.contains('انستا')
-          : value.contains('wallet') || value.contains('محفظ');
-    });
-    if (match.isNotEmpty) return match.first;
-    return channel == 'instapay' && methods.length > 1
-        ? methods[1]
-        : methods.first;
-  }
+  SellerOfflinePaymentMethod? _methodFor(String channel) =>
+      transferMethodForChannel(overview.offlinePaymentMethods, channel);
 }
 
 class SellerPackageOfflinePaymentScreen extends StatefulWidget {
@@ -156,13 +146,14 @@ class _SellerPackageOfflinePaymentScreenState
                       style: titilliumSemiBold.copyWith(
                           fontSize: Dimensions.fontSizeLarge)),
                   const SizedBox(height: Dimensions.paddingSizeSmall),
-                  ...widget.method.methodFields.map((field) => Padding(
-                        padding: const EdgeInsets.only(
-                            bottom: Dimensions.paddingSizeExtraSmall),
-                        child: Text('${_fieldTitle(field)}: ${field.inputData}',
-                            style: titilliumRegular),
-                      )),
+                  TransferAccountDetails(fields: widget.method.methodFields),
                 ],
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
+                  child: Text(
+                      getTranslated('package_transfer_steps', context) ?? ''),
+                ),
                 const SizedBox(height: Dimensions.paddingSizeLarge),
                 TextFormField(
                   controller: _senderNameController,
@@ -170,7 +161,7 @@ class _SellerPackageOfflinePaymentScreenState
                   decoration: InputDecoration(
                       counterText: '',
                       labelText:
-                          '${getTranslated('sender_name', context) ?? ''} *',
+                          '${getTranslated('transfer_sender_full_name', context) ?? ''} *',
                       border: const OutlineInputBorder()),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? (getTranslated('field_is_required', context) ?? '')
@@ -184,7 +175,7 @@ class _SellerPackageOfflinePaymentScreenState
                   decoration: InputDecoration(
                       counterText: '',
                       labelText:
-                          '${getTranslated('sender_phone_or_account', context) ?? ''} *',
+                          '${getTranslated('transfer_sender_number', context) ?? ''} *',
                       border: const OutlineInputBorder()),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? (getTranslated('field_is_required', context) ?? '')

@@ -148,7 +148,7 @@ class BankEditingScreenState extends State<BankEditingScreen> {
 
                 CustomTextFieldWidget(
                   border: true,
-                  hintText: 'Ex: mr.john',
+                  hintText: getTranslated('holder_name_hint', context),
                   controller: _holderNameController,
                   focusNode: _holderNameNode,
                   nextNode: _bankNameNode,

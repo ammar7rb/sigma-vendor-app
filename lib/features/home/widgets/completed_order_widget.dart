@@ -61,31 +61,13 @@ class CompletedOrderWidget extends StatelessWidget {
                             callback: callback,
                           ),
                           OrderTypeButtonWidget(
+                            showBorder: false,
                             color: Theme.of(context).colorScheme.error,
                             icon: Images.cancelled,
                             text: getTranslated('cancelled', context),
                             index: 6,
                             numberOfOrder: bankInfoController
                                 .businessAnalyticsFilterData?.canceled,
-                            callback: callback,
-                          ),
-                          OrderTypeButtonWidget(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                            icon: Images.returned,
-                            text: getTranslated('returned', context),
-                            index: 4,
-                            numberOfOrder: bankInfoController
-                                .businessAnalyticsFilterData?.returned,
-                            callback: callback,
-                          ),
-                          OrderTypeButtonWidget(
-                            showBorder: false,
-                            color: Theme.of(context).colorScheme.error,
-                            icon: Images.failed,
-                            text: getTranslated('failed_title', context),
-                            index: 5,
-                            numberOfOrder: bankInfoController
-                                .businessAnalyticsFilterData?.failed,
                             callback: callback,
                           ),
                         ],
@@ -141,7 +123,7 @@ class CompletedOrdersShimmer extends StatelessWidget {
               shrinkWrap: true,
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: 4,
+              itemCount: 2,
               itemBuilder: (_, __) {
                 return Container(
                   margin:

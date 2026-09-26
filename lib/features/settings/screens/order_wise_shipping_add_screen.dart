@@ -108,7 +108,7 @@ class OrderWiseShippingAddScreenState extends State<OrderWiseShippingAddScreen> 
                 const SizedBox(height: Dimensions.paddingSizeSmall),
                 CustomTextFieldWidget(
                   border: true,
-                  hintText: 'Ex: 4-6 days',
+                  hintText: getTranslated('example_shipping_duration', context),
                   focusNode: _addressNode,
                   controller: _durationController,
                   textInputType: TextInputType.streetAddress,
@@ -123,7 +123,7 @@ class OrderWiseShippingAddScreenState extends State<OrderWiseShippingAddScreen> 
                 const SizedBox(height: Dimensions.paddingSizeSmall),
                 CustomTextFieldWidget(
                   border: true,
-                  hintText: 'Ex: \$100',
+                  hintText: '${getTranslated('example', context)}: 100',
                   controller: _costController,
                   focusNode: _phoneNode,
                   textInputAction: TextInputAction.done,

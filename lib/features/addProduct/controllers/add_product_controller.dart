@@ -672,14 +672,7 @@ class AddProductController extends ChangeNotifier {
       return false;
     }
 
-    // 3. Check Category
-    if (categoryController.categoryIndex == 0 ||
-        categoryController.categoryIndex == -1) {
-      showCustomSnackBarWidget(
-          getTranslated('select_a_category', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
-    }
+    // An unselected category is assigned to General Category by the API.
 
     // Unit and measurements are optional for seller products.
 

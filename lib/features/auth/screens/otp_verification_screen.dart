@@ -139,7 +139,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                         .then((value) {
                                       if (value!.isSuccess) {
                                         _startTimer();
-                                        showCustomSnackBarWidget('Resent code successful', Get.context!, isError: false, sanckBarType: SnackBarType.success);
+                                        showCustomSnackBarWidget(getTranslated('resend_code_successful', Get.context!), Get.context!, isError: false, sanckBarType: SnackBarType.success);
                                       } else {
                                         showCustomSnackBarWidget(value.message, Get.context!);
                                       }

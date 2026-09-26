@@ -4,7 +4,6 @@ import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_tab
 import 'package:sixvalley_vendor_app/features/auction/screens/auction_menu_screen.dart';
 import 'package:sixvalley_vendor_app/features/clearance_sale/screens/clearance_sale_screen.dart';
 import 'package:sixvalley_vendor_app/features/restock/screens/restock_list_screen.dart';
-import 'package:sixvalley_vendor_app/features/splash/domain/models/business_pages_model.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/models/config_model.dart';
 import 'package:sixvalley_vendor_app/features/vat_management/screens/vat_management_screen.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
@@ -20,7 +19,6 @@ import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_pack
 import 'package:sixvalley_vendor_app/features/seller_promotion/screens/seller_promotion_screen.dart';
 import 'package:sixvalley_vendor_app/features/dashboard/screens/nav_bar_screen.dart';
 import 'package:sixvalley_vendor_app/features/menu/widgets/sign_out_confirmation_dialog_widget.dart';
-import 'package:sixvalley_vendor_app/features/more/screens/html_view_screen.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/profile_view_screen.dart';
 import 'package:sixvalley_vendor_app/features/settings/screens/setting_screen.dart';
@@ -110,53 +108,6 @@ class MenuBottomSheetWidget extends StatelessWidget {
           ),
 
 
-          if(getPageBySlug('terms-and-conditions', splashController.defaultBusinessPages) != null)
-          CustomBottomSheetWidget(image: Images.termsAndCondition, title: getTranslated('terms_and_condition', context),
-            onTap : () => _handleMenuTap(context, HtmlViewScreen(
-              page: getPageBySlug('terms-and-conditions', splashController.defaultBusinessPages)
-            )),
-          ),
-
-
-          if(getPageBySlug('about-us', splashController.defaultBusinessPages) != null)
-          CustomBottomSheetWidget(image: Images.aboutUs, title: getTranslated('about_us', context),
-            onTap : () => _handleMenuTap(context, HtmlViewScreen(
-              page: getPageBySlug('about-us', splashController.defaultBusinessPages),
-            )),
-          ),
-
-          if(getPageBySlug('privacy-policy', splashController.defaultBusinessPages) != null)
-          CustomBottomSheetWidget(image: Images.privacyPolicy, title: getTranslated('privacy_policy', context),
-            onTap : () => _handleMenuTap(context, HtmlViewScreen(
-              page: getPageBySlug('privacy-policy', splashController.defaultBusinessPages),
-            )),
-          ),
-
-
-          if(getPageBySlug('refund-policy', splashController.defaultBusinessPages) != null)
-            CustomBottomSheetWidget(image: Images.refundPolicy, title: getTranslated('refund_policy', context),
-            onTap : () => _handleMenuTap(context, HtmlViewScreen(
-              page:getPageBySlug('refund-policy', splashController.defaultBusinessPages),
-            )),
-          ),
-
-
-          if(getPageBySlug('return-policy', splashController.defaultBusinessPages) != null)
-            CustomBottomSheetWidget(image: Images.returnPolicy, title: getTranslated('return_policy', context),
-              onTap : () => _handleMenuTap(context, HtmlViewScreen(
-                page: getPageBySlug('return-policy', splashController.defaultBusinessPages),
-              )),
-            ),
-
-
-          if(getPageBySlug('cancellation-policy', splashController.defaultBusinessPages) != null)
-            CustomBottomSheetWidget(image: Images.cPolicy, title: getTranslated('cancellation_policy', context),
-              onTap : () => _handleMenuTap(context, HtmlViewScreen(
-                page: getPageBySlug('cancellation-policy', splashController.defaultBusinessPages),
-              )),
-            ),
-
-
           CustomBottomSheetWidget(image: Images.logOut, title: getTranslated('logout', context),
             onTap: () async {
               Navigator.pop(context); // Close bottom sheet
@@ -219,18 +170,6 @@ class MenuBottomSheetWidget extends StatelessWidget {
     // The add-product screen verifies account activation. Advertising packages
     // are intentionally not consulted here because publishing is not a paid quota.
     _handleMenuTap(context, const AddProductTabView(fromHome: false));
-  }
-
-  BusinessPageModel? getPageBySlug(String slug, List<BusinessPageModel>? pagesList) {
-    BusinessPageModel? pageModel;
-    if(pagesList != null && pagesList.isNotEmpty){
-      for (var page in pagesList) {
-        if(page.slug == slug) {
-          pageModel = page;
-        }
-      }
-    }
-    return pageModel;
   }
 
 }

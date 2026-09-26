@@ -5,6 +5,7 @@ import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/styles.dart';
+import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class InfoItemWidget extends StatelessWidget {
   final String? icon;
@@ -37,9 +38,9 @@ class InfoItemWidget extends StatelessWidget {
 
             Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
               child: !isMoney? Text(amount!,
-                style: titilliumSemiBold.copyWith(color:  Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeLarge),):
+                style: titilliumSemiBold.copyWith(color: AppDesign.foregroundAccent(Theme.of(context).brightness), fontSize: Dimensions.fontSizeLarge),):
               Text('${Provider.of<SplashController>(context, listen: false).myCurrency!.symbol} ${NumberFormat.compact().format(double.parse(amount!))}',
-                style: titilliumSemiBold.copyWith(color:  Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeLarge))),
+                style: titilliumSemiBold.copyWith(color: AppDesign.foregroundAccent(Theme.of(context).brightness), fontSize: Dimensions.fontSizeLarge))),
 
 
             Text(getTranslated(title, context)!,

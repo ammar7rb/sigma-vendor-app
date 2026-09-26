@@ -116,7 +116,7 @@ class _QuantityUpdateDialogWidgetState extends State<QuantityUpdateDialogWidget>
                                         controller: widget.stockQuantityController,
                                         textInputAction: TextInputAction.next,
                                         isAmount: true,
-                                        hintText: 'Ex: 500',
+                                        hintText: '${getTranslated('example', context)}: 500',
                                       ),
                                     ],)),
 

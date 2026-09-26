@@ -227,7 +227,8 @@ class _SummaryCard extends StatelessWidget {
                                 .withValues(alpha: .1),
                             borderRadius: BorderRadius.circular(12)),
                         child: Icon(icon,
-                            size: 20, color: Theme.of(context).primaryColor)),
+                            size: 20,
+                            color: AppDesign.foregroundAccent(Theme.of(context).brightness))),
                     const Spacer(),
                     Text(value,
                         maxLines: 1,
@@ -270,7 +271,8 @@ class _ActionCard extends StatelessWidget {
               decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(13)),
-              child: Icon(icon, color: Theme.of(context).primaryColor)),
+              child: Icon(icon,
+                  color: AppDesign.foregroundAccent(Theme.of(context).brightness))),
           title:
               Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
           subtitle: subtitle.isEmpty

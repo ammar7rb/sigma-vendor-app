@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_tab_view_screen.dart';
 import 'package:sixvalley_vendor_app/features/bank_info/screens/seller_bank_info_screen.dart';
 import 'package:sixvalley_vendor_app/features/coupon/screens/coupon_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/menu/widgets/sign_out_confirmation_dialog_widget.dart';
-import 'package:sixvalley_vendor_app/features/more/screens/html_view_screen.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/seller_profile_screen.dart';
 import 'package:sixvalley_vendor_app/features/refund/screens/refund_screen.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:sixvalley_vendor_app/features/seller_promotion/screens/seller_promotion_screen.dart';
 import 'package:sixvalley_vendor_app/features/settings/screens/setting_screen.dart';
-import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
-import 'package:sixvalley_vendor_app/features/splash/domain/models/business_pages_model.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/wallet_screen.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/main.dart';
@@ -27,46 +23,7 @@ class MenuBottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SplashController>(builder: (context, splash, _) {
-      final businessPages = <_MenuEntry>[
-        if (_page('terms-and-conditions', splash.defaultBusinessPages) != null)
-          _MenuEntry(
-              Icons.description_outlined,
-              'terms_and_condition',
-              () => _open(
-                  context,
-                  HtmlViewScreen(
-                      page: _page('terms-and-conditions',
-                          splash.defaultBusinessPages)))),
-        if (_page('privacy-policy', splash.defaultBusinessPages) != null)
-          _MenuEntry(
-              Icons.privacy_tip_outlined,
-              'privacy_policy',
-              () => _open(
-                  context,
-                  HtmlViewScreen(
-                      page: _page(
-                          'privacy-policy', splash.defaultBusinessPages)))),
-        if (_page('about-us', splash.defaultBusinessPages) != null)
-          _MenuEntry(
-              Icons.info_outline,
-              'about_us',
-              () => _open(
-                  context,
-                  HtmlViewScreen(
-                      page: _page('about-us', splash.defaultBusinessPages)))),
-        if (_page('refund-policy', splash.defaultBusinessPages) != null)
-          _MenuEntry(
-              Icons.assignment_return_outlined,
-              'refund_policy',
-              () => _open(
-                  context,
-                  HtmlViewScreen(
-                      page: _page(
-                          'refund-policy', splash.defaultBusinessPages)))),
-      ];
-
-      return SafeArea(
+    return SafeArea(
         child: Container(
           constraints: BoxConstraints(
               maxHeight: MediaQuery.sizeOf(context).height * .88),
@@ -129,7 +86,6 @@ class MenuBottomSheetWidget extends StatelessWidget {
               _section(context, 'vendor_preferences_and_support', [
                 _MenuEntry(Icons.settings_outlined, 'settings',
                     () => _open(context, const SettingsScreen())),
-                ...businessPages,
               ]),
               const SizedBox(height: 14),
               ListTile(
@@ -159,7 +115,6 @@ class MenuBottomSheetWidget extends StatelessWidget {
           ),
         ),
       );
-    });
   }
 
   Widget _section(
@@ -193,13 +148,6 @@ class MenuBottomSheetWidget extends StatelessWidget {
         Get.context!, MaterialPageRoute(builder: (_) => screen)));
   }
 
-  BusinessPageModel? _page(String slug, List<BusinessPageModel>? pages) {
-    if (pages == null) return null;
-    for (final page in pages) {
-      if (page.slug == slug) return page;
-    }
-    return null;
-  }
 }
 
 class _MenuEntry {
@@ -233,7 +181,8 @@ class _MenuTile extends StatelessWidget {
                           Theme.of(context).primaryColor.withValues(alpha: .1),
                       borderRadius: BorderRadius.circular(12)),
                   child: Icon(entry.icon,
-                      size: 20, color: Theme.of(context).primaryColor)),
+                      size: 20,
+                      color: AppDesign.foregroundAccent(Theme.of(context).brightness))),
               const SizedBox(width: 9),
               Expanded(
                   child: Text(

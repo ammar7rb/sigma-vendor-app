@@ -263,7 +263,7 @@ class AuctionInfoScreenState extends State<AuctionInfoScreen> with TickerProvide
                         ),
                         child: Center(
                           child: Text(getTranslated('go_back', context) ?? "",
-                            style: titilliumBold.copyWith(color: Colors.black),
+                            style: titilliumBold.copyWith(color: Theme.of(context).colorScheme.onSurface),
                           ),
                         ),
                       ),
@@ -304,4 +304,3 @@ class AuctionInfoScreenState extends State<AuctionInfoScreen> with TickerProvide
     );
   }
 }
-

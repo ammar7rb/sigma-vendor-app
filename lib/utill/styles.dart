@@ -37,18 +37,15 @@ const robotoRegular = TextStyle(
   fontFamily: 'Cairo',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeDefault,
-  color: Colors.black
 );
 const robotoRegularMainHeadingAddProduct = TextStyle(
   fontFamily: 'Cairo',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeDefault,
-  color: Colors.black
 );
 
 const robotoRegularForAddProductHeading = TextStyle(
   fontFamily: 'Cairo',
-  color: Color(0xFF9D9D9D),
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeSmall,
 );

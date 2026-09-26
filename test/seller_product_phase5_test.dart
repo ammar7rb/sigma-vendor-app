@@ -105,7 +105,7 @@ void main() {
     ).readAsStringSync();
     expect(general, contains("'upload_thumbnail'"));
     expect(general, contains("'additional_product_images'"));
-    expect(general, contains("'seller_product_category_admin_hint'"));
+    expect(general, isNot(contains("'seller_product_category_admin_hint'")));
     expect(general, contains("'enter_brand_name_if_not_listed'"));
     expect(general, contains('_generateSKU()'));
     expect(general, contains("'seller_product_sale_unit_\$value'"));

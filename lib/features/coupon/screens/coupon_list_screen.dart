@@ -130,16 +130,18 @@ class _CouponEntitlementBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(Dimensions.paddingSizeExtraSmall),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Package coupon quota: $remaining / $total remaining', style: Theme.of(context).textTheme.titleSmall),
+        Text((getTranslated('coupon_package_quota', context) ?? '')
+            .replaceAll('{remaining}', '$remaining')
+            .replaceAll('{total}', '$total'), style: Theme.of(context).textTheme.titleSmall),
         if (!isAllowed) ...[
           const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-          const Text('Your current package has no coupon quota available.'),
+          Text(getTranslated('coupon_no_quota', context) ?? ''),
           const SizedBox(height: Dimensions.paddingSizeSmall),
           OutlinedButton.icon(
             // Package upgrades are controlled by the existing seller package screen.
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellerPackageScreen())),
             icon: const Icon(Icons.inventory_2_outlined),
-            label: const Text('View packages'),
+            label: Text(getTranslated('view_packages', context) ?? ''),
           ),
         ],
       ]),

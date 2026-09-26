@@ -256,9 +256,9 @@ class _StockOutProductWidgetState extends State<StockOutProductWidget> {
                                       }
 
                                       if(isEmpty) {
-                                        showCustomSnackBarWidget('variation_quantity_is_required', sanckBarType: SnackBarType.error, context);
+                                        showCustomSnackBarWidget(getTranslated('variation_quantity_is_required', context), sanckBarType: SnackBarType.error, context);
                                       } else if(_stockQuantityController.text.toString().isEmpty){
-                                        showCustomSnackBarWidget('product_quantity_is_required', context);
+                                        showCustomSnackBarWidget(getTranslated('product_quantity_is_required', context), context);
                                         if (kDebugMode) {
                                           print(widget.productModel.id);
                                         }

@@ -45,6 +45,9 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
       final withdrawable = double.tryParse('${balances['available']}') ?? 0;
       final purchaseBalance = double.tryParse('${balances['operating']}') ?? 0;
       final walletTotal = withdrawable + purchaseBalance + insuranceAvailable;
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final actionColor =
+          isDark ? AppDesign.brandLight : Theme.of(context).primaryColor;
 
       void openFinance(String section) => Navigator.push(
           context,
@@ -68,7 +71,7 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                     color: Theme.of(context).primaryColor.withValues(alpha: .1),
                     borderRadius: BorderRadius.circular(13)),
                 child: Icon(Icons.dashboard_customize_outlined,
-                    color: Theme.of(context).primaryColor)),
+                    color: actionColor)),
             const SizedBox(width: 10),
             Expanded(
                 child: Text(
@@ -188,71 +191,100 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                 )),
           ],
           const SizedBox(height: 14),
-          LayoutBuilder(builder: (context, constraints) {
-            final itemWidth = constraints.maxWidth >= 620
-                ? (constraints.maxWidth - 16) / 3
-                : (constraints.maxWidth - 8) / 2;
-            Widget item(Widget child) =>
-                SizedBox(width: itemWidth, height: 52, child: child);
-            return Wrap(spacing: 8, runSpacing: 8, children: [
-              item(OutlinedButton.icon(
-                  onPressed: () async {
-                    await Navigator.push(
+          OutlinedButtonTheme(
+            data: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: actionColor,
+                side: BorderSide(color: actionColor),
+                backgroundColor:
+                    isDark ? actionColor.withValues(alpha: .08) : null,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                textStyle:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+            ),
+            child: LayoutBuilder(builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 700
+                  ? 3
+                  : constraints.maxWidth >= 500
+                      ? 2
+                      : 1;
+              final itemWidth =
+                  (constraints.maxWidth - 8 * (columns - 1)) / columns;
+              Widget item(Widget child) =>
+                  SizedBox(width: itemWidth, height: 58, child: child);
+              return Wrap(spacing: 8, runSpacing: 8, children: [
+                item(OutlinedButton.icon(
+                    onPressed: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SellerBalanceFundingScreen(
+                                  walletTarget: 'operating')));
+                      await wallet.getSellerDashboardOverview();
+                    },
+                    icon: const Icon(Icons.add_card),
+                    label: Text(
+                        getTranslated('fund_purchase_balance', context) ??
+                            'Fund purchase balance'))),
+                item(OutlinedButton.icon(
+                    onPressed: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SellerBalanceFundingScreen(
+                                  walletTarget: 'insurance')));
+                      await wallet.getSellerDashboardOverview();
+                    },
+                    icon: const Icon(Icons.shield_outlined),
+                    label: Text(
+                        getTranslated('fund_insurance_balance', context) ??
+                            'Fund insurance balance'))),
+                item(OutlinedButton.icon(
+                    onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const SellerBalanceFundingScreen(
-                                walletTarget: 'operating')));
-                    await wallet.getSellerDashboardOverview();
-                  },
-                  icon: const Icon(Icons.add_card),
-                  label: Text(getTranslated('fund_purchase_balance', context) ??
-                      'Fund purchase balance'))),
-              item(OutlinedButton.icon(
-                  onPressed: () async {
-                    await Navigator.push(
+                            builder: (_) => const SellerPackageScreen())),
+                    icon: const Icon(Icons.campaign),
+                    label: Text(
+                        getTranslated('advertising_packages', context) ??
+                            'Advertising packages'))),
+                item(OutlinedButton.icon(
+                    onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const SellerBalanceFundingScreen(
-                                walletTarget: 'insurance')));
-                    await wallet.getSellerDashboardOverview();
-                  },
-                  icon: const Icon(Icons.shield_outlined),
-                  label: Text(
-                      getTranslated('fund_insurance_balance', context) ??
-                          'Fund insurance balance'))),
-              item(OutlinedButton.icon(
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const SellerPackageScreen())),
-                  icon: const Icon(Icons.campaign),
-                  label: Text(getTranslated('advertising_packages', context) ??
-                      'Advertising packages'))),
-              item(OutlinedButton.icon(
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const OrderScreen(fromHome: true))),
-                  icon: const Icon(Icons.receipt_long_outlined),
-                  label: Text(
-                      getTranslated('review_orders', context) ?? 'Orders'))),
-              item(OutlinedButton.icon(
-                  onPressed: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const WalletScreen())),
-                  icon: const Icon(Icons.shield_outlined),
-                  label: Text(getTranslated('finance_my_wallet', context) ??
-                      'Insurance & shipping'))),
-              item(FilledButton.icon(
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              const AddProductTabView(fromHome: true))),
-                  icon: const Icon(Icons.add_box_outlined),
-                  label: Text(
-                      getTranslated('add_product', context) ?? 'Add product'))),
-            ]);
-          }),
+                            builder: (_) => const OrderScreen(fromHome: true))),
+                    icon: const Icon(Icons.receipt_long_outlined),
+                    label: Text(
+                        getTranslated('review_orders', context) ?? 'Orders'))),
+                item(OutlinedButton.icon(
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const WalletScreen())),
+                    icon: const Icon(Icons.shield_outlined),
+                    label: Text(getTranslated('finance_my_wallet', context) ??
+                        'Insurance & shipping'))),
+                item(FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      textStyle: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w700),
+                    ),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                const AddProductTabView(fromHome: true))),
+                    icon: const Icon(Icons.add_box_outlined),
+                    label: Text(getTranslated('add_product', context) ??
+                        'Add product'))),
+              ]);
+            }),
+          ),
         ]),
       );
     });
@@ -272,56 +304,58 @@ class _Metric extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-          width: double.infinity,
-          constraints: const BoxConstraints(minHeight: 104),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withValues(alpha: .055),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-                color: Theme.of(context).primaryColor.withValues(alpha: .1)),
-          ),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).primaryColor.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(11)),
-                child: Icon(icon,
-                    size: 19, color: Theme.of(context).primaryColor)),
-            const SizedBox(height: 8),
-            Text(value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-            const SizedBox(height: 2),
-            Text(label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    fontSize: 10,
-                    height: 1.35,
-                    color: Theme.of(context).hintColor)),
-            if (onTap != null) ...[
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent =
+        isDark ? AppDesign.brandLight : Theme.of(context).primaryColor;
+    return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(minHeight: 104),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor.withValues(alpha: .055),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                  color: Theme.of(context).primaryColor.withValues(alpha: .1)),
+            ),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                      color: accent.withValues(alpha: isDark ? .18 : .12),
+                      borderRadius: BorderRadius.circular(11)),
+                  child: Icon(icon, size: 19, color: accent)),
               const SizedBox(height: 8),
-              Row(children: [
-                Text(getTranslated('view_records', context) ?? 'View records',
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700)),
-                const Spacer(),
-                Icon(Icons.arrow_forward_rounded,
-                    size: 15, color: Theme.of(context).primaryColor),
-              ])
-            ]
-          ])));
+              Text(value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 15)),
+              const SizedBox(height: 2),
+              Text(label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: 11,
+                      height: 1.35,
+                      color: Theme.of(context).hintColor)),
+              if (onTap != null) ...[
+                const SizedBox(height: 8),
+                Row(children: [
+                  Text(getTranslated('view_records', context) ?? 'View records',
+                      style: TextStyle(
+                          color: accent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  Icon(Icons.arrow_forward_rounded, size: 15, color: accent),
+                ])
+              ]
+            ])));
+  }
 }

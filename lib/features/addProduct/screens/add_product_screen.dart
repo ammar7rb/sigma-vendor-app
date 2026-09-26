@@ -908,31 +908,6 @@ class AddProductScreenState extends State<AddProductScreen>
                                               child: SelectCategoryWidget(
                                                   product: widget.product),
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                Dimensions.paddingSizeMedium,
-                                                0,
-                                                Dimensions.paddingSizeMedium,
-                                                Dimensions.paddingSizeMedium,
-                                              ),
-                                              child: Align(
-                                                alignment: AlignmentDirectional
-                                                    .centerStart,
-                                                child: Text(
-                                                  getTranslated(
-                                                          'seller_product_category_admin_hint',
-                                                          context) ??
-                                                      '',
-                                                  style: robotoRegular.copyWith(
-                                                    color: Theme.of(context)
-                                                        .hintColor,
-                                                    fontSize: Dimensions
-                                                        .fontSizeSmall,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
                                             Provider.of<SplashController>(
                                                                 context,
                                                                 listen: false)
@@ -1489,72 +1464,6 @@ class AddProductScreenState extends State<AddProductScreen>
                                                         ]),
                                                   )
                                                 : const SizedBox(),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      Dimensions
-                                                          .paddingSizeMedium,
-                                                      0,
-                                                      Dimensions
-                                                          .paddingSizeMedium,
-                                                      0),
-                                              child: Column(children: [
-                                                Row(
-                                                  children: [
-                                                    const Spacer(),
-                                                    InkWell(
-                                                      splashColor:
-                                                          Colors.transparent,
-                                                      onTap: () {
-                                                        resProvider.productCode
-                                                                .text =
-                                                            _generateSKU();
-                                                      },
-                                                      child: Padding(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: Dimensions
-                                                                .paddingSizeExtraSmall),
-                                                        child: Text(
-                                                            getTranslated(
-                                                                'generate_code',
-                                                                context)!,
-                                                            style: robotoMedium.copyWith(
-                                                                fontSize: Dimensions
-                                                                    .fontSizeDefault,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .primaryColor)),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                    height: Dimensions
-                                                        .paddingSizeExtraSmall),
-                                                CustomTextFieldWidget(
-                                                  formProduct: true,
-                                                  required: true,
-                                                  border: true,
-                                                  borderColor: Theme.of(context)
-                                                      .primaryColor
-                                                      .withValues(alpha: .25),
-                                                  controller:
-                                                      resProvider.productCode,
-                                                  textInputAction:
-                                                      TextInputAction.next,
-                                                  textInputType:
-                                                      TextInputType.text,
-                                                  isAmount: false,
-                                                  hintText: getTranslated(
-                                                      'product_code_sku',
-                                                      context)!,
-                                                ),
-                                              ]),
-                                            ),
-                                            const SizedBox(
-                                                height: Dimensions
-                                                    .paddingSizeDefault),
                                             false &&
                                                     Provider.of<SplashController>(
                                                                 context,

@@ -168,10 +168,9 @@ class Button extends StatelessWidget {
         ),
         child: Text(title, style: isSelected ?
         robotoBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeDefault) :
-        robotoRegular.copyWith(color: Colors.black, fontSize: Dimensions.fontSizeDefault)
+        robotoRegular.copyWith(color: Theme.of(context).colorScheme.onSurface, fontSize: Dimensions.fontSizeDefault)
         ),
       ),
     );
   }
 }
-

@@ -391,7 +391,10 @@ class _SellerProductCard extends StatelessWidget {
               ]),
               Text(PriceConverter.convertPrice(context, product.unitPrice),
                   style: robotoBold.copyWith(
-                      color: Theme.of(context).primaryColor, fontSize: 17)),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppDesign.brandLight
+                          : Theme.of(context).primaryColor,
+                      fontSize: 17)),
               const SizedBox(height: 7),
               Wrap(spacing: 8, runSpacing: 6, children: [
                 _StatusChip(
@@ -438,12 +441,21 @@ class _StatusChip extends StatelessWidget {
       {required this.label, required this.color, this.muted = false});
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-        decoration: BoxDecoration(
-            color: color.withValues(alpha: muted ? .07 : .11),
-            borderRadius: BorderRadius.circular(30)),
-        child: Text(label,
-            style: robotoMedium.copyWith(color: color, fontSize: 11)),
-      );
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+          color: isDark && muted
+              ? Colors.white.withValues(alpha: .12)
+              : color.withValues(alpha: muted ? .07 : .11),
+          borderRadius: BorderRadius.circular(30)),
+      child: Text(label,
+          style: robotoMedium.copyWith(
+              color: isDark
+                  ? (muted ? Colors.white : Color.lerp(color, Colors.white, .7))
+                  : color,
+              fontSize: 12)),
+    );
+  }
 }

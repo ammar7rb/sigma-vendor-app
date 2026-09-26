@@ -6,6 +6,7 @@ import 'package:sixvalley_vendor_app/theme/controllers/theme_controller.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/images.dart';
 import 'package:sixvalley_vendor_app/utill/styles.dart';
+import 'package:sixvalley_vendor_app/theme/app_design.dart';
 import 'package:sixvalley_vendor_app/features/bank_info/screens/bank_info_screen.dart';
 import 'package:sixvalley_vendor_app/features/menu/widgets/sign_out_confirmation_dialog_widget.dart';
 import 'package:sixvalley_vendor_app/features/settings/screens/setting_screen.dart';
@@ -67,11 +68,6 @@ class ThemeChangerWidget extends StatelessWidget {
             onTap: () => showModalBottomSheet(context: context,
                 builder: (_) => const SignOutConfirmationDialogWidget())),
 
-        const SizedBox(height: Dimensions.paddingSizeExtraSmall,),
-
-        SectionItemWidget(icon: Images.delete, title: 'delete_account',
-            onTap: () => showModalBottomSheet(context: context, builder: (_) => const SignOutConfirmationDialogWidget(isDelete: true))),
-
       ],
     );
   }
@@ -101,7 +97,7 @@ class SectionItemWidget extends StatelessWidget {
                 style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color)),),
 
             SizedBox(width: Dimensions.iconSizeDefault,
-                child: Icon(Icons.arrow_forward_ios,color: Theme.of(context).primaryColor,size: Dimensions.iconSizeDefault,))
+                child: Icon(Icons.arrow_forward_ios,color: AppDesign.foregroundAccent(Theme.of(context).brightness),size: Dimensions.iconSizeDefault,))
           ],),
         ),
       ),

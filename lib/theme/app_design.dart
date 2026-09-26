@@ -15,6 +15,10 @@ abstract final class AppDesign {
   static const Color darkBackground = Color(0xFF081525);
   static const Color darkSurface = Color(0xFF102239);
 
+  /// Accent for text, icons and outlines placed on the current surface.
+  static Color foregroundAccent(Brightness brightness) =>
+      brightness == Brightness.dark ? brandLight : primary;
+
   static const double radiusSmall = 12;
   static const double radiusMedium = 18;
   static const double radiusLarge = 24;

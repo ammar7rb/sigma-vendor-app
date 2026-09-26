@@ -203,7 +203,9 @@ class _ProductHeader extends StatelessWidget {
                 Text(
                   PriceConverter.convertPrice(context, product.unitPrice),
                   style: robotoBold.copyWith(
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppDesign.brandLight
+                        : Theme.of(context).primaryColor,
                     fontSize: 18,
                   ),
                 ),
@@ -215,7 +217,12 @@ class _ProductHeader extends StatelessWidget {
             Text(
               getTranslated(isActive ? 'active' : 'inactive', context) ?? '',
               style: robotoMedium.copyWith(
-                color: isActive ? AppDesign.success : AppDesign.warning,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Color.lerp(
+                        isActive ? AppDesign.success : AppDesign.warning,
+                        Colors.white,
+                        .7)
+                    : (isActive ? AppDesign.success : AppDesign.warning),
               ),
             ),
           ]),
@@ -317,27 +324,29 @@ class _SectionCard extends StatelessWidget {
   const _SectionCard({this.title, required this.child});
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
-          border: Border.all(
-            color: Theme.of(context).dividerColor.withValues(alpha: .45),
-          ),
-          boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: .45),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (title?.isNotEmpty ?? false) ...[
-              Text(title!, style: robotoBold.copyWith(fontSize: 16)),
-              const SizedBox(height: 12),
-            ],
-            child,
+        boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title?.isNotEmpty ?? false) ...[
+            Text(title!, style: robotoBold.copyWith(fontSize: 16)),
+            const SizedBox(height: 12),
           ],
-        ),
-      );
+          child,
+        ],
+      ),
+    );
+  }
 }
 
 class _InfoRow extends StatelessWidget {
@@ -349,28 +358,29 @@ class _InfoRow extends StatelessWidget {
       {required this.label, required this.value, this.divider = true});
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 11),
-        decoration: BoxDecoration(
-          border: divider
-              ? Border(
-                  bottom: BorderSide(
-                    color:
-                        Theme.of(context).dividerColor.withValues(alpha: .35),
-                  ),
-                )
-              : null,
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 11),
+      decoration: BoxDecoration(
+        border: divider
+            ? Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor.withValues(alpha: .35),
+                ),
+              )
+            : null,
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Text(label,
+              style:
+                  robotoRegular.copyWith(color: Theme.of(context).hintColor)),
         ),
-        child: Row(children: [
-          Expanded(
-            child: Text(label,
-                style:
-                    robotoRegular.copyWith(color: Theme.of(context).hintColor)),
-          ),
-          Flexible(
-              child: Text(value, style: robotoBold, textAlign: TextAlign.end)),
-        ]),
-      );
+        Flexible(
+            child: Text(value, style: robotoBold, textAlign: TextAlign.end)),
+      ]),
+    );
+  }
 }
 
 class _Pill extends StatelessWidget {
@@ -380,19 +390,26 @@ class _Pill extends StatelessWidget {
   const _Pill({required this.text, this.success = false});
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: (success ? AppDesign.success : Theme.of(context).primaryColor)
-              .withValues(alpha: .09),
-          borderRadius: BorderRadius.circular(30),
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: .12)
+            : (success ? AppDesign.success : Theme.of(context).primaryColor)
+                .withValues(alpha: .09),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Text(
+        text,
+        style: robotoMedium.copyWith(
+          fontSize: Dimensions.fontSizeSmall,
+          color: isDark
+              ? Colors.white
+              : (success ? AppDesign.success : Theme.of(context).primaryColor),
         ),
-        child: Text(
-          text,
-          style: robotoMedium.copyWith(
-            fontSize: Dimensions.fontSizeSmall,
-            color: success ? AppDesign.success : Theme.of(context).primaryColor,
-          ),
-        ),
-      );
+      ),
+    );
+  }
 }

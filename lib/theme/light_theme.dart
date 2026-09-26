@@ -12,8 +12,8 @@ ThemeData light = ThemeData(
   bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
   brightness: Brightness.light,
   highlightColor: Colors.white,
-  hintColor: const Color(0xFFA7A7A7),
-  disabledColor:  const Color(0xFF343A40),
+  hintColor: const Color(0xFF637083),
+  disabledColor:  const Color(0xFF8290A2),
   canvasColor: const Color(0xFFFCFCFC),
   cardColor: const Color(0xFFFFFFFF),
   splashColor: Colors.transparent,
@@ -32,19 +32,26 @@ ThemeData light = ThemeData(
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDesign.radiusMedium), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDesign.radiusMedium), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDesign.radiusMedium), borderSide: const BorderSide(color: AppDesign.primary, width: 1.5)),
+    hintStyle: const TextStyle(color: Color(0xFF637083)),
+    labelStyle: const TextStyle(color: Color(0xFF475569)),
   ),
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: AppDesign.lightSurface,
     indicatorColor: AppDesign.primary,
     iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(color: states.contains(WidgetState.selected) ? Colors.white : const Color(0xFF64748B))),
+    labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
+      color: states.contains(WidgetState.selected)
+          ? AppDesign.primary
+          : const Color(0xFF475569),
+    )),
   ),
 
   textTheme: TextTheme(
     bodyLarge: const TextStyle(color: Color(0xFF222324)),  // Text color primary
-    bodyMedium: TextStyle(color: _primaryColor), // Text color Secondary
-    bodySmall: const TextStyle(color: Color(0xFFA7A7A7)),  // Text color Light grey
-    headlineMedium: const TextStyle(color: Color(0xFFA0A0A0)),
-    headlineLarge : const TextStyle(color: Color(0xFF656566)),
+    bodyMedium: const TextStyle(color: Color(0xFF334155)),
+    bodySmall: const TextStyle(color: Color(0xFF637083)),
+    headlineMedium: const TextStyle(color: Color(0xFF637083)),
+    headlineLarge : const TextStyle(color: Color(0xFF334155)),
   ),
 
 

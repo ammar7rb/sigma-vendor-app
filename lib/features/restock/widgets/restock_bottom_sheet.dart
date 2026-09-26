@@ -223,7 +223,7 @@ class RestockSheetWidgetState extends State<RestockSheetWidget> {
                                                     CustomTextFieldWidget(
                                                       variant: true,
                                                       border: true,
-                                                      hintText: 'Ex: 345',
+                                                      hintText: '${getTranslated('example', context)}: 345',
                                                       controller: restockController.variationQuantityController[index],
                                                       focusNode: restockController.variationQuantityFocusnode[index],
                                                       nextNode: index != widget.product!.variation!.length - 1 ? restockController.variationQuantityFocusnode[index+1] : null,
@@ -301,6 +301,5 @@ class RestockSheetWidgetState extends State<RestockSheetWidget> {
     );
   }
 }
-
 
 

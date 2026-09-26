@@ -69,7 +69,7 @@ class CollectedCashFromDeliveryManDialogState extends State<CollectedCashFromDel
                                 decoration: InputDecoration(
                                     border : InputBorder.none,
                                     isCollapsed: true,
-                                    hintText: "Ex: 500",
+                                    hintText: '${getTranslated('example', context)}: 500',
                                     hintStyle: robotoBold.copyWith(
                                      color: Theme.of(context).textTheme.bodySmall?.color, fontSize: 20)
                                 ),

@@ -205,7 +205,7 @@ class _DeliveryManAssignWidgetState extends State<DeliveryManAssignWidget> {
 
               CustomTextFieldWidget(
                 border: true,
-                hintText: 'Ex: xyz service',
+                hintText: '${getTranslated('example', context)}: XYZ',
                 idDate : widget.orderModel?.orderStatus == 'delivered',
                 controller: deliverymanController.thirdPartyShippingNameTextEditingController,
                 focusNode: _thirdPartyShippingNameNode,
@@ -221,7 +221,7 @@ class _DeliveryManAssignWidgetState extends State<DeliveryManAssignWidget> {
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               CustomTextFieldWidget(
-                hintText: 'Ex: xyz-12345678',
+                hintText: '${getTranslated('example', context)}: XYZ-12345678',
                 border: true,
                 idDate : widget.orderModel?.orderStatus == 'delivered',
                 controller: deliverymanController.thirdPartyShippingTrackingIdTextEditingController,

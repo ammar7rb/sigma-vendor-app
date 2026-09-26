@@ -42,7 +42,7 @@ class ChatCardWidget extends StatelessWidget {
           callBack();
 
           if(name.trim() == "Deleted"){
-            showCustomSnackBarWidget('Customer was deleted', context,  sanckBarType: SnackBarType.success);
+            showCustomSnackBarWidget(getTranslated('customer_was_deleted', context), context,  sanckBarType: SnackBarType.success);
           } else {
             Navigator.push(context, MaterialPageRoute(builder: (_) {
               return ChatScreen(userId: id, name: name, chat: chat!);

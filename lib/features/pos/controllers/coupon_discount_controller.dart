@@ -44,7 +44,8 @@ class CouponDiscountController extends ChangeNotifier{
 
       Provider.of<CartController>(Get.context!, listen: false).setCouponCodeAndAmount(_couponCodeAmount, couponCode);
 
-      showCustomSnackBarWidget('You got ${_couponCodeAmount.toString()} discount',Get.context!, isToaster: true, isError: false);
+      showCustomSnackBarWidget((getTranslated('coupon_discount_received', Get.context!) ?? '')
+          .replaceAll('{amount}', '${_couponCodeAmount ?? 0}'), Get.context!, isToaster: true, isError: false);
 
       if((orderAmount + (_couponCodeAmount ?? 0))  < extraDisAmount && _selectedDiscountType == 'amount') {
         Provider.of<CartController>(Get.context!, listen: false).setExtraDiscountAmount(0);

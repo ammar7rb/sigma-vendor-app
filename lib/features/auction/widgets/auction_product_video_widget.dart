@@ -302,7 +302,7 @@ class VideoFilePreview extends StatelessWidget {
                 children: [
                    Icon(Icons.videocam, size: 12, color: Theme.of(context).cardColor),
                   const SizedBox(width: 3),
-                  Text('Video', style: titilliumRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).cardColor)),
+                  Text(getTranslated('product_video', context) ?? 'Video', style: titilliumRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).cardColor)),
                 ],
               ),
             ),

@@ -208,9 +208,8 @@ class _SellerFinanceScreenState extends State<SellerFinanceScreen>
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Icon(item.$3,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .primary),
+                                                        color: AppDesign.foregroundAccent(
+                                                            Theme.of(context).brightness)),
                                                     const SizedBox(height: 8),
                                                     Text(tr(item.$2)),
                                                     const SizedBox(height: 4),
@@ -510,7 +509,8 @@ class _SellerFinanceScreenState extends State<SellerFinanceScreen>
           color: Theme.of(context).primaryColor.withValues(alpha: .1),
           borderRadius: BorderRadius.circular(13),
         ),
-        child: Icon(icon, color: Theme.of(context).primaryColor),
+        child: Icon(icon,
+            color: AppDesign.foregroundAccent(Theme.of(context).brightness)),
       );
 
   BoxDecoration _cardDecoration() => BoxDecoration(

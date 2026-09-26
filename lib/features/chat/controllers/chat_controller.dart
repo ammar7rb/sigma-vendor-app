@@ -468,7 +468,7 @@ class ChatController extends ChangeNotifier {
 
   void downloadFile(String url, String dir, String openFileUrl, String fileName) async {
 
-    var snackBar = const SnackBar(content: Text('Downloading....'),backgroundColor: Colors.black54, duration: Duration(seconds: 1),);
+    var snackBar = SnackBar(content: Text(getTranslated('downloading', Get.context!) ?? ''),backgroundColor: Colors.black54, duration: const Duration(seconds: 1),);
     ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
 
     final task  = await FlutterDownloader.enqueue(

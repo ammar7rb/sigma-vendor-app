@@ -74,7 +74,7 @@ class VacationDialogWidget extends StatelessWidget {
                       Text(getTranslated('vacation_note', context)!, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
                       const SizedBox(height: Dimensions.paddingSizeSmall,),
                       CustomTextFieldWidget(border: true,
-                        hintText: 'note',
+                        hintText: getTranslated('vacation_note', context),
                         maxLine: 2,
                         controller: vacationNote,
                       ),

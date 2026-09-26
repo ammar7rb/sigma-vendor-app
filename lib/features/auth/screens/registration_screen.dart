@@ -9,6 +9,7 @@ import 'package:sixvalley_vendor_app/common/basewidgets/textfeild/custom_text_fe
 import 'package:sixvalley_vendor_app/features/auth/controllers/auth_controller.dart';
 import 'package:sixvalley_vendor_app/features/auth/domain/models/register_model.dart';
 import 'package:sixvalley_vendor_app/features/auth/screens/seller_registration_verification_screen.dart';
+import 'package:sixvalley_vendor_app/features/dashboard/screens/dashboard_screen.dart';
 import 'package:sixvalley_vendor_app/features/auth/widgets/seller_auth_header.dart';
 import 'package:sixvalley_vendor_app/features/auth/widgets/required_registration_policy_links.dart';
 import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
@@ -78,15 +79,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           await auth.saveRegistrationReference(reference);
           if (data['token'] is String) await auth.saveUserToken(data['token']);
           if (!mounted) return;
+          final otpRequired = data['eligibility']?['verification']
+                  ?['otp_required'] ==
+              true;
+          if (!otpRequired) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                (route) => false);
+            return;
+          }
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (_) => SellerRegistrationVerificationScreen(
                         registrationReference: reference,
                         mobileNumber: EgyptPhoneHelper.toInternational(phone),
-                        otpRequired: data['eligibility']?['verification']
-                                ?['otp_required'] ==
-                            true,
+                        otpRequired: otpRequired,
                         resendAfter: data['otp']?['resend_after'] as int? ?? 0,
                         supportTicketRequired: data['eligibility']
                                 ?['verification']?['support_ticket_required'] ==

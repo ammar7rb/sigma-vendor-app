@@ -5,9 +5,11 @@ import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.d
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'package:sixvalley_vendor_app/features/wallet/domain/models/seller_balance_model.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/domain/models/seller_package_overview_model.dart';
+import 'package:sixvalley_vendor_app/features/seller_package/widgets/transfer_account_details.dart';
 import 'package:sixvalley_vendor_app/features/wallet/domain/models/funding_amount.dart';
 import 'package:sixvalley_vendor_app/helper/price_converter.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
+import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class SellerBalanceFundingScreen extends StatefulWidget {
   final String walletTarget;
@@ -167,18 +169,16 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                       Text(tr('transfer_service_unavailable'))
                     else if (channel == null)
                       Text(tr('select_transfer_channel'))
-                    else if (method != null) ...[
+                    else if (method == null)
+                      Text(tr('transfer_service_unavailable'))
+                    else ...[
                       _TransferChannelHeader(
                         title: tr(channel == 'wallet'
                             ? 'electronic_wallet_payment'
                             : 'instapay_payment'),
-                        subtitle: tr('transfer_using_admin_details'),
+                        subtitle: tr('balance_transfer_steps'),
                       ),
-                      for (final field in method.methodFields)
-                        Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: SelectableText(
-                                '${_fieldLabel(field.inputName)}: ${field.inputData}')),
+                      TransferAccountDetails(fields: method.methodFields),
                       Padding(
                           padding: const EdgeInsets.only(top: 12),
                           child: TextFormField(
@@ -189,7 +189,8 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                               maxLength: 100,
                               decoration: InputDecoration(
                                   counterText: '',
-                                  labelText: '${tr('sender_name')} *',
+                                  labelText:
+                                      '${tr('transfer_sender_full_name')} *',
                                   border: const OutlineInputBorder()),
                               validator: (value) => (value ?? '').trim().isEmpty
                                   ? tr('required')
@@ -206,7 +207,7 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                               decoration: InputDecoration(
                                   counterText: '',
                                   labelText:
-                                      '${tr('sender_phone_or_account')} *',
+                                      '${tr('transfer_sender_number')} *',
                                   border: const OutlineInputBorder()),
                               validator: (value) => (value ?? '').trim().isEmpty
                                   ? tr('required')
@@ -335,26 +336,8 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
     if (selectedChannel == null || balance.offlinePaymentMethods.isEmpty) {
       return null;
     }
-    final methods = balance.offlinePaymentMethods;
-    bool matches(SellerOfflinePaymentMethod method, String needle) {
-      final searchable =
-          '${method.methodName} ${method.methodFields.map((field) => '${field.inputName} ${field.inputData}').join(' ')}'
-              .toLowerCase();
-      return searchable.contains(needle);
-    }
-
-    if (selectedChannel == 'instapay') {
-      return methods
-              .where((method) =>
-                  matches(method, 'insta') || matches(method, 'انستا'))
-              .firstOrNull ??
-          (methods.length > 1 ? methods[1] : methods.first);
-    }
-    return methods
-            .where((method) =>
-                matches(method, 'wallet') || matches(method, 'محفظ'))
-            .firstOrNull ??
-        methods.first;
+    return transferMethodForChannel(
+        balance.offlinePaymentMethods, selectedChannel);
   }
 
   String _fieldLabel(String inputName) => tr(inputName);
@@ -405,7 +388,7 @@ class _PaymentChoiceCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           side: BorderSide(
               color: selected
-                  ? Theme.of(context).primaryColor
+                  ? AppDesign.foregroundAccent(Theme.of(context).brightness)
                   : Theme.of(context).dividerColor,
               width: selected ? 1.6 : 1),
         ),
@@ -417,14 +400,15 @@ class _PaymentChoiceCard extends StatelessWidget {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Icon(icon, color: Theme.of(context).primaryColor),
+                Icon(icon,
+                    color: AppDesign.foregroundAccent(Theme.of(context).brightness)),
                 const Spacer(),
                 Icon(
                     selected
                         ? Icons.radio_button_checked
                         : Icons.radio_button_off,
                     color: selected
-                        ? Theme.of(context).primaryColor
+                        ? AppDesign.foregroundAccent(Theme.of(context).brightness)
                         : Theme.of(context).hintColor),
               ]),
               const SizedBox(height: 12),

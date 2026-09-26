@@ -12,7 +12,8 @@ ThemeData dark = ThemeData(
   brightness: Brightness.dark,
   bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
   highlightColor: AppDesign.darkSurface,
-  hintColor: const Color(0xFFc7c7c7),
+  hintColor: const Color(0xFFAAB9CB),
+  disabledColor: const Color(0xFF718198),
   cardColor: AppDesign.darkSurface,
   scaffoldBackgroundColor: AppDesign.darkBackground,
   dividerColor: const Color(0xFF24364D),
@@ -29,20 +30,36 @@ ThemeData dark = ThemeData(
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDesign.radiusMedium), borderSide: const BorderSide(color: Color(0xFF24364D))),
     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDesign.radiusMedium), borderSide: const BorderSide(color: Color(0xFF24364D))),
     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDesign.radiusMedium), borderSide: const BorderSide(color: AppDesign.brandLight, width: 1.5)),
+    hintStyle: const TextStyle(color: Color(0xFFAAB9CB)),
+    labelStyle: const TextStyle(color: Color(0xFFCBD6E3)),
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(foregroundColor: AppDesign.brandLight),
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: AppDesign.brandLight,
+      side: const BorderSide(color: AppDesign.brandLight),
+    ),
   ),
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: AppDesign.darkSurface,
     indicatorColor: AppDesign.primary,
     iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(color: states.contains(WidgetState.selected) ? Colors.white : const Color(0xFF94A3B8))),
+    labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
+      color: states.contains(WidgetState.selected)
+          ? const Color(0xFFE9EEF4)
+          : const Color(0xFFB8C7D8),
+    )),
   ),
 
 
   textTheme: const TextTheme(
     bodyLarge: TextStyle(color: Color(0xFFE9EEF4)),  // Text color primary
     bodyMedium: TextStyle(color: Color(0xFFE9EEF4)), // Text color Secondary
-    bodySmall: TextStyle(color: Color(0xFFE9EEF4)),  // Text color Light grey
-    headlineMedium: TextStyle(color: Color(0xFFA0A0A0)),
-    headlineLarge : TextStyle(color: Color(0xFF656566)),
+    bodySmall: TextStyle(color: Color(0xFFB8C7D8)),
+    headlineMedium: TextStyle(color: Color(0xFFB8C7D8)),
+    headlineLarge : TextStyle(color: Color(0xFFDDE6F0)),
   ),
 
 

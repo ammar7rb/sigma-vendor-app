@@ -397,7 +397,7 @@ class OrderDetailsController extends ChangeNotifier {
 
         if (fileExists) {
           ScaffoldMessenger.of(Get.context!).showSnackBar(
-              const SnackBar(content: Text("File already downloaded")));
+              SnackBar(content: Text(getTranslated('file_already_downloaded', Get.context!) ?? '')));
           _isDownloadLoading = false;
         } else {
           apiResponse.listen((d) => downloadData.addAll(d), onDone: () {
