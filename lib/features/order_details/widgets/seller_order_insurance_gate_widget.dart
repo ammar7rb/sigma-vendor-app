@@ -1,5 +1,5 @@
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
-import 'package:intl/intl.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -21,186 +21,145 @@ class SellerOrderInsuranceGateWidget extends StatelessWidget {
       final insurance = envelope?.insurance;
       if (controller.insuranceLoading || insurance == null)
         return const Center(child: CircularProgressIndicator());
+      final lastThree = insurance.orderLastThreeDigits.padLeft(3, '0');
       return ListView(padding: const EdgeInsets.all(16), children: [
         Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
-                side: BorderSide(color: Theme.of(context).dividerColor)),
-            child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
+            side: BorderSide(color: Theme.of(context).dividerColor),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Icon(Icons.shield_outlined, size: 42, color: Theme.of(context).primaryColor),
+              const SizedBox(height: 10),
+              Text(getTranslated('seller_order_insurance', context) ?? 'تأمين الطلب',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Text(getTranslated('seller_order_details_hidden_until_insurance_paid', context) ?? 'تفاصيل الطلب محجوبة حتى سداد التأمين',
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: insurance.status == 'pending_payment'
+                    ? () => _showPaymentOptions(context, controller, envelope!, insurance)
+                    : null,
+                icon: const Icon(Icons.lock_open_outlined),
+                label: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text('${getTranslated('insurance_amount', context) ?? 'قيمة التأمين'}: ${PriceConverter.convertPrice(context, insurance.amount)}'),
+                ),
+              ),
+              if (insurance.status == 'pending_review')
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(getTranslated('offline_payment_waiting_for_admin_review', context) ?? 'الدفع قيد مراجعة الإدارة', textAlign: TextAlign.center),
+                ),
+              const SizedBox(height: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Stack(children: [
+                  Container(
+                    height: 155,
+                    padding: const EdgeInsets.all(20),
+                    color: Theme.of(context).primaryColor.withValues(alpha: .08),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Container(width: 170, height: 14, color: Theme.of(context).dividerColor),
+                      const SizedBox(height: 18),
+                      Container(width: 240, height: 14, color: Theme.of(context).dividerColor),
+                      const SizedBox(height: 18),
+                      Container(width: 130, height: 14, color: Theme.of(context).dividerColor),
+                    ]),
+                  ),
+                  Positioned.fill(child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: ColoredBox(color: Theme.of(context).cardColor.withValues(alpha: .7)),
+                  )),
+                  Positioned.fill(child: Center(child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(children: [
-                        Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .primaryColor
-                                    .withValues(alpha: .1),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Icon(Icons.shield_outlined,
-                                color: Theme.of(context).primaryColor)),
-                        const SizedBox(width: 12),
-                        Expanded(
-                            child: Text(
-                                getTranslated(
-                                        'seller_order_insurance', context) ??
-                                    'Seller order insurance',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w800)))
-                      ]),
-                      const SizedBox(height: 12),
-                      Container(
-                          padding: const EdgeInsets.all(13),
-                          decoration: BoxDecoration(
-                              color: AppDesign.warning.withValues(alpha: .1),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: Text(
-                              getTranslated(
-                                      'seller_order_details_hidden_until_insurance_paid',
-                                      context) ??
-                                  'Order details remain hidden until insurance is paid.',
-                              style: const TextStyle(height: 1.5))),
-                      const Divider(height: 28),
-                      _row(
-                          context,
-                          getTranslated('order_reference', context) ??
-                              'Order reference',
-                          insurance.orderReference),
-                      _row(
-                          context,
-                          getTranslated('insurance_amount', context) ??
-                              'Insurance amount',
-                          PriceConverter.convertPrice(
-                              context, insurance.amount)),
-                      _row(
-                          context,
-                          getTranslated('payment_deadline', context) ??
-                              'Payment deadline',
-                          insurance.expiresAt == null
-                              ? (getTranslated('finance_not_set', context) ??
-                                  '')
-                              : DateFormat.yMMMd(Localizations.localeOf(context)
-                                      .languageCode)
-                                  .format(DateTime.parse(insurance.expiresAt!)
-                                      .toLocal())),
-                      _row(
-                          context,
-                          getTranslated('status', context) ?? 'Status',
-                          getTranslated(insurance.status, context) ??
-                              insurance.status),
-                      if (insurance.adminNote?.isNotEmpty == true)
-                        _row(
-                            context,
-                            getTranslated('admin_note', context) ??
-                                'Admin note',
-                            insurance.adminNote!),
-                      _row(
-                          context,
-                          getTranslated('order_insurance_credit', context) ??
-                              '',
-                          PriceConverter.convertPrice(
-                              context, insurance.reusableInsuranceCredit)),
-                      Text(getTranslated('finance_due_notice', context) ?? ''),
-                      const SizedBox(height: 16),
-                      if (insurance.status == 'pending_payment') ...[
-                        if (envelope!.paymentOptions.reusableInsuranceCredit &&
-                            insurance.reusableInsuranceCredit >=
-                                insurance.amount)
-                          _payButton(
-                              context,
-                              controller,
-                              insurance,
-                              'seller_order_insurance_credit',
-                              'pay_from_reusable_insurance_credit'),
-                        if (envelope.paymentOptions.digitalPayment)
-                          ...envelope.paymentOptions.digitalGateways
-                              .map((gateway) => Padding(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  child: OutlinedButton(
-                                    onPressed: controller.insuranceLoading
-                                        ? null
-                                        : () async {
-                                            final redirect = await _pay(context,
-                                                controller, gateway.id);
-                                            if (redirect != null) {
-                                              try {
-                                                final opened = await launchUrl(
-                                                    Uri.parse(redirect),
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                                if (!opened && context.mounted)
-                                                  showCustomSnackBarWidget(
-                                                      getTranslated(
-                                                          'could_not_open_payment_page',
-                                                          context),
-                                                      context);
-                                              } catch (_) {
-                                                if (context.mounted)
-                                                  showCustomSnackBarWidget(
-                                                      getTranslated(
-                                                          'could_not_open_payment_page',
-                                                          context),
-                                                      context);
-                                              }
-                                            }
-                                          },
-                                    child: Text(
-                                        '${getTranslated('pay_with', context) ?? 'Pay with'} ${gateway.title}'),
-                                  ))),
-                        if (envelope.paymentOptions.offlinePayment &&
-                            envelope.paymentOptions.offlineMethods.isNotEmpty)
-                          Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: OutlinedButton(
-                                  onPressed: () => _offlineDialog(
-                                      context,
-                                      controller,
-                                      envelope.paymentOptions.offlineMethods),
-                                  child: Text(getTranslated(
-                                          'offline_payment', context) ??
-                                      'Offline payment'))),
-                      ],
-                      if (insurance.status == 'pending_review')
-                        Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(getTranslated(
-                                    'offline_payment_waiting_for_admin_review',
-                                    context) ??
-                                'Payment is waiting for admin review.')),
-                    ]))),
+                      Text('•••${lastThree.substring(lastThree.length - 3)}', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 8),
+                      Text('${getTranslated('order_amount', context) ?? 'قيمة الطلب'}: ${PriceConverter.convertPrice(context, insurance.orderAmount)}'),
+                    ],
+                  ))),
+                ]),
+              ),
+            ]),
+          ),
+        ),
       ]);
     });
   }
 
-  Widget _row(BuildContext context, String title, String value) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(child: Text(title)),
-        Expanded(
-            child: Text(value,
-                textAlign: TextAlign.end,
-                style: const TextStyle(fontWeight: FontWeight.w600)))
-      ]));
-
-  Widget _payButton(BuildContext context, OrderDetailsController controller,
-          SellerOrderInsuranceModel insurance, String method, String label) =>
-      Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-                onPressed: controller.insuranceLoading
-                    ? null
-                    : () => _pay(context, controller, method),
-                icon: const Icon(Icons.shield_outlined),
-                label: Text(getTranslated(label, context) ?? label))),
-      );
+  void _showPaymentOptions(BuildContext context, OrderDetailsController controller,
+      SellerOrderInsuranceEnvelope envelope, SellerOrderInsuranceModel insurance) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text(getTranslated('choose_payment_method', sheetContext) ?? 'اختر طريقة دفع التأمين',
+              style: Theme.of(sheetContext).textTheme.titleLarge),
+          const SizedBox(height: 14),
+          if (envelope.paymentOptions.reusableInsuranceCredit)
+            OutlinedButton.icon(
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              label: Text(getTranslated('pay_from_reusable_insurance_credit', sheetContext) ?? 'الدفع من رصيد التأمين'),
+              onPressed: () async {
+                if (insurance.reusableInsuranceCredit < insurance.amount) {
+                  showCustomSnackBarWidget(
+                    getTranslated('seller_insurance_balance_insufficient_action', sheetContext) ??
+                        'رصيد التأمين لا يكفي لإتمام المعاملة. اختر طريقة أخرى أو أودع في رصيد التأمين.',
+                    sheetContext,
+                  );
+                  return;
+                }
+                Navigator.pop(sheetContext);
+                await _pay(context, controller, 'seller_order_insurance_credit');
+              },
+            ),
+          for (final method in envelope.paymentOptions.offlineMethods)
+            if (envelope.paymentOptions.offlinePayment)
+              OutlinedButton.icon(
+                icon: Icon(method.channel == 'instapay'
+                    ? Icons.account_balance_outlined : Icons.phone_android_outlined),
+                label: Text(method.channel == 'instapay'
+                    ? '${getTranslated('instapay_payment', sheetContext) ?? 'إنستا باي'} · ${method.title}'
+                    : '${getTranslated('electronic_wallet_payment', sheetContext) ?? 'محفظة إلكترونية'} · ${method.title}'),
+                onPressed: () {
+                  Navigator.pop(sheetContext);
+                  _offlineDialog(context, controller, [method]);
+                },
+              ),
+          if (envelope.paymentOptions.digitalPayment)
+            for (final gateway in envelope.paymentOptions.digitalGateways)
+              OutlinedButton.icon(
+                icon: const Icon(Icons.credit_card_outlined),
+                label: Text(gateway.title),
+                onPressed: () async {
+                  Navigator.pop(sheetContext);
+                  final redirect = await _pay(context, controller, gateway.id);
+                  if (redirect == null) return;
+                  try {
+                    final opened = await launchUrl(Uri.parse(redirect), mode: LaunchMode.externalApplication);
+                    if (!opened && context.mounted) {
+                      showCustomSnackBarWidget(getTranslated('could_not_open_payment_page', context), context);
+                    }
+                  } catch (_) {
+                    if (context.mounted) {
+                      showCustomSnackBarWidget(getTranslated('could_not_open_payment_page', context), context);
+                    }
+                  }
+                },
+              ),
+        ]),
+      )),
+    );
+  }
 
   Future<String?> _pay(BuildContext context, OrderDetailsController controller,
       String method) async {

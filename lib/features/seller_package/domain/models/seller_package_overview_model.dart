@@ -58,17 +58,19 @@ class SellerPaymentGateway {
 class SellerOfflinePaymentMethod {
   final int id;
   final String methodName;
+  final String paymentChannel;
   final List<SellerOfflineMethodField> methodFields;
   final List<SellerOfflineMethodField> methodInformations;
 
   SellerOfflinePaymentMethod({
-    required this.id, required this.methodName, required this.methodFields,
+    required this.id, required this.methodName, required this.paymentChannel, required this.methodFields,
     required this.methodInformations,
   });
 
   factory SellerOfflinePaymentMethod.fromJson(Map<String, dynamic> json) => SellerOfflinePaymentMethod(
     id: _intValue(json['id']),
     methodName: json['method_name']?.toString() ?? '',
+    paymentChannel: json['payment_channel']?.toString().toLowerCase() ?? '',
     methodFields: _methodFields(json['method_fields']),
     methodInformations: _methodFields(json['method_informations']),
   );

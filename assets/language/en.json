@@ -1661,6 +1661,7 @@
     "instructions": "Instructions",
     "company_manages_shipping_status_after_packaging": "After packaging, the company manages the shipping status.",
     "pay_from_reusable_insurance_credit": "Pay from insurance wallet",
+    "seller_insurance_balance_insufficient_action": "Your insurance balance is insufficient. Choose another payment method or add funds to your insurance balance.",
     "admin_note": "Admin note",
     "seller_dashboard_overview": "Seller dashboard overview",
     "active_ads": "Active advertisements",
@@ -1866,5 +1867,6 @@
   "customer_was_deleted": "Customer account was deleted",
   "coupon_discount_received": "You received a discount of {amount}",
   "example": "Example",
-  "example_shipping_duration": "Example: 4–6 days"
+  "example_shipping_duration": "Example: 4–6 days",
+  "product_upload_failed": "The product could not be saved. Please try again."
 }

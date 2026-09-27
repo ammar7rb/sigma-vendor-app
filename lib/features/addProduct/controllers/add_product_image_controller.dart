@@ -153,20 +153,40 @@ class AddProductImageController extends ChangeNotifier {
 
 
 
-  Future addProductImage(BuildContext context, ImageModel imageForUpload, Function callback, {bool update =false, int? index, int? productId}) async {
+  Future<bool> addProductImage(BuildContext context, ImageModel imageForUpload, Function callback, {bool update =false, int? index, int? productId}) async {
 
     bool isColorVariationActive = Provider.of<VariationController>(context, listen: false).attributeList![0].active;
 
     _isLoading = true;
     notifyListeners();
 
-    ApiResponse response = await shopServiceInterface.addImage(context, imageForUpload, isColorVariationActive);
+    ApiResponse response;
+    try {
+      response = await shopServiceInterface.addImage(context, imageForUpload, isColorVariationActive);
+    } catch (_) {
+      _isLoading = false;
+      notifyListeners();
+      if (context.mounted) showCustomSnackBarWidget(getTranslated('image_upload_failed', context), context);
+      return false;
+    }
 
 
     if(response.response != null && response.response!.statusCode == 200) {
       totalUploaded ++;
       _isLoading = false;
-      Map map = jsonDecode(response.response!.data);
+      dynamic decoded;
+      try {
+        decoded = response.response!.data is String
+            ? jsonDecode(response.response!.data) : response.response!.data;
+      } catch (_) {
+        if (context.mounted) showCustomSnackBarWidget(getTranslated('image_upload_failed', context), context);
+        return false;
+      }
+      if (decoded is! Map) {
+        if (context.mounted) showCustomSnackBarWidget(getTranslated('image_upload_failed', context), context);
+        return false;
+      }
+      Map map = decoded;
 
 
       String? name = map["image_name"];
@@ -214,13 +234,15 @@ class AddProductImageController extends ChangeNotifier {
 
       callback(true, name, type, map['color_image'] != null ? map['color_image']['color'] : null);
       notifyListeners();
+      return true;
     }else {
       _isLoading = false;
       ApiChecker.
       checkApi( response);
       showCustomSnackBarWidget(getTranslated('image_upload_failed', Get.context!), Get.context!);
+      notifyListeners();
+      return false;
     }
-    notifyListeners();
   }
 
 
@@ -412,7 +434,7 @@ class AddProductImageController extends ChangeNotifier {
 
   final List<ColorImage> _deletedColorImageList = [];
 
-  Future<void> onUploadColorImages({required BuildContext context, required bool isUpdate, required int? productId, required Function callBack}) async {
+  Future<bool> onUploadColorImages({required BuildContext context, required bool isUpdate, required int? productId, required Function callBack}) async {
     _deletedColorImageList.clear();
 
     if(imagesWithColor.isNotEmpty){
@@ -422,11 +444,12 @@ class AddProductImageController extends ChangeNotifier {
         await onDeleteAllProductImage(isUpdate, productId, i);
 
         if(imagesWithColor[i].image != null && context.mounted){
-          await addProductImage(context, imagesWithColor[i], callBack, index: i, update: isUpdate);
+          if (!await addProductImage(context, imagesWithColor[i], callBack, index: i, update: isUpdate)) return false;
         }
 
       }
     }
+    return true;
   }
 
   Future<void> onDeleteAllProductImage(bool update, int? productId, int? index) async {

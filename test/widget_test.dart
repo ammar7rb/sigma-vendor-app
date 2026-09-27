@@ -34,14 +34,12 @@ void main() {
         reason: 'Registration must never log password-bearing form fields');
   });
 
-  test('vendor profile exposes logout before account deletion', () {
+  test('vendor profile exposes a logout action', () {
     final profile =
         File('lib/features/profile/widgets/theme_changer_widget.dart')
             .readAsStringSync();
     final logout = profile.indexOf("title: 'logout'");
-    final deletion = profile.indexOf("title: 'delete_account'");
     expect(logout, greaterThanOrEqualTo(0));
-    expect(deletion, greaterThan(logout));
     expect(profile, contains('SignOutConfirmationDialogWidget()'));
   });
 

@@ -6,6 +6,9 @@ import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 SellerOfflinePaymentMethod? transferMethodForChannel(
     List<SellerOfflinePaymentMethod> methods, String channel) {
   for (final method in methods) {
+    if (method.paymentChannel == channel) return method;
+  }
+  for (final method in methods) {
     final name = method.methodName.toLowerCase();
     if (channel == 'instapay'
         ? name.contains('insta') || name.contains('انستا')

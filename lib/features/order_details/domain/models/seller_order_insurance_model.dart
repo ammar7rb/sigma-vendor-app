@@ -23,6 +23,7 @@ class SellerOrderInsuranceEnvelope {
 class SellerOrderInsuranceModel {
   final int id;
   final int orderId;
+  final String orderLastThreeDigits;
   final String orderReference;
   final double orderAmount;
   final double amount;
@@ -44,6 +45,7 @@ class SellerOrderInsuranceModel {
   SellerOrderInsuranceModel({
     required this.id,
     required this.orderId,
+    required this.orderLastThreeDigits,
     required this.orderReference,
     required this.orderAmount,
     required this.amount,
@@ -70,6 +72,7 @@ class SellerOrderInsuranceModel {
     return SellerOrderInsuranceModel(
       id: int.tryParse('${json['id']}') ?? 0,
       orderId: int.tryParse('${json['order_id']}') ?? 0,
+      orderLastThreeDigits: (json['order_last_three_digits'] ?? '${json['order_id'] ?? 0}'.padLeft(3, '0')).toString(),
       orderReference: '${json['order_reference'] ?? 'ORD-${json['order_id']}'}',
       orderAmount: double.tryParse('${json['order_amount'] ?? 0}') ?? 0,
       amount: double.tryParse('${json['amount'] ?? 0}') ?? 0,
@@ -134,14 +137,16 @@ class SellerOrderInsurancePaymentOptions {
 class InsurancePaymentMethod {
   final String id;
   final String title;
+  final String channel;
   final List<Map<String, dynamic>> fields;
   InsurancePaymentMethod(
-      {required this.id, required this.title, this.fields = const []});
+      {required this.id, required this.title, this.channel = '', this.fields = const []});
   factory InsurancePaymentMethod.fromJson(Map<String, dynamic> json,
           {bool digital = false}) =>
       InsurancePaymentMethod(
         id: '${digital ? json['key'] : json['id']}',
         title: '${digital ? json['title'] : json['method_name']}',
+        channel: digital ? '' : '${json['payment_channel'] ?? ''}'.toLowerCase(),
         fields: (json['method_fields'] as List? ?? [])
             .whereType<Map>()
             .map((f) => Map<String, dynamic>.from(f))

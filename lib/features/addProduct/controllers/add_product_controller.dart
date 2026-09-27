@@ -312,6 +312,8 @@ class AddProductController extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    try {
+
     final addProductImageController =
         Provider.of<AddProductImageController>(context, listen: false);
     bool isDigitalVariationEmpty =
@@ -362,7 +364,7 @@ class AddProductController extends ChangeNotifier {
         thumbnail,
         metaImage,
         isAdd,
-        attributeList![0].active,
+        attributeList?.firstOrNull?.active ?? false,
         colorImageObjects,
         tags,
         digitalProductFileName,
@@ -401,8 +403,17 @@ class AddProductController extends ChangeNotifier {
       // Keep the backend's specific entitlement reason visible to the seller.
       ApiChecker.checkApi(response);
     }
-    _isLoading = false;
-    notifyListeners();
+    } catch (_) {
+      if (context.mounted) {
+        showCustomSnackBarWidget(
+            getTranslated('product_upload_failed', context) ??
+                'تعذر حفظ المنتج. حاول مرة أخرى.',
+            context);
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void setMetaSeoData(Product product) {

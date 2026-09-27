@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:sixvalley_vendor_app/features/order/controllers/order_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
@@ -27,52 +28,8 @@ class _OrderWidgetState extends State<OrderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double orderAmount = 0;
-
-    if (widget.orderModel.orderType == 'POS') {
-      double itemsPrice = 0;
-      double discount = 0;
-      double? eeDiscount = 0;
-      double tax = 0;
-      double coupon = 0;
-      double shipping = 0;
-      if (widget.orderModel.orderDetails != null &&
-          widget.orderModel.orderDetails!.isNotEmpty) {
-        coupon = widget.orderModel.discountAmount!;
-        shipping = widget.orderModel.shippingCost!;
-        for (var orderDetails in widget.orderModel.orderDetails!) {
-          if (orderDetails.productDetails?.productType == "physical") {}
-          itemsPrice = itemsPrice + (orderDetails.price! * orderDetails.qty!);
-          discount = discount + orderDetails.discount!;
-          tax = tax + orderDetails.tax!;
-        }
-        if (widget.orderModel.orderType == 'POS') {
-          if (widget.orderModel.extraDiscountType == 'percent') {
-            eeDiscount = itemsPrice * (widget.orderModel.extraDiscount! / 100);
-          } else {
-            eeDiscount = widget.orderModel.extraDiscount;
-          }
-        }
-      }
-      double subTotal = itemsPrice + tax - discount;
-
-      orderAmount = subTotal + shipping - coupon - eeDiscount!;
-
-      // double ? _extraDiscountAnount = 0;
-      // if(orderModel.extraDiscount != null){
-      //   _extraDiscountAnount = PriceConverter.convertWithDiscount(context, orderModel.totalProductPrice, orderModel.extraDiscount, orderModel.extraDiscountType == 'percent' ? 'percent' : 'amount' );
-      //   if(_extraDiscountAnount != null) {
-      //     double percentAmount = _extraDiscountAnount!;
-      //     _extraDiscountAnount = orderModel.totalProductPrice! - percentAmount;
-      //   }
-      // }
-      //
-      // double totalDiscount = (_extraDiscountAnount! + orderModel.totalProductDiscount!);
-      // double totalOrderAmount = (orderModel.totalProductPrice! + orderModel.totalTaxAmount!);
-      //
-      // orderAmount = totalOrderAmount - totalDiscount;
-      //
-      // orderAmount = orderModel.orderAmount! - orderModel.totalTaxAmount!;
+    if (widget.orderModel.detailsLocked) {
+      return _lockedOrderCard(context);
     }
 
     return Padding(
@@ -349,6 +306,70 @@ class _OrderWidgetState extends State<OrderWidget> {
           ),
           const SizedBox(height: Dimensions.paddingSizeSmall),
         ],
+      ),
+    );
+  }
+
+  Widget _lockedOrderCard(BuildContext context) {
+    Future<void> openPayment() async {
+      await Navigator.push(context, MaterialPageRoute(builder: (_) =>
+          OrderDetailsScreen(orderId: widget.orderModel.id,
+              accessToken: widget.orderModel.restrictedAccessToken)));
+      if (!context.mounted) return;
+      final orders = context.read<OrderController>();
+      await orders.getOrderList(context, 1, orders.orderType, orders.filterModel);
+    }
+
+    final lastThree = (widget.orderModel.maskedOrderReference ?? '')
+        .replaceAll(RegExp(r'[^0-9]'), '').padLeft(3, '0');
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            FilledButton.icon(
+              onPressed: openPayment,
+              icon: const Icon(Icons.shield_outlined),
+              label: Text('${getTranslated('insurance_amount', context) ?? 'قيمة التأمين'}: '
+                  '${PriceConverter.convertPrice(context, widget.orderModel.sellerInsuranceAmount ?? 0)}'),
+            ),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: openPayment,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Stack(children: [
+                  Container(
+                    height: 110,
+                    color: Theme.of(context).primaryColor.withValues(alpha: .08),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Container(width: 140, height: 12, color: Theme.of(context).dividerColor),
+                      const SizedBox(height: 14),
+                      Container(width: 210, height: 12, color: Theme.of(context).dividerColor),
+                    ]),
+                  ),
+                  Positioned.fill(child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: ColoredBox(color: Theme.of(context).cardColor.withValues(alpha: .7)),
+                  )),
+                  Positioned.fill(child: Center(child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('•••${lastThree.substring(lastThree.length - 3)}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 5),
+                      Text('${getTranslated('order_amount', context) ?? 'قيمة الطلب'}: '
+                          '${PriceConverter.convertPrice(context, widget.orderModel.orderAmount ?? 0)}'),
+                    ],
+                  ))),
+                ]),
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }

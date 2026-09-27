@@ -95,7 +95,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
   Product? _product;
   AddProductModel? _addProduct;
   String? thumbnailImage = '', metaImage = '';
-  int counter = 0, total = 0;
   int addColor = 0;
   List<String> tagList = [];
   final categoryController =
@@ -213,8 +212,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
         thumbnailImage = name;
       }
       if (_update) {
-        int withc = 0, withOurC = 0;
-
         if (Provider.of<AddProductImageController>(Get.context!, listen: false)
             .imagesWithColor
             .isNotEmpty) {
@@ -243,37 +240,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
           }
         }
 
-        for (int i = 0;
-            i <
-                Provider.of<AddProductImageController>(Get.context!,
-                        listen: false)
-                    .imagesWithColor
-                    .length;
-            i++) {
-          if (Provider.of<AddProductImageController>(Get.context!,
-                      listen: false)
-                  .imagesWithColor[i]
-                  .image !=
-              null) {
-            withc++;
-          }
-        }
-
-        for (int i = 0;
-            i <
-                Provider.of<AddProductImageController>(Get.context!,
-                        listen: false)
-                    .withoutColor
-                    .length;
-            i++) {
-          if (Provider.of<AddProductImageController>(Get.context!,
-                      listen: false)
-                  .withoutColor[i]
-                  .image !=
-              null) {
-            withOurC++;
-          }
-        }
       } else {
         if (Provider.of<AddProductImageController>(Get.context!, listen: false)
             .imagesWithColor
@@ -314,36 +280,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
               index++) {}
         }
 
-        counter++;
-
-        if (metaImage == '') {
-          total = Provider.of<AddProductImageController>(Get.context!,
-                      listen: false)
-                  .imagesWithColor
-                  .length +
-              Provider.of<AddProductImageController>(Get.context!,
-                      listen: false)
-                  .withoutColor
-                  .length +
-              1;
-        } else {
-          total = Provider.of<AddProductImageController>(Get.context!,
-                      listen: false)
-                  .imagesWithColor
-                  .length +
-              Provider.of<AddProductImageController>(Get.context!,
-                      listen: false)
-                  .withoutColor
-                  .length +
-              2;
-        }
-
-        if (counter == total) {
-          counter++;
-          Provider.of<AddProductController>(Get.context!, listen: false)
-              .addProduct(context, _product!, _addProduct!, thumbnailImage,
-                  metaImage, !_update, tagList);
-        }
       }
     }
   }
@@ -1630,35 +1566,35 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                     if (addProductImageController
                                                             .selectedLogoFile !=
                                                         null) {
-                                                      await addProductImageController
+                                                      if (!await addProductImageController
                                                           .addProductImage(
                                                               context,
                                                               addProductImageController
                                                                   .thumbnailImageModel,
                                                               route,
-                                                              update: _update);
+                                                              update: _update)) return;
                                                     }
 
                                                     if (addProductImageController
                                                             .selectedMetaImageFile !=
                                                         null) {
-                                                      await addProductImageController
+                                                      if (!await addProductImageController
                                                           .addProductImage(
                                                               Get.context!,
                                                               addProductImageController
                                                                   .metaImageModel,
                                                               route,
-                                                              update: _update);
+                                                              update: _update)) return;
                                                     }
 
                                                     if (context.mounted) {
-                                                      await addProductImageController
+                                                      if (!await addProductImageController
                                                           .onUploadColorImages(
                                                         context: context,
                                                         isUpdate: _update,
                                                         productId: _product?.id,
                                                         callBack: route,
-                                                      );
+                                                      )) return;
                                                     }
 
                                                     if (addProductImageController
@@ -1674,7 +1610,7 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                 .withoutColor[i]
                                                                 .image !=
                                                             null) {
-                                                          await addProductImageController
+                                                          if (!await addProductImageController
                                                               .addProductImage(
                                                                   Get.context!,
                                                                   addProductImageController
@@ -1683,7 +1619,7 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                   route,
                                                                   index: i,
                                                                   update:
-                                                                      _update);
+                                                                      _update)) return;
                                                         }
                                                       }
                                                     }
@@ -1691,23 +1627,23 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                     if (addProductImageController
                                                             .selectedLogoFile !=
                                                         null) {
-                                                      await addProductImageController
+                                                      if (!await addProductImageController
                                                           .addProductImage(
                                                               context,
                                                               addProductImageController
                                                                   .thumbnailImageModel,
-                                                              route);
+                                                              route)) return;
                                                     }
 
                                                     if (addProductImageController
                                                             .selectedMetaImageFile !=
                                                         null) {
-                                                      await addProductImageController
+                                                      if (!await addProductImageController
                                                           .addProductImage(
                                                               Get.context!,
                                                               addProductImageController
                                                                   .metaImageModel,
-                                                              route);
+                                                              route)) return;
                                                     }
 
                                                     if (addProductImageController
@@ -1719,12 +1655,12 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                   .imagesWithColor
                                                                   .length;
                                                           i++) {
-                                                        await addProductImageController
+                                                        if (!await addProductImageController
                                                             .addProductImage(
                                                                 Get.context!,
                                                                 addProductImageController
                                                                     .imagesWithColor[i],
-                                                                route);
+                                                                route)) return;
                                                       }
                                                     }
 
@@ -1737,30 +1673,26 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                   .withoutColor
                                                                   .length;
                                                           i++) {
-                                                        await addProductImageController
+                                                        if (!await addProductImageController
                                                             .addProductImage(
                                                                 Get.context!,
                                                                 addProductImageController
                                                                     .withoutColor[i],
-                                                                route);
+                                                                route)) return;
                                                       }
                                                     }
                                                   }
                                                 }
 
-                                                if (widget.product != null) {
-                                                  Provider.of<AddProductController>(
-                                                          Get.context!,
-                                                          listen: false)
-                                                      .addProduct(
-                                                          Get.context!,
-                                                          _product!,
-                                                          _addProduct!,
-                                                          thumbnailImage,
-                                                          metaImage,
-                                                          widget.product ==
-                                                              null,
-                                                          tagList);
+                                                if (context.mounted) {
+                                                  await resProvider.addProduct(
+                                                      context,
+                                                      _product!,
+                                                      _addProduct!,
+                                                      thumbnailImage,
+                                                      metaImage,
+                                                      !_update,
+                                                      tagList);
                                                 }
                                               }),
                                         )

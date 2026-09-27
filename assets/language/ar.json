@@ -1661,6 +1661,7 @@
     "instructions": "التعليمات",
     "company_manages_shipping_status_after_packaging": "بعد التجهيز تتولى الشركة إدارة حالة الشحن.",
     "pay_from_reusable_insurance_credit": "الدفع من محفظة التأمين",
+    "seller_insurance_balance_insufficient_action": "رصيد التأمين لا يكفي لإتمام المعاملة. اختر طريقة أخرى أو أودع في رصيد التأمين.",
     "admin_note": "ملاحظة الإدارة",
     "seller_dashboard_overview": "نظرة عامة على لوحة التاجر",
     "active_ads": "الإعلانات النشطة",
@@ -1866,5 +1867,6 @@
   "customer_was_deleted": "تم حذف حساب العميل",
   "coupon_discount_received": "حصلت على خصم بقيمة {amount}",
   "example": "مثال",
-  "example_shipping_duration": "مثال: من 4 إلى 6 أيام"
+  "example_shipping_duration": "مثال: من 4 إلى 6 أيام",
+  "product_upload_failed": "تعذر حفظ المنتج. حاول مرة أخرى."
 }

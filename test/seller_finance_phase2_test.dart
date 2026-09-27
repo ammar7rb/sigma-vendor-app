@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sixvalley_vendor_app/features/wallet/domain/models/seller_balance_model.dart';
 import 'package:sixvalley_vendor_app/features/wallet/domain/models/funding_amount.dart';
+import 'package:sixvalley_vendor_app/features/seller_package/widgets/transfer_account_details.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'package:sixvalley_vendor_app/features/wallet/domain/services/wallet_service_interface.dart';
 import 'package:sixvalley_vendor_app/data/model/response/base/api_response.dart';
@@ -62,6 +63,16 @@ void main() {
     expect(model.summary['order_insurance_credit'], 35.5);
     expect(model.summary['available'], 12);
     expect(model.summary['operating'], 50);
+  });
+  test('transfer choice follows payment channel even with a custom method name', () {
+    final balance = SellerBalanceModel.fromJson({
+      'offline_payment_methods': [
+        {'id': 1, 'method_name': 'حساب التحويل الأول', 'payment_channel': 'wallet'},
+        {'id': 2, 'method_name': 'حساب التحويل الثاني', 'payment_channel': 'instapay'},
+      ],
+    });
+    expect(transferMethodForChannel(balance.offlinePaymentMethods, 'wallet')?.id, 1);
+    expect(transferMethodForChannel(balance.offlinePaymentMethods, 'instapay')?.id, 2);
   });
   test('wallet labels have complete Arabic and English translations', () {
     final en =

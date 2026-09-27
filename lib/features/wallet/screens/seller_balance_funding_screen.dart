@@ -308,7 +308,9 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                           .trim() ??
                       '',
               for (final f in method.methodInformations
-                  .where((f) => f.inputName != 'payment_screenshot'))
+                  .where((f) => f.inputName != 'payment_screenshot' &&
+                      f.inputName != 'sender_name' &&
+                      f.inputName != 'sender_wallet_or_phone'))
                 f.inputName:
                     information['${method.id}:${f.inputName}']?.text.trim() ??
                         ''
