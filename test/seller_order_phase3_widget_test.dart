@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/order/domain/models/order_model.dart';
 import 'package:sixvalley_vendor_app/features/order_details/controllers/order_details_controller.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/seller_shipping_assignment_widget.dart';
+import 'package:sixvalley_vendor_app/features/order_details/widgets/seller_order_insurance_gate_widget.dart';
 import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/models/config_model.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/services/splash_service_interface.dart';
@@ -40,6 +41,33 @@ class LoadedLocale extends LocalizationsDelegate<AppLocalization> {
 }
 
 void main() {
+  testWidgets('locked order reveals only its last three digits and value', (tester) async {
+    final controller = OrderDetailsController(orderDetailsServiceInterface: OrderServiceFake());
+    final splash = FinanceSplashFake();
+    addTearDown(controller.dispose);
+    addTearDown(splash.dispose);
+    final locale = AppLocalization(const Locale('ar'));
+    await tester.runAsync(() async { await locale.load(); });
+    await controller.getOrderDetails('opaque-token');
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider<OrderDetailsController>.value(value: controller),
+        ChangeNotifierProvider<SplashController>.value(value: splash),
+      ],
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        localizationsDelegates: [LoadedLocale(locale), GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+        home: const Scaffold(body: SellerOrderInsuranceGateWidget(orderId: 'opaque-token')),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('•••012'), findsOneWidget);
+    expect(find.textContaining('100'), findsOneWidget);
+    expect(find.textContaining('ORD-'), findsNothing);
+    expect(find.textContaining('customer'), findsNothing);
+  });
+
   testWidgets(
       'Arabic delivery form fits narrow dark and light screens and completed state removes submit',
       (tester) async {

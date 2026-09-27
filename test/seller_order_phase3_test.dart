@@ -28,6 +28,9 @@ class OrderServiceFake implements OrderDetailsServiceInterface {
       'seller_order_insurance': {
         'order_id': locked ? null : 12,
         'order_reference': '***012',
+        'order_last_three_digits': '012',
+        'order_amount': 100,
+        'amount': 10,
         'details_hidden': locked,
         'can_view_order_details': !locked,
         'status': offline
