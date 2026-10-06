@@ -14,8 +14,8 @@ class LocalizationController extends ChangeNotifier {
   }
 
   int? _languageIndex;
-  Locale _locale = Locale(AppConstants.languages[0].languageCode!, AppConstants.languages[0].countryCode);
-  bool _isLtr = true;
+  Locale _locale = const Locale('ar', 'SA');
+  bool _isLtr = false;
   Locale get locale => _locale;
   bool get isLtr => _isLtr;
   int? get languageIndex => _languageIndex;
@@ -32,13 +32,13 @@ class LocalizationController extends ChangeNotifier {
       _isLtr = true;
     }
     _saveLanguage(_locale);
-    Provider.of<AuthController>(Get.context!, listen: false).setCurrentLanguage(locale.countryCode == 'US'?'en': _locale.countryCode!.toLowerCase());
+    Provider.of<AuthController>(Get.context!, listen: false).setCurrentLanguage(locale.languageCode);
     notifyListeners();
   }
 
   Future<void> _loadCurrentLanguage() async {
-    _locale = Locale(sharedPreferences!.getString(AppConstants.languageCode) ?? AppConstants.languages[0].languageCode!,
-        sharedPreferences!.getString(AppConstants.countryCode) ?? AppConstants.languages[0].countryCode);
+    // Every new session starts in Arabic; the in-app language selector remains available.
+    _locale = const Locale('ar', 'SA');
     for(int index=0; index<AppConstants.languages.length; index++) {
       if(AppConstants.languages[index].languageCode == _locale.languageCode) {
         _languageIndex = index;
@@ -48,16 +48,17 @@ class LocalizationController extends ChangeNotifier {
     _isLtr = _locale.languageCode != 'ar';
     _languages = [];
     _languages.addAll(AppConstants.languages);
+    await _saveLanguage(_locale);
     notifyListeners();
   }
 
   Future<void> _saveLanguage(Locale locale) async {
-    sharedPreferences!.setString(AppConstants.languageCode, locale.languageCode);
-    sharedPreferences!.setString(AppConstants.countryCode, locale.countryCode!);
+    await sharedPreferences!.setString(AppConstants.languageCode, locale.languageCode);
+    await sharedPreferences!.setString(AppConstants.countryCode, locale.countryCode!);
   }
 
   String? getCurrentLanguage() {
-    return sharedPreferences!.getString(AppConstants.countryCode == 'US'? 'en' : AppConstants.countryCode) ?? "en";
+    return _locale.languageCode;
   }
 
 

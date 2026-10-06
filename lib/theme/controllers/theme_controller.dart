@@ -8,17 +8,14 @@ class ThemeController with ChangeNotifier {
     _loadCurrentTheme();
   }
 
-  bool _darkTheme = true;
-  bool get darkTheme => _darkTheme;
+  bool get darkTheme => false;
 
   void toggleTheme() {
-    _darkTheme = !_darkTheme;
-    sharedPreferences!.setBool(AppConstants.theme, _darkTheme);
-    notifyListeners();
+    // Vendor appearance stays light, including devices using dark mode.
+    sharedPreferences?.setBool(AppConstants.theme, false);
   }
 
   void _loadCurrentTheme() async {
-    _darkTheme = sharedPreferences!.getBool(AppConstants.theme) ?? false;
-    notifyListeners();
+    await sharedPreferences?.setBool(AppConstants.theme, false);
   }
 }

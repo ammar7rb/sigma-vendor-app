@@ -63,7 +63,6 @@ import 'package:sixvalley_vendor_app/notification/models/notification_body.dart'
 import 'package:sixvalley_vendor_app/theme/controllers/theme_controller.dart';
 import 'package:sixvalley_vendor_app/features/bank_info/controllers/bank_info_controller.dart';
 import 'package:sixvalley_vendor_app/features/transaction/controllers/transaction_controller.dart';
-import 'package:sixvalley_vendor_app/theme/dark_theme.dart';
 import 'package:sixvalley_vendor_app/theme/light_theme.dart';
 import 'package:sixvalley_vendor_app/utill/app_constants.dart';
 import 'package:sixvalley_vendor_app/features/splash/screens/splash_screen.dart';
@@ -212,7 +211,8 @@ class MyApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
-      theme: Provider.of<ThemeController>(context).darkTheme ? dark : light,
+      themeMode: ThemeMode.light,
+      theme: light,
       locale: Provider.of<LocalizationController>(context).locale,
       builder: (context, child) {
         return Consumer<ShopController>(builder: (context, shopController, _) {

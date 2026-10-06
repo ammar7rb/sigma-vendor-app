@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sixvalley_vendor_app/localization/controllers/localization_controller.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_image_widget.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/models/business_pages_model.dart';
@@ -10,10 +12,11 @@ class HtmlViewScreen extends StatelessWidget {
   const HtmlViewScreen({super.key, required this.page});
   @override
   Widget build(BuildContext context) {
+    final language = context.watch<LocalizationController>().locale.languageCode;
     return Scaffold(
       body: Column(
         children: [
-          CustomAppBarWidget(title: page?.title ?? ''),
+          CustomAppBarWidget(title: page?.localizedTitle(language) ?? ''),
           Expanded(
             child: SingleChildScrollView(
               child: Container(
@@ -41,7 +44,7 @@ class HtmlViewScreen extends StatelessWidget {
                           fontSize: FontSize.medium,
                         ),
                       },
-                      data: page?.description ?? '',
+                      data: page?.localizedDescription(language) ?? '',
                     ),
 
                   ],

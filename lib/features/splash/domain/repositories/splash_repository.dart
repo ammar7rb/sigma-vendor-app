@@ -69,7 +69,8 @@ class SplashRepository implements SplashRepositoryInterface{
   @override
   Future<ApiResponse> getBusinessPages(String type) async {
     try {
-      final response = await dioClient!.get(AppConstants.businessPagesUri+type);
+      final response = await dioClient!.get(AppConstants.businessPagesUri+type,
+        options: Options(headers: {'lang': sharedPreferences?.getString(AppConstants.languageCode) ?? AppConstants.languages.first.languageCode ?? 'en'}));
       return ApiResponse.withSuccess(response);
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));

@@ -3,6 +3,17 @@ class BusinessPageModel {
   String? title;
   String? slug;
   String? description;
+  Map<String, dynamic>? translations;
+
+  String localizedTitle(String languageCode) => _localized('title', languageCode, title);
+  String localizedDescription(String languageCode) => _localized('description', languageCode, description);
+
+  String _localized(String field, String languageCode, String? fallback) {
+    final code = languageCode.toLowerCase().replaceAll('_', '-').split('-').first;
+    final language = code == 'ar' || code == 'sa' ? 'ar' : 'en';
+    final content = translations?[language];
+    return content is Map && content[field] is String ? content[field] as String : fallback ?? '';
+  }
   int? status;
   int? defaultStatus;
   String? createdAt;
@@ -27,6 +38,7 @@ class BusinessPageModel {
     title = json['title'];
     slug = json['slug'];
     description = json['description'];
+    translations = json['translations'] is Map ? Map<String, dynamic>.from(json['translations']) : null;
     status = json['status'];
     defaultStatus = json['default_status'];
     createdAt = json['created_at'];
@@ -44,6 +56,7 @@ class BusinessPageModel {
     data['title'] = title;
     data['slug'] = slug;
     data['description'] = description;
+    data['translations'] = translations;
     data['status'] = status;
     data['default_status'] = defaultStatus;
     data['created_at'] = createdAt;

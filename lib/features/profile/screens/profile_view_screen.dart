@@ -13,7 +13,6 @@ import 'package:sixvalley_vendor_app/utill/styles.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_image_widget.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/profile_screen.dart';
-import 'package:sixvalley_vendor_app/features/profile/widgets/theme_changer_widget.dart';
 
 
 
@@ -139,10 +138,6 @@ class ProfileScreenViewState extends State<ProfileScreenView> {
                   ],),
                 ),
 
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeMedium),
-                  child: ThemeChangerWidget(),
-                ),
                 Padding(
                   padding: const EdgeInsets.only(top: Dimensions.paddingSizeDefault,bottom: Dimensions.paddingSizeExtraLarge),
                   child: Row(mainAxisAlignment: MainAxisAlignment.center,

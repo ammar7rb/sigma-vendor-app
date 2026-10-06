@@ -79,9 +79,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           await auth.saveRegistrationReference(reference);
           if (data['token'] is String) await auth.saveUserToken(data['token']);
           if (!mounted) return;
-          final otpRequired = data['eligibility']?['verification']
-                  ?['otp_required'] ==
-              true;
+          final otpRequired =
+              data['eligibility']?['verification']?['otp_required'] == true;
           if (!otpRequired) {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -116,13 +115,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           sanckBarType: SnackBarType.warning);
 
   List<Map<String, dynamic>> _displayPolicies(AuthController auth) {
-    if (auth.requiredRegistrationPolicies.isNotEmpty) {
-      return auth.requiredRegistrationPolicies;
-    }
-
-    const policySlugs = {'terms-and-conditions', 'privacy-policy'};
+    const policySlugs = {'terms-and-conditions'};
     final pages = context.read<SplashController>().defaultBusinessPages ?? [];
-    return pages
+    final combined = pages
         .where((page) => policySlugs.contains(page.slug))
         .map((page) => <String, dynamic>{
               'title': page.title,
@@ -130,6 +125,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               'version': '',
             })
         .toList();
+    return [
+      ...combined,
+      ...auth.requiredRegistrationPolicies.where((policy) =>
+          !combined.any((page) => page['title'] == policy['title'])),
+    ];
   }
 
   @override

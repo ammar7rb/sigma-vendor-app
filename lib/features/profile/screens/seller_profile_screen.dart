@@ -7,7 +7,6 @@ import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/profile_controller.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/profile_screen.dart';
-import 'package:sixvalley_vendor_app/features/profile/widgets/theme_changer_widget.dart';
 import 'package:sixvalley_vendor_app/features/settings/screens/setting_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/wallet_screen.dart';
@@ -179,7 +178,6 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
                 subtitle: getTranslated('vendor_settings_hint', context) ?? '',
                 onTap: () => _open(const SettingsScreen())),
             const SizedBox(height: 10),
-            const ThemeChangerWidget(),
             const SizedBox(height: 18),
           ]),
         );
