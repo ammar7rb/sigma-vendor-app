@@ -307,8 +307,28 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                         input('l_name', 'last_name'),
                         input('store_name', 'store_name'),
                         input('email', 'email'),
-                        repeated(phones, 'vendor_phone_numbers'),
-                        repeated(addresses, 'vendor_store_addresses'),
+                        LayoutBuilder(
+                            builder: (context, constraints) =>
+                                Wrap(spacing: 16, runSpacing: 16, children: [
+                                  SizedBox(
+                                      width: constraints.maxWidth >= 700
+                                          ? (constraints.maxWidth - 16) / 2
+                                          : constraints.maxWidth,
+                                      child: Card(
+                                          child: Padding(
+                                              padding: const EdgeInsets.all(16),
+                                              child: repeated(phones,
+                                                  'vendor_phone_numbers')))),
+                                  SizedBox(
+                                      width: constraints.maxWidth >= 700
+                                          ? (constraints.maxWidth - 16) / 2
+                                          : constraints.maxWidth,
+                                      child: Card(
+                                          child: Padding(
+                                              padding: const EdgeInsets.all(16),
+                                              child: repeated(addresses,
+                                                  'vendor_store_addresses'))))
+                                ])),
                         for (final entry in {
                           'commercial': 'commercial_registration',
                           'tax': 'tax_card'

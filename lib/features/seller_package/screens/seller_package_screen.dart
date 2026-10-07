@@ -1,3 +1,6 @@
+import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
+import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
+import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
 import 'package:sixvalley_vendor_app/features/seller_promotion/screens/seller_promotion_screen.dart';
 import 'package:sixvalley_vendor_app/features/coupon/screens/coupon_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +21,26 @@ class SellerPackageScreen extends StatefulWidget {
 }
 
 class _SellerPackageScreenState extends State<SellerPackageScreen> {
+  dynamic paymentsBalance;
+  Future<void> loadPayments() async {
+    try {
+      final r =
+          await VendorWorkspace.instance.client.get('/api/v3/seller/balance');
+      if (mounted)
+        setState(
+            () => paymentsBalance = r.data['financial_summary']['operating']);
+    } catch (_) {}
+  }
+
   @override
   void initState() {
     super.initState();
+    loadPayments();
     Future.microtask(() async {
       final controller =
           Provider.of<SellerPackageController>(context, listen: false);
       await controller.getOverview();
+      if (!mounted) return;
       final active = controller.overview?.subscription.active;
       if (active != null) await controller.getPerformance(active.id);
     });
@@ -50,6 +66,27 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
             child: ListView(
               padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
               children: [
+                FinancePanel(
+                    title: getTranslated('payments_balance', context) ??
+                        'Payments balance',
+                    amount: paymentsBalance == null
+                        ? '—'
+                        : financeMoney(context, paymentsBalance),
+                    hint: getTranslated('ads_payments_balance_hint', context),
+                    child: OutlinedButton.icon(
+                        onPressed: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const SellerFinanceScreen(
+                                      initialSection: 'operating')));
+                          await loadPayments();
+                        },
+                        icon: const Icon(Icons.account_balance_wallet_outlined),
+                        label: Text(
+                            getTranslated('view_balance_details', context) ??
+                                'Balance details'))),
+                const SizedBox(height: 16),
                 _CurrentPackageCard(summary: overview.subscription),
                 Wrap(spacing: 8, children: [
                   TextButton.icon(

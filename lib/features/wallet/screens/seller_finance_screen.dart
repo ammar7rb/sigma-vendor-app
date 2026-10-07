@@ -25,6 +25,9 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
       withdrawalsPage = 1,
       transactionsPage = 1,
       depositsPage = 1;
+  bool get isInsurance => widget.initialSection == 'insurance';
+  bool get isPayments => widget.initialSection == 'operating';
+  bool get isOverview => !isInsurance && !isPayments;
   int? methodId;
   final amount = TextEditingController();
   String requestKey = withdrawalRequestKey();
@@ -57,6 +60,8 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
           .get('/api/v3/seller/balance', queryParameters: {
         'transactions_page': transactionsPage,
         'deposits_page': depositsPage,
+        if (!isOverview) 'wallet_target': widget.initialSection,
+        if (isOverview) 'ledger_bucket': 'available',
         'security_page': securityPage,
         'withdrawals_page': withdrawalsPage
       });
@@ -156,7 +161,12 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
     final withdrawals = data?['withdrawals'] as Map? ?? {};
     final methods = data?['withdrawal_methods'] as List? ?? [];
     return Scaffold(
-        appBar: VendorFinanceAppBar(title: tr('finance_my_wallet')),
+        appBar: VendorFinanceAppBar(
+            title: tr(isInsurance
+                ? 'security_deposit_balance'
+                : isPayments
+                    ? 'payments_balance'
+                    : 'finance_my_wallet')),
         body: loading && data == null
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -177,145 +187,201 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                                 .colorScheme
                                                 .error))),
                               if (data != null) ...[
-                                FinancePanel(
-                                    title: tr('available_balance'),
-                                    amount: money(summary['available']),
-                                    hint: tr('available_balance_hint'),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          DropdownButtonFormField<int>(
-                                              initialValue: methodId,
-                                              isExpanded: true,
-                                              decoration: InputDecoration(
-                                                  labelText: tr(
-                                                      'selected_withdrawal_method')),
-                                              items: methods
-                                                  .map((m) => DropdownMenuItem<
-                                                          int>(
-                                                      value: m['id'],
-                                                      child: Text(
-                                                          '${m['method_name']}',
-                                                          overflow: TextOverflow
-                                                              .ellipsis)))
-                                                  .toList(),
-                                              onChanged: submitting
-                                                  ? null
-                                                  : (v) => setState(
-                                                      () => methodId = v)),
-                                          const SizedBox(height: 12),
-                                          TextField(
-                                              controller: amount,
-                                              keyboardType: const TextInputType
-                                                  .numberWithOptions(
-                                                  decimal: true),
-                                              decoration: InputDecoration(
-                                                  labelText:
-                                                      tr('withdrawal_amount'))),
-                                          const SizedBox(height: 16),
-                                          FilledButton(
-                                              onPressed: submitting ||
-                                                      methods.isEmpty ||
-                                                      (double.tryParse(
-                                                                  '${summary['available']}') ??
-                                                              0) <=
-                                                          0
-                                                  ? null
-                                                  : withdraw,
-                                              child: submitting
-                                                  ? const SizedBox(
-                                                      width: 20,
-                                                      height: 20,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                              strokeWidth: 2))
-                                                  : Text(tr(
-                                                      'submit_withdrawal_request'))),
-                                          TextButton(
-                                              onPressed: () async {
-                                                await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            const VendorWithdrawalMethodsScreen()));
-                                                if (mounted) load();
-                                              },
-                                              child: Text(tr(
-                                                  'manage_withdrawal_methods'))),
-                                          Text(
-                                              '${tr('pending_withdrawal_amount')}: ${money(summary['pending_withdraw'])}')
-                                        ])),
-                                const SizedBox(height: 16),
-                                FinancePanel(
-                                    title: tr('payments_balance'),
-                                    amount: money(summary['operating']),
-                                    hint: tr('payments_balance_hint'),
-                                    child: OutlinedButton(
-                                        onPressed: () => fund('operating'),
-                                        child:
-                                            Text(tr('fund_purchase_balance')))),
-                                const SizedBox(height: 16),
-                                FinancePanel(
-                                    title: tr('security_deposit_balance'),
-                                    amount: money(
-                                        summary['order_insurance_credit']),
-                                    hint: tr('unused_security_balance_hint'),
-                                    child: OutlinedButton(
-                                        onPressed: () => fund('insurance'),
-                                        child: Text(
-                                            tr('fund_insurance_balance')))),
-                                const SizedBox(height: 28),
-                                Text(tr('paid_security_deposits'),
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge),
-                                const SizedBox(height: 12),
-                                Text(
-                                    '${tr('total_security_deposits_paid')}: ${money(totals['total_paid'])}'),
-                                Text(
-                                    '${tr('nearest_return_date')}: ${financeDate(context, totals['next_return_at'])}'),
-                                Text(
-                                    '${tr('due_on_nearest_date')}: ${money(totals['next_return_amount'])}'),
-                                Text(tr('security_returns_hint')),
-                                const SizedBox(height: 16),
-                                for (final row in records['data'] as List? ?? [])
-                                  Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12),
-                                      child: FinancePanel(
-                                          title: '${row['reference']}',
-                                          amount: money(row['amount']),
-                                          hint:
-                                              '${financeDate(context, row['return_at'])} · ${tr('deposit_${row['status']}')}',
-                                          child: row['invoice_number'] != null
-                                              ? TextButton.icon(
-                                                  onPressed: () => Navigator.push(
+                                if (isOverview) ...[
+                                  FinancePanel(
+                                      title: tr('available_balance'),
+                                      amount: money(summary['available']),
+                                      hint: tr('available_balance_hint'),
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            DropdownButtonFormField<int>(
+                                                initialValue: methodId,
+                                                isExpanded: true,
+                                                decoration: InputDecoration(
+                                                    labelText: tr(
+                                                        'selected_withdrawal_method')),
+                                                items: methods
+                                                    .map((m) => DropdownMenuItem<
+                                                            int>(
+                                                        value: m['id'],
+                                                        child: Text(
+                                                            '${m['method_name']}',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis)))
+                                                    .toList(),
+                                                onChanged: submitting
+                                                    ? null
+                                                    : (v) => setState(
+                                                        () => methodId = v)),
+                                            const SizedBox(height: 12),
+                                            TextField(
+                                                controller: amount,
+                                                keyboardType:
+                                                    const TextInputType
+                                                        .numberWithOptions(
+                                                        decimal: true),
+                                                decoration: InputDecoration(
+                                                    labelText: tr(
+                                                        'withdrawal_amount'))),
+                                            const SizedBox(height: 16),
+                                            FilledButton(
+                                                onPressed: submitting ||
+                                                        methods.isEmpty ||
+                                                        (double.tryParse(
+                                                                    '${summary['available']}') ??
+                                                                0) <=
+                                                            0
+                                                    ? null
+                                                    : withdraw,
+                                                child: submitting
+                                                    ? const SizedBox(
+                                                        width: 20,
+                                                        height: 20,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                                strokeWidth: 2))
+                                                    : Text(tr(
+                                                        'submit_withdrawal_request'))),
+                                            TextButton(
+                                                onPressed: () async {
+                                                  await Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                           builder: (_) =>
-                                                              VendorInvoiceDocumentScreen(
-                                                                  order:
-                                                                      '${row['order_reference']}'))),
-                                                  icon: const Icon(
-                                                      Icons.receipt_long_outlined),
-                                                  label: Text('${tr('view_invoice')} #${row['invoice_number']}'))
-                                              : null)),
-                                if ((records['data'] as List? ?? []).isEmpty)
-                                  Text(tr('no_data_found')),
-                                pager(records, securityPage, () {
-                                  securityPage--;
-                                  load();
-                                }, () {
-                                  securityPage++;
-                                  load();
-                                }),
+                                                              const VendorWithdrawalMethodsScreen()));
+                                                  if (mounted) load();
+                                                },
+                                                child: Text(tr(
+                                                    'manage_withdrawal_methods'))),
+                                            Text(
+                                                '${tr('pending_withdrawal_amount')}: ${money(summary['pending_withdraw'])}')
+                                          ])),
+                                  const SizedBox(height: 16),
+                                ],
+                                if (!isInsurance)
+                                  FinancePanel(
+                                      onTap: isOverview
+                                          ? () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      const SellerFinanceScreen(
+                                                          initialSection:
+                                                              'operating')))
+                                          : null,
+                                      title: tr('payments_balance'),
+                                      amount: money(summary['operating']),
+                                      hint: tr('payments_balance_hint'),
+                                      child: OutlinedButton(
+                                          onPressed: () => isOverview
+                                              ? Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          const SellerFinanceScreen(
+                                                              initialSection:
+                                                                  'operating')))
+                                              : fund('operating'),
+                                          child: Text(tr(isOverview
+                                              ? 'view_balance_details'
+                                              : 'fund_purchase_balance')))),
+                                const SizedBox(height: 16),
+                                if (!isPayments)
+                                  FinancePanel(
+                                      onTap: isOverview
+                                          ? () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      const SellerFinanceScreen(
+                                                          initialSection:
+                                                              'insurance')))
+                                          : null,
+                                      title: tr('security_deposit_balance'),
+                                      amount: money(
+                                          summary['order_insurance_credit']),
+                                      hint: tr(
+                                          'order_insurance_credit_purpose_hint'),
+                                      child: OutlinedButton(
+                                          onPressed: () => isOverview
+                                              ? Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          const SellerFinanceScreen(
+                                                              initialSection:
+                                                                  'insurance')))
+                                              : fund('insurance'),
+                                          child: Text(
+                                              tr(isOverview ? 'view_balance_details' : 'fund_insurance_balance')))),
                                 const SizedBox(height: 28),
+                                if (isInsurance) ...[
+                                  FinancePanel(
+                                      title: tr('held_security_total'),
+                                      amount: money(totals['held_total'])),
+                                  const SizedBox(height: 12),
+                                  Text(tr('paid_security_deposits'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge),
+                                  const SizedBox(height: 12),
+                                  FinancePanel(
+                                      title: tr('total_security_deposits_paid'),
+                                      amount: money(totals['total_paid'])),
+                                  const SizedBox(height: 12),
+                                  FinancePanel(
+                                      title: tr('nearest_return_date'),
+                                      amount: financeDate(
+                                          context, totals['next_return_at']),
+                                      hint:
+                                          '${tr('due_on_nearest_date')}: ${money(totals['next_return_amount'])}'),
+                                  Text(tr('security_returns_hint')),
+                                  const SizedBox(height: 16),
+                                  for (final row in records['data'] as List? ?? [])
+                                    Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 12),
+                                        child: FinancePanel(
+                                            title: '${row['reference']}',
+                                            amount: money(row['amount']),
+                                            hint:
+                                                '${financeDate(context, row['return_at'])} · ${tr('deposit_${row['status']}')}',
+                                            child: row['invoice_number'] != null
+                                                ? TextButton.icon(
+                                                    onPressed: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                VendorInvoiceDocumentScreen(
+                                                                    order:
+                                                                        '${row['order_reference']}'))),
+                                                    icon: const Icon(
+                                                        Icons.receipt_long_outlined),
+                                                    label: Text('${tr('view_invoice')} #${row['invoice_number']}'))
+                                                : null)),
+                                  if ((records['data'] as List? ?? []).isEmpty)
+                                    Text(tr('no_data_found')),
+                                  pager(records, securityPage, () {
+                                    securityPage--;
+                                    load();
+                                  }, () {
+                                    securityPage++;
+                                    load();
+                                  }),
+                                  const SizedBox(height: 28),
+                                ],
                                 Text(tr('wallet_transactions'),
                                     style:
                                         Theme.of(context).textTheme.titleLarge),
                                 const SizedBox(height: 12),
                                 for (final row
-                                    in transactions['data'] as List? ?? [])
+                                    in (transactions['data'] as List? ?? [])
+                                        .where((row) =>
+                                            !isOverview ||
+                                            row['bucket'] == 'available'))
                                   Card(
                                       child: ListTile(
                                     title: Text(
@@ -339,59 +405,64 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                   load();
                                 }),
                                 const SizedBox(height: 28),
-                                Text(tr('deposit_history'),
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge),
-                                const SizedBox(height: 12),
-                                for (final row
-                                    in deposits['data'] as List? ?? [])
-                                  Card(
-                                      child: ListTile(
-                                    title: Text(
-                                        '${row['amount']} ${row['currency_code']}'),
-                                    subtitle: Text(
-                                        '${tr('funding_status_${row['status']}')} · ${tr(row['metadata']?['wallet_target'] == 'insurance' ? 'security_deposit_balance' : 'payments_balance')}\n${row['transaction_reference'] ?? row['payment_request_id'] ?? '—'} · ${financeDate(context, row['created_at'])}${row['rejection_reason'] == null ? '' : '\n${row['rejection_reason']}'}'),
-                                    isThreeLine: true,
-                                  )),
-                                if ((deposits['data'] as List? ?? []).isEmpty)
-                                  Text(tr('no_data_found')),
-                                pager(deposits, depositsPage, () {
-                                  depositsPage--;
-                                  load();
-                                }, () {
-                                  depositsPage++;
-                                  load();
-                                }),
-                                const SizedBox(height: 28),
-                                Text(tr('finance_withdraw_history'),
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge),
-                                const SizedBox(height: 12),
-                                for (final row
-                                    in withdrawals['data'] as List? ?? [])
-                                  Card(
-                                      child: ListTile(
-                                          title: Text(money(row['amount'])),
-                                          subtitle: Text(
-                                              '${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr('withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}'),
-                                          isThreeLine: true,
-                                          trailing: row['approved'] == 0
-                                              ? TextButton(
-                                                  onPressed: submitting
-                                                      ? null
-                                                      : () => cancel(row),
-                                                  child: Text(tr('cancel')))
-                                              : null)),
-                                if ((withdrawals['data'] as List? ?? [])
-                                    .isEmpty)
-                                  Text(tr('no_data_found')),
-                                pager(withdrawals, withdrawalsPage, () {
-                                  withdrawalsPage--;
-                                  load();
-                                }, () {
-                                  withdrawalsPage++;
-                                  load();
-                                })
+                                if (!isOverview) ...[
+                                  Text(tr('deposit_history'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge),
+                                  const SizedBox(height: 12),
+                                  for (final row
+                                      in deposits['data'] as List? ?? [])
+                                    Card(
+                                        child: ListTile(
+                                      title: Text(money(row['amount'])),
+                                      subtitle: Text(
+                                          '${tr('funding_status_${row['status']}')} · ${tr(row['metadata']?['wallet_target'] == 'insurance' ? 'security_deposit_balance' : 'payments_balance')}\n${row['transaction_reference'] ?? row['payment_request_id'] ?? '—'} · ${financeDate(context, row['created_at'])}${row['rejection_reason'] == null ? '' : '\n${row['rejection_reason']}'}'),
+                                      isThreeLine: true,
+                                    )),
+                                  if ((deposits['data'] as List? ?? []).isEmpty)
+                                    Text(tr('no_data_found')),
+                                  pager(deposits, depositsPage, () {
+                                    depositsPage--;
+                                    load();
+                                  }, () {
+                                    depositsPage++;
+                                    load();
+                                  }),
+                                  const SizedBox(height: 28),
+                                ],
+                                if (isOverview) ...[
+                                  Text(tr('finance_withdraw_history'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge),
+                                  const SizedBox(height: 12),
+                                  for (final row
+                                      in withdrawals['data'] as List? ?? [])
+                                    Card(
+                                        child: ListTile(
+                                            title: Text(money(row['amount'])),
+                                            subtitle: Text(
+                                                '${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr('withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}'),
+                                            isThreeLine: true,
+                                            trailing: row['approved'] == 0
+                                                ? TextButton(
+                                                    onPressed: submitting
+                                                        ? null
+                                                        : () => cancel(row),
+                                                    child: Text(tr('cancel')))
+                                                : null)),
+                                  if ((withdrawals['data'] as List? ?? [])
+                                      .isEmpty)
+                                    Text(tr('no_data_found')),
+                                  pager(withdrawals, withdrawalsPage, () {
+                                    withdrawalsPage--;
+                                    load();
+                                  }, () {
+                                    withdrawalsPage++;
+                                    load();
+                                  })
+                                ]
                               ]
                             ])))));
   }

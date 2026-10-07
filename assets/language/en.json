@@ -1926,7 +1926,7 @@
     "nearest_return_date": "Nearest return date",
     "expected_return_amount": "Expected amount on that date",
     "security_returns_hint": "Paid deposits are separate from unused credit. Eligible amounts return to the security deposit balance under existing rules.",
-    "sales_invoices_hint": "Sales receivables only. Deposit returns appear separately in Wallet.",
+    "sales_invoices_hint": "Your sales invoices and due dates. Select an invoice to review its order and products.",
     "total_invoice_receivables": "Total unsettled receivables",
     "nearest_entitlement_date": "Nearest entitlement date",
     "due_on_nearest_date": "Amount due on that date",
@@ -1992,5 +1992,9 @@
     "funding_status_pending": "Awaiting verification",
     "funding_status_paid": "Payment confirmed",
     "funding_status_rejected": "Rejected",
-    "funding_status_reversed": "Deposit reversed"
+    "funding_status_reversed": "Deposit reversed",
+    "view_balance_details": "View details",
+    "held_security_total": "Reserved security deposits",
+    "grow_your_catalogue": "Your next product starts here",
+    "grow_your_catalogue_hint": "Add its images, specifications and price to reach buyers."
 }
