@@ -200,6 +200,8 @@ class Product {
   String? dimensionUnit;
   double? weight;
   String? weightUnit;
+  bool categoryReviewRequired = false;
+  bool noProductionExpiryDates = false;
   String? productionDate;
   String? expiryDate;
   int? sellerOrdersCount;
@@ -425,6 +427,8 @@ class Product {
     deniedNote = json['denied_note'];
     sellerReviewStatus = json['seller_review_status'];
     sellerReviewReason = json['seller_review_reason'];
+    categoryReviewRequired = json['category_review_required'] == true ||
+        json['category_review_required'] == 1;
     saleUnitType = json['sale_unit_type'];
     piecesPerUnit = int.tryParse(json['pieces_per_unit']?.toString() ?? '');
     length = double.tryParse(json['length']?.toString() ?? '');
@@ -433,6 +437,8 @@ class Product {
     dimensionUnit = json['dimension_unit'];
     weight = double.tryParse(json['weight']?.toString() ?? '');
     weightUnit = json['weight_unit'];
+    noProductionExpiryDates = json['no_production_expiry_dates'] == true ||
+        json['no_production_expiry_dates'] == 1;
     productionDate = json['production_date'];
     expiryDate = json['expiry_date'];
     sellerOrdersCount =
@@ -596,7 +602,8 @@ class Product {
       data['category_ids'] = categoryIds!.map((v) => v.toJson()).toList();
     }
     data['unit'] = unit;
-    data['production_date'] = productionDate;
+    data['no_production_expiry_dates'] = noProductionExpiryDates;
+    data['production_date'] = noProductionExpiryDates ? null : productionDate;
     data['expiry_date'] = expiryDate;
     data['seller_orders_count'] = sellerOrdersCount;
     data['min_qty'] = minQty;

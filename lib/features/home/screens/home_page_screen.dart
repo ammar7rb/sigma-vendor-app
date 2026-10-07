@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'package:sixvalley_vendor_app/features/profile/widgets/vendor_navigation_actions.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sixvalley_vendor_app/features/notification/controllers/notification_controller.dart';
+
 import 'package:sixvalley_vendor_app/features/product/domain/models/product_model.dart';
 import 'package:sixvalley_vendor_app/features/bank_info/controllers/bank_info_controller.dart';
 import 'package:sixvalley_vendor_app/features/order/controllers/order_controller.dart';
@@ -10,15 +11,15 @@ import 'package:sixvalley_vendor_app/features/profile/controllers/profile_contro
 import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/images.dart';
-import 'package:sixvalley_vendor_app/utill/styles.dart';
+
 import 'package:sixvalley_vendor_app/features/home/widgets/completed_order_widget.dart';
 import 'package:sixvalley_vendor_app/features/home/widgets/on_going_order_widget.dart';
 import 'package:sixvalley_vendor_app/features/product/widgets/stock_out_product_widget.dart';
-import 'package:sixvalley_vendor_app/features/notification/screens/notification_screen.dart';
+
 import 'package:sixvalley_vendor_app/features/auth/widgets/seller_activation_banner_widget.dart';
 import 'package:sixvalley_vendor_app/features/home/widgets/seller_dashboard_overview_widget.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
-import 'package:sixvalley_vendor_app/theme/app_design.dart';
+
 import 'package:sixvalley_vendor_app/localization/controllers/localization_controller.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/utill/app_constants.dart';
@@ -50,8 +51,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     // Financial, delivery, review, and seller-shipping data are admin-managed.
     // Do not request them from the vendor home screen after their UI was removed.
-    Provider.of<NotificationController>(context, listen: false)
-        .getNotificationList(1);
     Provider.of<ProductController>(context, listen: false)
         .getStockLimitStatus(context);
     Provider.of<ProductController>(context, listen: false)
@@ -173,84 +172,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   color: Theme.of(context).primaryColor,
                                   size: 22)));
                     }),
-                    Consumer<NotificationController>(
-                        builder: (context, notificationController, _) {
-                      return Padding(
-                          padding: const EdgeInsetsDirectional.only(end: 16),
-                          child: InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        const NotificationScreen())),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color: Theme.of(context).dividerColor),
-                                    boxShadow: AppDesign.softShadow(
-                                        Theme.of(context).brightness),
-                                  ),
-                                  child: Icon(CupertinoIcons.bell,
-                                      color: Theme.of(context).primaryColor,
-                                      size: 22),
-                                ),
-                                PositionedDirectional(
-                                    top: -2,
-                                    end: -2,
-                                    child: Align(
-                                        alignment: Alignment.topRight,
-                                        child: CircleAvatar(
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .error,
-                                          radius: 8,
-                                          child: Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(1.0),
-                                              child: Builder(
-                                                builder: (context) {
-                                                  final isAuctionEnabled = Provider
-                                                              .of<SplashController>(
-                                                                  context,
-                                                                  listen: false)
-                                                          .configModel
-                                                          ?.isAuctionFeatureEnabled ==
-                                                      true;
-                                                  final generalCount =
-                                                      notificationController
-                                                              .notificationModel
-                                                              ?.newNotificationItem ??
-                                                          0;
-                                                  final auctionCount = isAuctionEnabled
-                                                      ? (notificationController
-                                                              .auctionNotificationModel
-                                                              ?.newNotification ??
-                                                          0)
-                                                      : 0;
-                                                  return Text(
-                                                    '${generalCount + auctionCount}',
-                                                    style: robotoRegular.copyWith(
-                                                        fontSize: Dimensions
-                                                            .fontSizeExtraSmall,
-                                                        color: Colors.white),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ))),
-                              ],
-                            ),
-                          ));
-                    })
+                    const VendorNavigationActions(),
                   ],
                 ),
                 SliverToBoxAdapter(

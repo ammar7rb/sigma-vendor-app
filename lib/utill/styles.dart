@@ -4,72 +4,72 @@ import 'package:sixvalley_vendor_app/theme/controllers/theme_controller.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 
 const titilliumRegular = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeDefault,
 );
 
 
 const titilliumSemiBold = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontSize: Dimensions.fontSizeLarge,
   fontWeight: FontWeight.w500,
 );
 
 const titilliumBold = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontSize: Dimensions.fontSizeDefault,
   fontWeight: FontWeight.w600,
 );
 const titilliumItalic = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontSize: Dimensions.fontSizeDefault,
   fontStyle: FontStyle.italic,
 );
 
 const robotoHintRegular = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'VendorCare',
     fontWeight: FontWeight.w400,
     fontSize: Dimensions.fontSizeSmall,
     color: Colors.grey
 );
 const robotoRegular = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeDefault,
 );
 const robotoRegularMainHeadingAddProduct = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeDefault,
 );
 
 const robotoRegularForAddProductHeading = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeSmall,
 );
 
 const robotoTitleRegular = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeLarge,
 );
 
 const robotoSmallTitleRegular = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeSmall,
 );
 
 const robotoBold = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontSize: Dimensions.fontSizeDefault,
   fontWeight: FontWeight.w600,
 );
 
  const robotoMedium = TextStyle(
-  fontFamily: 'Cairo',
+  fontFamily: 'VendorCare',
   fontSize: Dimensions.fontSizeDefault,
   fontWeight: FontWeight.w500,
 );

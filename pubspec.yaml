@@ -118,6 +118,9 @@ flutter:
     - assets/svg/
 
   fonts:
+    - family: VendorCare
+      fonts:
+        - asset: assets/font/vendor-care/Vazirmatn.ttf
     - family: Cairo
       fonts:
         - asset: assets/font/cairo/Cairo.ttf

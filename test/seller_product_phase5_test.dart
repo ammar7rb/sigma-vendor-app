@@ -108,8 +108,8 @@ void main() {
     expect(general, isNot(contains("'seller_product_category_admin_hint'")));
     expect(general, contains("'enter_brand_name_if_not_listed'"));
     expect(general, contains('_generateSKU()'));
-    expect(general, contains("'seller_product_sale_unit_\$value'"));
-    expect(general, matches(RegExp(r"==\s*'package'")));
+    expect(pricing, contains('seller_product_sale_unit_'));
+    expect(pricing, matches(RegExp(r"==\s*'package'")));
     expect(pricing, contains("'seller_product_package_price'"));
     expect(validation, contains('productImageCount < 5'));
     expect(validation, isNot(contains("getTranslated('select_a_unit'")));

@@ -176,7 +176,7 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
       resProvider.unitPriceController.text = '0';
       resProvider.discountController.text = '0';
       _discountController.text = '0';
-      variationController.totalQuantityController.text = '1';
+      variationController.totalQuantityController.clear();
       resProvider.minimumOrderQuantityController.text = '1';
       resProvider.shippingCostController.text = '0';
     }
@@ -677,13 +677,40 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                                       isAmount:
                                                                           true,
                                                                       hintText: getTranslated(
-                                                                          'current_stock',
+                                                                          resProvider.saleUnitType == 'package'
+                                                                              ? 'quantity_packages'
+                                                                              : 'quantity_pieces',
                                                                           context)!,
                                                                       formProduct:
                                                                           true,
                                                                     )
                                                                   : const SizedBox
                                                                       .shrink(),
+                                                              ValueListenableBuilder<
+                                                                      TextEditingValue>(
+                                                                  valueListenable:
+                                                                      variationController
+                                                                          .totalQuantityController,
+                                                                  builder: (context, value, child) => (int.tryParse(value.text) ??
+                                                                              0) >
+                                                                          0
+                                                                      ? Column(
+                                                                          crossAxisAlignment: CrossAxisAlignment
+                                                                              .stretch,
+                                                                          children: [
+                                                                              const SizedBox(height: 12),
+                                                                              DropdownButtonFormField<String>(
+                                                                                  initialValue: resProvider.saleUnitType,
+                                                                                  decoration: InputDecoration(labelText: getTranslated('seller_product_sale_unit_type', context)),
+                                                                                  items: ['piece', 'package'].map((v) => DropdownMenuItem(value: v, child: Text(getTranslated('seller_product_sale_unit_$v', context) ?? v))).toList(),
+                                                                                  onChanged: (v) {
+                                                                                    if (v != null) resProvider.setSaleUnitType(v);
+                                                                                  }),
+                                                                              if (resProvider.saleUnitType == 'package')
+                                                                                Padding(padding: const EdgeInsets.only(top: 12), child: TextField(controller: resProvider.piecesPerUnitController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: getTranslated('seller_product_pieces_per_unit', context))))
+                                                                            ])
+                                                                      : const SizedBox
+                                                                          .shrink()),
                                                               resProvider.productTypeIndex ==
                                                                       0
                                                                   ? const SizedBox(

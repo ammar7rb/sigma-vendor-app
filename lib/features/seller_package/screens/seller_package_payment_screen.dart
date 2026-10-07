@@ -1,3 +1,7 @@
+import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
+import 'package:sixvalley_vendor_app/features/wallet/screens/seller_balance_funding_screen.dart';
+import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
+import 'package:sixvalley_vendor_app/utill/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -10,73 +14,91 @@ import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/styles.dart';
 
-class SellerPackagePaymentScreen extends StatelessWidget {
+class SellerPackagePaymentScreen extends StatefulWidget {
   final SellerPackagePlan plan;
   final SellerPackageOverviewModel overview;
-
   const SellerPackagePaymentScreen(
       {super.key, required this.plan, required this.overview});
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          CustomAppBarWidget(title: getTranslated('package_payment', context)),
-      body: ListView(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-          children: [
-            _PackageAmountCard(plan: plan),
-            if (overview.offlinePaymentAvailable &&
-                overview.offlinePaymentMethods.isNotEmpty) ...[
-              const SizedBox(height: Dimensions.paddingSizeLarge),
-              Text(getTranslated('choose_payment_method', context) ?? '',
-                  style: titilliumSemiBold.copyWith(
-                      fontSize: Dimensions.fontSizeLarge)),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
-              if (_methodFor('wallet') != null)
-                _PaymentMethodTile(
-                  icon: Icons.account_balance_wallet_outlined,
-                  title:
-                      getTranslated('electronic_wallet_payment', context) ?? '',
-                  subtitle:
-                      getTranslated('submit_proof_for_admin_review', context),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => SellerPackageOfflinePaymentScreen(
-                            plan: plan, method: _methodFor('wallet')!)),
-                  ),
-                ),
-              if (_methodFor('instapay') != null)
-                _PaymentMethodTile(
-                  icon: Icons.account_balance_rounded,
-                  title: getTranslated('instapay_payment', context) ?? '',
-                  subtitle:
-                      getTranslated('submit_proof_for_admin_review', context),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => SellerPackageOfflinePaymentScreen(
-                            plan: plan, method: _methodFor('instapay')!)),
-                  ),
-                ),
-            ],
-            if (!overview.offlinePaymentAvailable ||
-                overview.offlinePaymentMethods.isEmpty)
-              Padding(
-                padding:
-                    const EdgeInsets.only(top: Dimensions.paddingSizeLarge),
-                child: Center(
-                    child: Text(
-                        getTranslated('no_payment_method_available', context) ??
-                            '')),
-              ),
-          ]),
-    );
+  State<SellerPackagePaymentScreen> createState() => _PackagePaymentState();
+}
+
+class _PackagePaymentState extends State<SellerPackagePaymentScreen> {
+  final String requestKey = withdrawalRequestKey();
+  bool loading = false;
+  String? error;
+  double? balance;
+  @override
+  void initState() {
+    super.initState();
+    load();
   }
 
-  SellerOfflinePaymentMethod? _methodFor(String channel) =>
-      transferMethodForChannel(overview.offlinePaymentMethods, channel);
+  Future<void> load() async {
+    try {
+      final r =
+          await VendorWorkspace.instance.client.get('/api/v3/seller/balance');
+      if (mounted)
+        setState(() => balance =
+            double.tryParse('${r.data['financial_summary']['operating']}'));
+    } catch (e) {
+      if (mounted) setState(() => error = financeError(context, e));
+    }
+  }
+
+  Future<void> purchase() async {
+    setState(() => loading = true);
+    try {
+      await VendorWorkspace.instance.client
+          .post(AppConstants.sellerPackagePayUri, data: {
+        'package_id': widget.plan.id,
+        'payment_method': 'operating_balance',
+        'payment_platform': 'vendor_app',
+        'request_key': requestKey
+      });
+      if (!mounted) return;
+      await context.read<SellerPackageController>().getOverview();
+      if (mounted) Navigator.pop(context, true);
+    } catch (e) {
+      if (mounted) setState(() => error = financeError(context, e));
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+      appBar: VendorFinanceAppBar(title: financeText(context, 'ads_manager')),
+      body: ListView(padding: const EdgeInsets.all(20), children: [
+        _PackageAmountCard(plan: widget.plan),
+        const SizedBox(height: 24),
+        Text(financeText(context, 'payments_balance_hint')),
+        const SizedBox(height: 12),
+        Text(
+            '${financeText(context, 'payments_balance')}: ${balance == null ? '—' : financeMoney(context, balance)}'),
+        if (error != null)
+          Text(error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        const SizedBox(height: 20),
+        FilledButton(
+            onPressed: loading ||
+                    balance == null ||
+                    balance! < widget.plan.packagePrice
+                ? null
+                : purchase,
+            child: Text(financeText(context,
+                loading ? 'loading' : 'purchase_from_payments_balance'))),
+        TextButton(
+            onPressed: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const SellerBalanceFundingScreen(
+                          walletTarget: 'operating')));
+              if (mounted) load();
+            },
+            child: Text(financeText(context, 'fund_purchase_balance')))
+      ]));
 }
 
 class SellerPackageOfflinePaymentScreen extends StatefulWidget {
@@ -321,39 +343,6 @@ class _PackageAmountCard extends StatelessWidget {
             style:
                 titilliumSemiBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
       ]),
-    );
-  }
-}
-
-class _PaymentMethodTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final VoidCallback onTap;
-
-  const _PaymentMethodTile(
-      {required this.icon,
-      required this.title,
-      this.subtitle,
-      required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: Theme.of(context).hintColor.withValues(alpha: .25)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title, style: titilliumSemiBold),
-        subtitle:
-            subtitle == null ? null : Text(subtitle!, style: titilliumRegular),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
     );
   }
 }

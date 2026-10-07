@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/profile/widgets/vendor_navigation_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -78,7 +79,7 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
     final method = balance == null ? null : _methodForChannel(balance, channel);
     final disabled = sending || wallet.isFunding;
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(actions:const [VendorAddProductAction()],
           title: Text(tr(widget.walletTarget == 'insurance'
               ? 'fund_insurance_balance'
               : 'fund_purchase_balance'))),

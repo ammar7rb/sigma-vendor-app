@@ -1,3 +1,5 @@
+import 'package:sixvalley_vendor_app/features/profile/screens/vendor_account_screen.dart';
+import 'package:sixvalley_vendor_app/features/profile/screens/vendor_inbox_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
@@ -6,7 +8,7 @@ import 'package:sixvalley_vendor_app/features/bank_info/screens/seller_bank_info
 import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/profile_controller.dart';
-import 'package:sixvalley_vendor_app/features/profile/screens/profile_screen.dart';
+
 import 'package:sixvalley_vendor_app/features/settings/screens/setting_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/wallet_screen.dart';
@@ -102,7 +104,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const ProfileScreen())),
+                                builder: (_) => const VendorAccountScreen())),
                         child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 11, vertical: 6),
@@ -121,6 +123,23 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
               ]),
             ),
             const SizedBox(height: 16),
+            _ActionCard(
+                icon: Icons.manage_accounts_outlined,
+                title: getTranslated('vendor_account', context) ?? 'Account',
+                subtitle: getTranslated('vendor_account_hint', context) ?? '',
+                onTap: () => _open(const VendorAccountScreen())),
+            _ActionCard(
+                icon: Icons.mail_outline,
+                title: getTranslated('administration_messages', context) ??
+                    'Messages',
+                subtitle: '',
+                onTap: () => _open(const VendorInboxScreen(messages: true))),
+            _ActionCard(
+                icon: Icons.notifications_outlined,
+                title:
+                    getTranslated('notification', context) ?? 'Notifications',
+                subtitle: '',
+                onTap: () => _open(const VendorInboxScreen())),
             Text(
                 getTranslated('vendor_account_summary', context) ??
                     'Account summary',
@@ -226,7 +245,8 @@ class _SummaryCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12)),
                         child: Icon(icon,
                             size: 20,
-                            color: AppDesign.foregroundAccent(Theme.of(context).brightness))),
+                            color: AppDesign.foregroundAccent(
+                                Theme.of(context).brightness))),
                     const Spacer(),
                     Text(value,
                         maxLines: 1,
@@ -270,7 +290,8 @@ class _ActionCard extends StatelessWidget {
                   color: Theme.of(context).primaryColor.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(13)),
               child: Icon(icon,
-                  color: AppDesign.foregroundAccent(Theme.of(context).brightness))),
+                  color: AppDesign.foregroundAccent(
+                      Theme.of(context).brightness))),
           title:
               Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
           subtitle: subtitle.isEmpty

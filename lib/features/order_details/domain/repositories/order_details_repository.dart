@@ -253,8 +253,9 @@ class OrderDetailsRepository implements OrderDetailsRepositoryInterface {
   @override
   Future getOrderInvoice(String orderID) async {
     try {
-      final response =
-          await dioClient!.get('${AppConstants.generateInvoice}$orderID');
+      final response = await dioClient!.get(
+          '/api/v3/seller/invoices/$orderID/document',
+          options: Options(responseType: ResponseType.bytes));
       return ApiResponse.withSuccess(response);
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));

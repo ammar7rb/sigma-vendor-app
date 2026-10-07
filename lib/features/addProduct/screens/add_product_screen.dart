@@ -122,11 +122,13 @@ class AddProductScreenState extends State<AddProductScreen>
         : null;
 
     return ProductGeneralInfoData(
-      categoryId: categoryController.categoryIndex != 0
-          ? categoryController
-              .categoryList![categoryController.categoryIndex! - 1].id
-              .toString()
-          : '-1',
+      categoryId: categoryController.categoryIndex == -2
+          ? 'other'
+          : categoryController.categoryIndex != 0
+              ? categoryController
+                  .categoryList![categoryController.categoryIndex! - 1].id
+                  .toString()
+              : '-1',
       subCategoryId: categoryController.subCategoryIndex != 0
           ? categoryController
               .subCategoryList![categoryController.subCategoryIndex! - 1].id
@@ -1146,56 +1148,71 @@ class AddProductScreenState extends State<AddProductScreen>
                                                     ),
                                                   )
                                                 : const SizedBox(),
-                                            Padding(
-                                              padding: const EdgeInsets
-                                                  .fromLTRB(
-                                                  Dimensions.paddingSizeMedium,
-                                                  Dimensions.paddingSizeMedium,
-                                                  Dimensions.paddingSizeMedium,
-                                                  0),
-                                              child: Row(children: [
-                                                Expanded(
-                                                    child: InkWell(
-                                                  onTap: () => _selectProductDate(
-                                                      resProvider
-                                                          .productionDateController,
-                                                      false),
-                                                  child: IgnorePointer(
-                                                      child: CustomTextFieldWidget(
-                                                          formProduct: true,
-                                                          required: true,
-                                                          border: true,
-                                                          readOnly: true,
-                                                          controller: resProvider
-                                                              .productionDateController,
-                                                          hintText: getTranslated(
-                                                              'production_date',
-                                                              context)!)),
-                                                )),
-                                                const SizedBox(
-                                                    width: Dimensions
-                                                        .paddingSizeSmall),
-                                                Expanded(
-                                                    child: InkWell(
-                                                  onTap: () => _selectProductDate(
-                                                      resProvider
-                                                          .expiryDateController,
-                                                      true),
-                                                  child: IgnorePointer(
-                                                      child: CustomTextFieldWidget(
-                                                          formProduct: true,
-                                                          required: true,
-                                                          border: true,
-                                                          readOnly: true,
-                                                          controller: resProvider
-                                                              .expiryDateController,
-                                                          hintText:
-                                                              getTranslated(
-                                                                  'expiry_date',
-                                                                  context)!)),
-                                                )),
-                                              ]),
-                                            ),
+                                            CheckboxListTile(
+                                                value: resProvider
+                                                    .noProductionExpiryDates,
+                                                onChanged: (v) => resProvider
+                                                    .setNoProductionExpiryDates(
+                                                        v ?? false),
+                                                title: Text(getTranslated(
+                                                        'no_production_expiry_dates',
+                                                        context) ??
+                                                    'No production or expiry dates')),
+                                            if (!resProvider
+                                                .noProductionExpiryDates)
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        Dimensions
+                                                            .paddingSizeMedium,
+                                                        Dimensions
+                                                            .paddingSizeMedium,
+                                                        Dimensions
+                                                            .paddingSizeMedium,
+                                                        0),
+                                                child: Row(children: [
+                                                  Expanded(
+                                                      child: InkWell(
+                                                    onTap: () => _selectProductDate(
+                                                        resProvider
+                                                            .productionDateController,
+                                                        false),
+                                                    child: IgnorePointer(
+                                                        child: CustomTextFieldWidget(
+                                                            formProduct: true,
+                                                            required: true,
+                                                            border: true,
+                                                            readOnly: true,
+                                                            controller: resProvider
+                                                                .productionDateController,
+                                                            hintText: getTranslated(
+                                                                'production_date',
+                                                                context)!)),
+                                                  )),
+                                                  const SizedBox(
+                                                      width: Dimensions
+                                                          .paddingSizeSmall),
+                                                  Expanded(
+                                                      child: InkWell(
+                                                    onTap: () => _selectProductDate(
+                                                        resProvider
+                                                            .expiryDateController,
+                                                        true),
+                                                    child: IgnorePointer(
+                                                        child: CustomTextFieldWidget(
+                                                            formProduct: true,
+                                                            required: true,
+                                                            border: true,
+                                                            readOnly: true,
+                                                            controller: resProvider
+                                                                .expiryDateController,
+                                                            hintText:
+                                                                getTranslated(
+                                                                    'expiry_date',
+                                                                    context)!)),
+                                                  )),
+                                                ]),
+                                              ),
                                             resProvider.productTypeIndex == 0
                                                 ? Padding(
                                                     padding: const EdgeInsets
@@ -1225,76 +1242,6 @@ class AddProductScreenState extends State<AddProductScreen>
                                                           const SizedBox(
                                                               height: Dimensions
                                                                   .paddingSizeSmall),
-                                                          DropdownDecoratorWidget(
-                                                            title:
-                                                                'seller_product_sale_unit_type',
-                                                            isRequired: true,
-                                                            child:
-                                                                DropdownButton<
-                                                                    String>(
-                                                              value: resProvider
-                                                                  .saleUnitType,
-                                                              isExpanded: true,
-                                                              underline:
-                                                                  const SizedBox(),
-                                                              items: [
-                                                                'piece',
-                                                                'package'
-                                                              ]
-                                                                  .map((value) =>
-                                                                      DropdownMenuItem<
-                                                                          String>(
-                                                                        value:
-                                                                            value,
-                                                                        child: Text(getTranslated(
-                                                                            'seller_product_sale_unit_$value',
-                                                                            context)!),
-                                                                      ))
-                                                                  .toList(),
-                                                              selectedItemBuilder: (context) => [
-                                                                'piece',
-                                                                'package'
-                                                              ]
-                                                                  .map((value) =>
-                                                                      Text(getTranslated(
-                                                                          'seller_product_sale_unit_$value',
-                                                                          context)!))
-                                                                  .toList(),
-                                                              onChanged:
-                                                                  (value) {
-                                                                if (value !=
-                                                                    null)
-                                                                  resProvider
-                                                                      .setSaleUnitType(
-                                                                          value);
-                                                              },
-                                                            ),
-                                                          ),
-                                                          if (resProvider
-                                                                  .saleUnitType ==
-                                                              'package') ...[
-                                                            const SizedBox(
-                                                                height: Dimensions
-                                                                    .paddingSizeSmall),
-                                                            CustomTextFieldWidget(
-                                                              formProduct: true,
-                                                              required: true,
-                                                              border: true,
-                                                              controller:
-                                                                  resProvider
-                                                                      .piecesPerUnitController,
-                                                              textInputType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              textInputAction:
-                                                                  TextInputAction
-                                                                      .next,
-                                                              hintText:
-                                                                  getTranslated(
-                                                                      'seller_product_pieces_per_unit',
-                                                                      context)!,
-                                                            ),
-                                                          ],
                                                           const SizedBox(
                                                               height: Dimensions
                                                                   .paddingSizeSmall),

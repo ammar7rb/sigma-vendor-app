@@ -62,10 +62,10 @@ void main() {
 
     expect(dashboard, isNot(contains('PosScreen(fromMenu: true)')));
     expect(dashboard, isNot(contains('FloatingActionButton.extended')));
-    expect(overview, contains('const AddProductTabView(fromHome: true)'));
+    expect(File('lib/features/profile/widgets/vendor_navigation_actions.dart').readAsStringSync(), contains('AddProductTabView'));
     expect(overview, contains('const ProductListMenuScreen()'));
-    expect(overview, contains('const OrderScreen(fromHome: true)'));
-    expect(overview, contains('mainAxisExtent: columns == 4 ? 164 : 178'));
+    expect(dashboard,contains('const OrderScreen()'));
+    expect(overview, contains('VendorInvoicesScreen'));
     expect(mainSource, contains('if (_showSetupGuideOverlay() &&'));
     expect(mainSource, contains('bool _showSetupGuideOverlay() => false;'));
   });

@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,26 +27,32 @@ class SellerPackageRepository implements SellerPackageRepositoryInterface {
   @override
   Future<ApiResponse> getPerformance(int subscriptionId) async {
     try {
-      return ApiResponse.withSuccess(await dioClient.get(AppConstants.sellerPackagePerformanceUri(subscriptionId)));
+      return ApiResponse.withSuccess(await dioClient
+          .get(AppConstants.sellerPackagePerformanceUri(subscriptionId)));
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
 
   @override
-  Future<ApiResponse> cancelPackage({required int subscriptionId, required String reason}) async {
+  Future<ApiResponse> cancelPackage(
+      {required int subscriptionId, required String reason}) async {
     try {
-      return ApiResponse.withSuccess(await dioClient.post(AppConstants.sellerPackageCancelUri(subscriptionId), data: {'reason': reason}));
+      return ApiResponse.withSuccess(await dioClient.post(
+          AppConstants.sellerPackageCancelUri(subscriptionId),
+          data: {'reason': reason}));
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
 
   @override
-  Future<ApiResponse> payPackage({required int packageId, required String paymentMethod}) async {
+  Future<ApiResponse> payPackage(
+      {required int packageId, required String paymentMethod}) async {
     try {
       // vendor_app tells the payment system which client originated the secure redirect.
-      final response = await dioClient.post(AppConstants.sellerPackagePayUri, data: {
+      final response =
+          await dioClient.post(AppConstants.sellerPackagePayUri, data: {
         'package_id': packageId,
         'payment_method': paymentMethod,
         'payment_platform': 'vendor_app',
@@ -57,11 +64,14 @@ class SellerPackageRepository implements SellerPackageRepositoryInterface {
   }
 
   @override
-  Future<ApiResponse> payPackageFromOperatingBalance({required int packageId}) async {
+  Future<ApiResponse> payPackageFromOperatingBalance(
+      {required int packageId}) async {
     try {
-      final response = await dioClient.post(AppConstants.sellerPackagePayUri, data: {
+      final response =
+          await dioClient.post(AppConstants.sellerPackagePayUri, data: {
         'package_id': packageId,
         'payment_method': 'operating_balance',
+        'request_key': withdrawalRequestKey(),
         'payment_platform': 'vendor_app',
       });
       return ApiResponse.withSuccess(response);
@@ -72,22 +82,28 @@ class SellerPackageRepository implements SellerPackageRepositoryInterface {
 
   @override
   Future<ApiResponse> submitOfflinePayment({
-    required int packageId, required int methodId, required Map<String, String> methodInformations,
-    required XFile paymentProof, String? paymentNote,
+    required int packageId,
+    required int methodId,
+    required Map<String, String> methodInformations,
+    required XFile paymentProof,
+    String? paymentNote,
   }) async {
     try {
-      final proof = MultipartFile.fromBytes(await paymentProof.readAsBytes(), filename: paymentProof.name);
+      final proof = MultipartFile.fromBytes(await paymentProof.readAsBytes(),
+          filename: paymentProof.name);
       // The proof is a real multipart image; text data stays in method_informations as JSON.
-      final response = await dioClient.postMultipart(AppConstants.sellerPackageOfflinePaymentUri, data: {
+      final response = await dioClient
+          .postMultipart(AppConstants.sellerPackageOfflinePaymentUri, data: {
         'package_id': packageId,
         'method_id': methodId,
         'method_informations': jsonEncode(methodInformations),
         'payment_note': paymentNote ?? '',
-      }, files: [MultipartWithKey(key: 'payment_proof', multipartFile: proof)]);
+      }, files: [
+        MultipartWithKey(key: 'payment_proof', multipartFile: proof)
+      ]);
       return ApiResponse.withSuccess(response);
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
-
 }

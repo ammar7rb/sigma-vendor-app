@@ -113,6 +113,16 @@ class AddProductController extends ChangeNotifier {
   final TextEditingController productionDateController =
       TextEditingController();
   final TextEditingController expiryDateController = TextEditingController();
+  bool noProductionExpiryDates = false;
+  void setNoProductionExpiryDates(bool value) {
+    noProductionExpiryDates = value;
+    if (value) {
+      productionDateController.clear();
+      expiryDateController.clear();
+    }
+    notifyListeners();
+  }
+
   String saleUnitType = 'piece';
   String dimensionUnit = 'cm';
   String weightUnit = 'kg';
@@ -313,96 +323,97 @@ class AddProductController extends ChangeNotifier {
     notifyListeners();
 
     try {
-
-    final addProductImageController =
-        Provider.of<AddProductImageController>(context, listen: false);
-    bool isDigitalVariationEmpty =
-        Provider.of<DigitalProductController>(context, listen: false)
-            .selectedDigitalVariation
-            .isNotEmpty;
-
-    DigitalVariationModel? digitalVariationModel;
-    String? token;
-
-    List<AttributeModel>? attributeList =
-        Provider.of<VariationController>(context, listen: false).attributeList;
-
-    Map<String, dynamic> variationFields =
-        Provider.of<VariationController>(context, listen: false)
-            .processVariantData(context);
-
-    Provider.of<VariationController>(context, listen: false)
-        .onClearColorVariations(addProduct);
-
-    List<Map<String, dynamic>>? productReturnImages =
-        addProductImageController.productReturnImageList;
-
-    List<ColorImage> colorImageObjects =
-        addProductImageController.colorImageObject;
-
-    String? digitalProductFileName =
-        Provider.of<DigitalProductController>(context, listen: false)
-            .digitalProductFileName;
-
-    if (_productTypeIndex == 1) {
-      digitalVariationModel =
+      final addProductImageController =
+          Provider.of<AddProductImageController>(context, listen: false);
+      bool isDigitalVariationEmpty =
           Provider.of<DigitalProductController>(context, listen: false)
-              .getDigitalVariationModel();
-    } else {
-      digitalVariationModel = DigitalVariationModel();
-    }
+              .selectedDigitalVariation
+              .isNotEmpty;
 
-    token = Provider.of<AuthController>(context, listen: false).getUserToken();
+      DigitalVariationModel? digitalVariationModel;
+      String? token;
 
-    setMetaSeoData(product);
+      List<AttributeModel>? attributeList =
+          Provider.of<VariationController>(context, listen: false)
+              .attributeList;
 
-    ApiResponse response = await shopServiceInterface.addProduct(
-        product,
-        addProduct,
-        variationFields,
-        productReturnImages,
-        thumbnail,
-        metaImage,
-        isAdd,
-        attributeList?.firstOrNull?.active ?? false,
-        colorImageObjects,
-        tags,
-        digitalProductFileName,
-        digitalVariationModel,
-        isDigitalVariationEmpty,
-        token);
-    if (response.response != null && response.response?.statusCode == 200) {
-      await addProductImageController.onDeleteColorImages(product);
+      Map<String, dynamic> variationFields =
+          Provider.of<VariationController>(context, listen: false)
+              .processVariantData(context);
 
-      _productCode.clear();
-      Navigator.pushAndRemoveUntil(
+      Provider.of<VariationController>(context, listen: false)
+          .onClearColorVariations(addProduct);
+
+      List<Map<String, dynamic>>? productReturnImages =
+          addProductImageController.productReturnImageList;
+
+      List<ColorImage> colorImageObjects =
+          addProductImageController.colorImageObject;
+
+      String? digitalProductFileName =
+          Provider.of<DigitalProductController>(context, listen: false)
+              .digitalProductFileName;
+
+      if (_productTypeIndex == 1) {
+        digitalVariationModel =
+            Provider.of<DigitalProductController>(context, listen: false)
+                .getDigitalVariationModel();
+      } else {
+        digitalVariationModel = DigitalVariationModel();
+      }
+
+      token =
+          Provider.of<AuthController>(context, listen: false).getUserToken();
+
+      setMetaSeoData(product);
+
+      ApiResponse response = await shopServiceInterface.addProduct(
+          product,
+          addProduct,
+          variationFields,
+          productReturnImages,
+          thumbnail,
+          metaImage,
+          isAdd,
+          attributeList?.firstOrNull?.active ?? false,
+          colorImageObjects,
+          tags,
+          digitalProductFileName,
+          digitalVariationModel,
+          isDigitalVariationEmpty,
+          token);
+      if (response.response != null && response.response?.statusCode == 200) {
+        await addProductImageController.onDeleteColorImages(product);
+
+        _productCode.clear();
+        Navigator.pushAndRemoveUntil(
+            Get.context!,
+            MaterialPageRoute(
+                builder: (_) =>
+                    const ProductListMenuScreen(fromNotification: true)),
+            (route) => false);
+        showCustomSnackBarWidget(
+          isAdd
+              ? getTranslated(
+                  'seller_product_uploaded_under_review', Get.context!)
+              : getTranslated('product_updated_successfully', Get.context!),
           Get.context!,
-          MaterialPageRoute(
-              builder: (_) =>
-                  const ProductListMenuScreen(fromNotification: true)),
-          (route) => false);
-      showCustomSnackBarWidget(
-        isAdd
-            ? getTranslated(
-                'seller_product_uploaded_under_review', Get.context!)
-            : getTranslated('product_updated_successfully', Get.context!),
-        Get.context!,
-        isError: false,
-      );
-      titleControllerList.clear();
-      descriptionControllerList.clear();
-      Provider.of<AddProductImageController>(Get.context!, listen: false)
-          .removeProductImage();
-      emptyDigitalProductData();
-      _isLoading = false;
-      _metaSeoInfo = MetaSeoInfo();
-    } else {
-      Provider.of<AddProductImageController>(Get.context!, listen: false)
-          .emptyWithColorImage();
-      _isLoading = false;
-      // Keep the backend's specific entitlement reason visible to the seller.
-      ApiChecker.checkApi(response);
-    }
+          isError: false,
+        );
+        titleControllerList.clear();
+        descriptionControllerList.clear();
+        Provider.of<AddProductImageController>(Get.context!, listen: false)
+            .removeProductImage();
+        emptyDigitalProductData();
+        _isLoading = false;
+        _metaSeoInfo = MetaSeoInfo();
+      } else {
+        Provider.of<AddProductImageController>(Get.context!, listen: false)
+            .emptyWithColorImage();
+        _isLoading = false;
+        // Keep the backend's specific entitlement reason visible to the seller.
+        ApiChecker.checkApi(response);
+      }
     } catch (_) {
       if (context.mounted) {
         showCustomSnackBarWidget(
@@ -683,7 +694,13 @@ class AddProductController extends ChangeNotifier {
       return false;
     }
 
-    // An unselected category is assigned to General Category by the API.
+    if (categoryController.categoryIndex == null ||
+        categoryController.categoryIndex == 0) {
+      showCustomSnackBarWidget(
+          getTranslated('choose_category_or_other', context), context,
+          sanckBarType: SnackBarType.warning);
+      return false;
+    }
 
     // Unit and measurements are optional for seller products.
 
@@ -756,24 +773,26 @@ class AddProductController extends ChangeNotifier {
       return false;
     }
 
-    final productionDate =
-        DateTime.tryParse(productionDateController.text.trim());
-    final expiryDate = DateTime.tryParse(expiryDateController.text.trim());
-    final today = DateTime.now();
-    final todayOnly = DateTime(today.year, today.month, today.day);
-    if (productionDate == null || expiryDate == null) {
-      showCustomSnackBarWidget(
-          getTranslated('product_dates_are_required', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
+    if (!noProductionExpiryDates) {
+      final productionDate =
+          DateTime.tryParse(productionDateController.text.trim());
+      final expiryDate = DateTime.tryParse(expiryDateController.text.trim());
+      final today = DateTime.now();
+      final todayOnly = DateTime(today.year, today.month, today.day);
+      if (productionDate == null || expiryDate == null) {
+        showCustomSnackBarWidget(
+            getTranslated('product_dates_are_required', context), context,
+            sanckBarType: SnackBarType.warning);
+        return false;
+      }
+      if (expiryDate.isBefore(productionDate) ||
+          !expiryDate.isAfter(todayOnly)) {
+        showCustomSnackBarWidget(
+            getTranslated('product_expiry_date_is_invalid', context), context,
+            sanckBarType: SnackBarType.warning);
+        return false;
+      }
     }
-    if (expiryDate.isBefore(productionDate) || !expiryDate.isAfter(todayOnly)) {
-      showCustomSnackBarWidget(
-          getTranslated('product_expiry_date_is_invalid', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
-    }
-
     final optionalMeasurements = [
       lengthController.text,
       widthController.text,
@@ -827,6 +846,7 @@ class AddProductController extends ChangeNotifier {
     weightController.text = product?.weight?.toString() ?? '';
     dimensionUnit = product?.dimensionUnit ?? 'cm';
     weightUnit = product?.weightUnit ?? 'kg';
+    noProductionExpiryDates = product?.noProductionExpiryDates ?? false;
     productionDateController.text = product?.productionDate ?? '';
     expiryDateController.text = product?.expiryDate ?? '';
   }

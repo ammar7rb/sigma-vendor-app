@@ -19,84 +19,153 @@ class SelectCategoryWidget extends StatefulWidget {
 }
 
 class SelectCategoryWidgetState extends State<SelectCategoryWidget> {
-  
   @override
   Widget build(BuildContext context) {
     log("category section===>");
     return Consumer<AddProductController>(
-      builder: (context, addProductController, child){
-        return Consumer<CategoryController>(
-          builder: (context, categoryController, child){
-            return Column(crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                categoryController.categoryList != null ? categoryController.categoryList!.isNotEmpty ?
-                Column(
-                  children: [
-                    DropdownDecoratorWidget(
-                        child: DropdownButton<int>(
-                          icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                          borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                          value:   categoryController.categoryIds.isEmpty ? 0 : categoryController.categoryIndex == -1 ? 0 : categoryController.categoryIndex,
-                          items: categoryController.categoryIds.map((int? value) {
-                            return DropdownMenuItem<int>(
-                              value: categoryController.categoryIds.indexOf(value),
-                              child: Text(value != 0
-                                  ? categoryController.categoryList![(categoryController.categoryIds.indexOf(value) -1)].name!
-                                  : getTranslated('select_category', context)!,
-                                style: robotoMedium.copyWith(color: value == 0 ? Theme.of(context).hintColor : null),
+        builder: (context, addProductController, child) {
+      return Consumer<CategoryController>(
+        builder: (context, categoryController, child) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: Dimensions.paddingSizeSmall),
+              categoryController.categoryList != null
+                  ? categoryController.categoryList!.isNotEmpty
+                      ? Column(
+                          children: [
+                            DropdownDecoratorWidget(
+                                child: DropdownButton<int>(
+                                    icon: const Icon(
+                                        Icons.keyboard_arrow_down_outlined),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(Dimensions.paddingEye)),
+                                    value: categoryController
+                                            .categoryIds.isEmpty
+                                        ? 0
+                                        : categoryController.categoryIndex == -1
+                                            ? 0
+                                            : categoryController.categoryIndex,
+                                    items: [
+                                      DropdownMenuItem<int>(
+                                          value: -2,
+                                          child: Text(getTranslated(
+                                                  'other_category', context) ??
+                                              'Other')),
+                                      ...categoryController.categoryIds
+                                          .map((int? value) {
+                                        return DropdownMenuItem<int>(
+                                          value: categoryController.categoryIds
+                                              .indexOf(value),
+                                          child: Text(
+                                            value != 0
+                                                ? categoryController
+                                                    .categoryList![
+                                                        (categoryController
+                                                                .categoryIds
+                                                                .indexOf(
+                                                                    value) -
+                                                            1)]
+                                                    .name!
+                                                : getTranslated(
+                                                    'select_category',
+                                                    context)!,
+                                            style: robotoMedium.copyWith(
+                                                color: value == 0
+                                                    ? Theme.of(context)
+                                                        .hintColor
+                                                    : null),
+                                          ),
+                                        );
+                                      }).toList()
+                                    ],
+                                    onChanged: (int? value) {
+                                      categoryController.setCategoryIndex(
+                                          value, true);
+                                      categoryController.getSubCategoryList(
+                                          context,
+                                          value != 0
+                                              ? categoryController
+                                                  .categorySelectedIndex
+                                              : 0,
+                                          true,
+                                          widget.product);
+                                    },
+                                    isExpanded: true,
+                                    underline: const SizedBox())),
+                            addProductController.productTypeIndex == 0
+                                ? const SizedBox(
+                                    height: Dimensions.paddingSizeMedium)
+                                : const SizedBox.shrink(),
+                          ],
+                        )
+                      : const NoDataScreen(
+                          title: 'no_category_found',
+                        )
+                  : const SizedBox.shrink(),
+              categoryController.subCategoryList != null
+                  ? categoryController.subCategoryList!.isNotEmpty
+                      ? Column(
+                          children: [
+                            DropdownDecoratorWidget(
+                              child: DropdownButton<int>(
+                                icon: const Icon(
+                                    Icons.keyboard_arrow_down_outlined),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(Dimensions.paddingEye)),
+                                value: categoryController.subCategoryIndex == -1
+                                    ? 0
+                                    : categoryController.subCategoryIndex,
+                                items: categoryController.subCategoryIds
+                                    .map((int? value) {
+                                  return DropdownMenuItem<int>(
+                                    value: categoryController.subCategoryIds
+                                        .indexOf(value),
+                                    child: Text(
+                                      value != 0
+                                          ? categoryController
+                                              .subCategoryList![
+                                                  (categoryController
+                                                          .subCategoryIds
+                                                          .indexOf(value) -
+                                                      1)]
+                                              .name!
+                                          : getTranslated(
+                                              'sub_category', context)!,
+                                      style: robotoMedium.copyWith(
+                                          color: value == 0
+                                              ? Theme.of(context).hintColor
+                                              : null),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (int? value) {
+                                  categoryController.setSubCategoryIndex(
+                                      value, true);
+                                  categoryController.getSubSubCategoryList(
+                                      value != 0
+                                          ? categoryController
+                                              .subCategorySelectedIndex
+                                          : 0,
+                                      true);
+                                },
+                                isExpanded: true,
+                                underline: const SizedBox(),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (int? value) {
-                            categoryController.setCategoryIndex(value, true);
-                            categoryController.getSubCategoryList(context, value != 0 ?
-                            categoryController.categorySelectedIndex : 0, true, widget.product);},
-                          isExpanded: true, underline: const SizedBox())
-                    ),
-
-                    addProductController.productTypeIndex == 0 ? const SizedBox(height: Dimensions.paddingSizeMedium) : const SizedBox.shrink(),
-                  ],
-                ) : const NoDataScreen(title: 'no_category_found',) : const SizedBox.shrink(),
-
-
-                categoryController.subCategoryList != null ? categoryController.subCategoryList!.isNotEmpty ?
-                Column(children: [
-                  DropdownDecoratorWidget(
-                    child: DropdownButton<int>(
-                      icon: const Icon(Icons.keyboard_arrow_down_outlined),
-                      borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                      value: categoryController.subCategoryIndex == -1 ? 0 : categoryController.subCategoryIndex,
-                      items: categoryController.subCategoryIds.map((int? value) {
-                        return DropdownMenuItem<int>(
-                          value: categoryController.subCategoryIds.indexOf(value),
-                          child: Text(value != 0
-                              ? categoryController.subCategoryList![(categoryController.subCategoryIds.indexOf(value) - 1)].name!
-                              : getTranslated('sub_category', context)!,
-                            style: robotoMedium.copyWith(color: value == 0 ? Theme.of(context).hintColor : null),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (int? value) {
-                        categoryController.setSubCategoryIndex(value, true);
-                        categoryController.getSubSubCategoryList( value != 0 ? categoryController.subCategorySelectedIndex : 0, true);
-                      },
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                    ),
-                  ),
-
-                  addProductController.productTypeIndex == 0 ? const SizedBox(height: Dimensions.paddingSizeMedium) : const SizedBox.shrink(),
-                ],
-                ) : const SizedBox.shrink() : const SizedBox.shrink(),
-
-              ],);
-          },
-
-        );
-      }
-    );
+                            ),
+                            addProductController.productTypeIndex == 0
+                                ? const SizedBox(
+                                    height: Dimensions.paddingSizeMedium)
+                                : const SizedBox.shrink(),
+                          ],
+                        )
+                      : const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+            ],
+          );
+        },
+      );
+    });
   }
 }

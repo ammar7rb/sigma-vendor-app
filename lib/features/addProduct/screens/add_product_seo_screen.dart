@@ -239,7 +239,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
             }
           }
         }
-
       } else {
         if (Provider.of<AddProductImageController>(Get.context!, listen: false)
             .imagesWithColor
@@ -279,7 +278,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                       .length;
               index++) {}
         }
-
       }
     }
   }
@@ -1507,6 +1505,10 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                               .trim());
                                                   _product!.weightUnit =
                                                       resProvider.weightUnit;
+                                                  _product!
+                                                          .noProductionExpiryDates =
+                                                      resProvider
+                                                          .noProductionExpiryDates;
                                                   _product!.productionDate =
                                                       resProvider
                                                           .productionDateController
@@ -1572,7 +1574,8 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                               addProductImageController
                                                                   .thumbnailImageModel,
                                                               route,
-                                                              update: _update)) return;
+                                                              update: _update))
+                                                        return;
                                                     }
 
                                                     if (addProductImageController
@@ -1584,7 +1587,8 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                               addProductImageController
                                                                   .metaImageModel,
                                                               route,
-                                                              update: _update)) return;
+                                                              update: _update))
+                                                        return;
                                                     }
 
                                                     if (context.mounted) {
@@ -1619,7 +1623,8 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                   route,
                                                                   index: i,
                                                                   update:
-                                                                      _update)) return;
+                                                                      _update))
+                                                            return;
                                                         }
                                                       }
                                                     }
