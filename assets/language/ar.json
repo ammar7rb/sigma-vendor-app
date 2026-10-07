@@ -693,7 +693,7 @@
     "select_customer": "حدد العميل",
     "coupon_title": "عنوان القسيمة",
     "limit_for_same_user": "الحد لنفس المستخدم",
-    "percentage": "نسبة مئوية ٪",
+    "percentage": "نسبة مئوية",
     "minimum_purchase": "الحد الأدنى للشراء",
     "start_date": "تاريخ البدء",
     "expire_date": "تاريخ انتهاء الصلاحية",
@@ -1997,5 +1997,8 @@
     "held_security_total": "التأمين المحجوز",
     "grow_your_catalogue": "منتجك القادم يبدأ من هنا",
     "grow_your_catalogue_hint": "أضف صور المنتج ومواصفاته وسعره ليصل إلى المشترين.",
-    "notifications": "الإشعارات"
+    "notifications": "الإشعارات",
+    "vendor_manage_payment_methods": "إدارة طرق الدفع",
+    "flat": "مبلغ ثابت",
+    "fixed": "مبلغ ثابت"
 }

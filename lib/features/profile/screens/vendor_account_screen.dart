@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/profile_controller.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
-import 'package:sixvalley_vendor_app/features/profile/screens/vendor_inbox_screen.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
@@ -247,31 +246,6 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(error!,
                         style: const TextStyle(color: AppDesign.danger))),
-              Wrap(spacing: 12, children: [
-                TextButton.icon(
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) =>
-                                const VendorInboxScreen(messages: true))),
-                    icon: const Icon(Icons.mail_outline),
-                    label: Text(text('administration_messages'))),
-                TextButton.icon(
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const VendorInboxScreen())),
-                    icon: const Icon(Icons.notifications_outlined),
-                    label: Text(text('notification'))),
-              ]),
-              TextButton.icon(
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              const VendorWithdrawalMethodsScreen())),
-                  icon: const Icon(Icons.account_balance_outlined),
-                  label: Text(text('manage_withdrawal_methods'))),
               Form(
                   key: form,
                   child: Column(
@@ -297,11 +271,23 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                                       text('profile_picture'))))
                         ]),
                         const SizedBox(height: 20),
-                        TextFormField(
-                            initialValue: '${data!['account_id']}',
-                            readOnly: true,
-                            decoration: InputDecoration(
-                                labelText: text('vendor_account_id'))),
+                        Row(children: [
+                          Expanded(
+                              child: TextFormField(
+                                  initialValue: '${data!['account_id']}',
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                      labelText: text('vendor_account_id')))),
+                          const SizedBox(width: 12),
+                          OutlinedButton(
+                              onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          const VendorWithdrawalMethodsScreen())),
+                              child:
+                                  Text(text('vendor_manage_payment_methods')))
+                        ]),
                         const SizedBox(height: 16),
                         input('f_name', 'first_name'),
                         input('l_name', 'last_name'),

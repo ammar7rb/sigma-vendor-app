@@ -1996,5 +1996,6 @@
     "view_balance_details": "View details",
     "held_security_total": "Reserved security deposits",
     "grow_your_catalogue": "Your next product starts here",
-    "grow_your_catalogue_hint": "Add its images, specifications and price to reach buyers."
+    "grow_your_catalogue_hint": "Add its images, specifications and price to reach buyers.",
+    "vendor_manage_payment_methods": "Manage payment methods"
 }

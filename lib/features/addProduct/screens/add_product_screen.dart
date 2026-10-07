@@ -203,7 +203,7 @@ class AddProductScreenState extends State<AddProductScreen>
           .productCode
           .text = _generateSKU();
       Provider.of<AddProductController>(context, listen: false)
-          .setValueForUnit('select_unit');
+          .setValueForUnit('pc');
       Provider.of<VariationController>(context, listen: false)
           .setCurrentStock('1');
       Provider.of<AddProductController>(context, listen: false)
@@ -1056,94 +1056,6 @@ class AddProductScreenState extends State<AddProductScreen>
                                                         const SizedBox(
                                                             height: Dimensions
                                                                 .paddingSizeMedium),
-                                                      ],
-                                                    ),
-                                                  )
-                                                : const SizedBox(),
-                                            resProvider.productTypeIndex == 0
-                                                ? Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: Dimensions
-                                                            .paddingSizeMedium),
-                                                    child: Column(
-                                                      children: [
-                                                        DropdownDecoratorWidget(
-                                                          title:
-                                                              'seller_product_measurement_unit_optional',
-                                                          isRequired: false,
-                                                          child: DropdownButton<
-                                                              String>(
-                                                            icon: const Icon(Icons
-                                                                .keyboard_arrow_down_outlined),
-                                                            borderRadius: const BorderRadius
-                                                                .all(
-                                                                Radius.circular(
-                                                                    Dimensions
-                                                                        .paddingEye)),
-                                                            hint: (resProvider
-                                                                            .unitValue ==
-                                                                        null ||
-                                                                    resProvider
-                                                                            .unitValue ==
-                                                                        'select_unit' ||
-                                                                    resProvider
-                                                                            .unitValue ==
-                                                                        'null')
-                                                                ? Text(
-                                                                    getTranslated(
-                                                                        'select_unit',
-                                                                        context)!,
-                                                                    style: robotoMedium.copyWith(
-                                                                        color: Theme.of(context)
-                                                                            .hintColor))
-                                                                : Text(
-                                                                    resProvider
-                                                                        .unitValue!,
-                                                                    style: robotoMedium
-                                                                        .copyWith(
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .bodyLarge
-                                                                          ?.color,
-                                                                      fontSize:
-                                                                          Dimensions
-                                                                              .fontSizeExtraLarge,
-                                                                    )),
-                                                            items: Provider.of<
-                                                                        SplashController>(
-                                                                    context,
-                                                                    listen:
-                                                                        false)
-                                                                .configModel!
-                                                                .unit!
-                                                                .map((String
-                                                                    value) {
-                                                              return DropdownMenuItem<
-                                                                  String>(
-                                                                value: value,
-                                                                child: Text(
-                                                                    value,
-                                                                    style:
-                                                                        robotoMedium),
-                                                              );
-                                                            }).toList(),
-                                                            onChanged: (val) {
-                                                              unitValue = val;
-                                                              setState(
-                                                                () {
-                                                                  resProvider
-                                                                      .setValueForUnit(
-                                                                          val);
-                                                                },
-                                                              );
-                                                            },
-                                                            isExpanded: true,
-                                                            underline:
-                                                                const SizedBox(),
-                                                          ),
-                                                        ),
                                                       ],
                                                     ),
                                                   )
