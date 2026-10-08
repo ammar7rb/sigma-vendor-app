@@ -100,7 +100,11 @@ void main() {
                     )))));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        await tester.tap(find.byIcon(Icons.receipt_long_outlined));
+        await tester.tap(find
+            .ancestor(
+                of: find.byIcon(Icons.receipt_long_outlined),
+                matching: find.byType(InkWell))
+            .first);
         expect(selected, 3);
         await tester.pumpAndSettle();
         Future<void> capture(String name) async {
@@ -121,7 +125,10 @@ void main() {
 
         await capture('flutter-home');
         for (final icon in [Icons.mail_outline, Icons.notifications_outlined]) {
-          await tester.tap(find.byIcon(icon));
+          await tester.tap(find
+              .ancestor(
+                  of: find.byIcon(icon), matching: find.byType(IconButton))
+              .first);
           await tester.pumpAndSettle();
           expect(find.byType(VendorInboxScreen), findsOneWidget);
           expect(
