@@ -22,7 +22,7 @@ import 'package:sixvalley_vendor_app/utill/images.dart';
 import 'package:sixvalley_vendor_app/features/home/screens/home_page_screen.dart';
 import 'package:sixvalley_vendor_app/features/menu/widgets/vendor_menu_widget.dart';
 import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
-import 'package:sixvalley_vendor_app/features/profile/screens/vendor_account_screen.dart';
+import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
@@ -120,12 +120,12 @@ class DashboardScreenState extends State<DashboardScreen> {
     _screens = [
       HomePageScreen(callback: () {
         setState(() {
-          setPage(1);
+          setPage(3);
         });
       }),
-      const OrderScreen(),
       const SellerFinanceScreen(),
-      const VendorAccountScreen(),
+      const ProductListMenuScreen(fromDashboard: true),
+      const OrderScreen(),
     ];
 
     NetworkInfo.checkConnectivity(context);
@@ -145,57 +145,19 @@ class DashboardScreenState extends State<DashboardScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        bottomNavigationBar: Container(
-          height: 78,
-          padding: const EdgeInsets.fromLTRB(6, 7, 6, 5),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border:
-                Border(top: BorderSide(color: Theme.of(context).dividerColor)),
-            boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
-          ),
-          child: AnimatedBuilder(
-              animation: VendorWorkspace.instance,
-              builder: (context, _) => Row(
-                      children: List.generate(5, (index) {
-                    final data = [
-                      (Icons.home_outlined, getTranslated('home', context)),
-                      (
-                        Icons.receipt_long_outlined,
-                        getTranslated('my_order', context)
-                      ),
-                      (
-                        Icons.account_balance_wallet_outlined,
-                        getTranslated('finance_my_wallet', context)
-                      ),
-                      (
-                        Icons.person_outline_rounded,
-                        getTranslated('profile', context)
-                      ),
-                      (Icons.grid_view_rounded, getTranslated('menu', context)),
-                    ][index];
-                    return Expanded(
-                        child: _VendorNavItem(
-                      icon: data.$1,
-                      count: index == 1
-                          ? VendorWorkspace.instance.counts['orders']!
-                          : 0,
-                      label: data.$2 ?? '',
-                      selected: _pageIndex == index,
-                      onTap: () {
-                        if (index != 4) {
-                          setPage(index);
-                        } else {
-                          showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (con) => const MenuBottomSheetWidget());
-                        }
-                      },
-                    ));
-                  }))),
-        ),
+        bottomNavigationBar: VendorBottomNavigation(
+            selectedIndex: _pageIndex,
+            onSelected: (index) {
+              if (index != 4) {
+                setPage(index);
+              } else {
+                showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const MenuBottomSheetWidget());
+              }
+            }),
         body: PageView.builder(
           controller: _pageController,
           itemCount: _screens.length,
@@ -237,6 +199,61 @@ class DashboardScreenState extends State<DashboardScreen> {
 
     return true;
   }
+}
+
+class VendorBottomNavigation extends StatelessWidget {
+  const VendorBottomNavigation(
+      {super.key, required this.selectedIndex, required this.onSelected});
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+  @override
+  Widget build(BuildContext context) => SafeArea(
+        top: false,
+        child: Container(
+          height: 78,
+          padding: const EdgeInsets.fromLTRB(6, 7, 6, 5),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            border:
+                Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+            boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
+          ),
+          child: AnimatedBuilder(
+              animation: VendorWorkspace.instance,
+              builder: (context, _) => Row(
+                      children: List.generate(5, (index) {
+                    final data = [
+                      (Icons.home_outlined, getTranslated('home', context)),
+                      (
+                        Icons.account_balance_wallet_outlined,
+                        getTranslated('finance_my_wallet', context)
+                      ),
+                      (
+                        Icons.inventory_2_outlined,
+                        getTranslated('products', context)
+                      ),
+                      (
+                        Icons.receipt_long_outlined,
+                        getTranslated('my_order', context)
+                      ),
+                      (
+                        Icons.grid_view_rounded,
+                        getTranslated('vendor_other', context)
+                      ),
+                    ][index];
+                    return Expanded(
+                        child: _VendorNavItem(
+                      icon: data.$1,
+                      count: index == 3
+                          ? VendorWorkspace.instance.counts['orders']!
+                          : 0,
+                      label: data.$2 ?? '',
+                      selected: selectedIndex == index,
+                      onTap: () => onSelected(index),
+                    ));
+                  }))),
+        ),
+      );
 }
 
 class _VendorNavItem extends StatelessWidget {
@@ -281,7 +298,7 @@ class _VendorNavItem extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected
                       ? Theme.of(context).primaryColor

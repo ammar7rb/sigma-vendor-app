@@ -106,15 +106,17 @@ class _ProductListMenuScreenState extends State<ProductListMenuScreen> {
                       margin: const EdgeInsets.fromLTRB(16, 10, 16, 8),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        gradient: AppDesign.brandGradient,
+                        color: Theme.of(context).cardColor,
+                        border:
+                            Border.all(color: Theme.of(context).dividerColor),
                         borderRadius:
                             BorderRadius.circular(AppDesign.radiusLarge),
                         boxShadow:
                             AppDesign.softShadow(Theme.of(context).brightness),
                       ),
                       child: Row(children: [
-                        const Icon(Icons.inventory_2_outlined,
-                            color: Colors.white, size: 32),
+                        Icon(Icons.inventory_2_outlined,
+                            color: Theme.of(context).primaryColor, size: 32),
                         const SizedBox(width: 12),
                         Expanded(
                             child: Column(
@@ -128,7 +130,7 @@ class _ProductListMenuScreenState extends State<ProductListMenuScreen> {
                                       .textTheme
                                       .titleMedium
                                       ?.copyWith(
-                                          color: Colors.white,
+                                          color: Theme.of(context).primaryColor,
                                           fontWeight: FontWeight.w800)),
                               Text(
                                   getTranslated('seller_products_overview_hint',
@@ -138,15 +140,14 @@ class _ProductListMenuScreenState extends State<ProductListMenuScreen> {
                                       .textTheme
                                       .bodySmall
                                       ?.copyWith(
-                                          color: Colors.white
-                                              .withValues(alpha: .82))),
+                                          color: Theme.of(context).hintColor)),
                             ])),
                         Text('${controller.sellerProductModel?.totalSize ?? 0}',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
                                 ?.copyWith(
-                                    color: Colors.white,
+                                    color: Theme.of(context).primaryColor,
                                     fontWeight: FontWeight.w900)),
                       ]),
                     )),

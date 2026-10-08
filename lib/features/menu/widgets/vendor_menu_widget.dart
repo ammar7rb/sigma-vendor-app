@@ -1,9 +1,6 @@
-import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_account_screen.dart';
-import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/vendor_invoices_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_inbox_screen.dart';
-import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/features/menu/widgets/sign_out_confirmation_dialog_widget.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
@@ -40,7 +37,7 @@ class MenuBottomSheetWidget extends StatelessWidget {
                         color: Theme.of(context).dividerColor,
                         borderRadius: BorderRadius.circular(9)))),
             const SizedBox(height: 18),
-            Text(getTranslated('vendor_menu', context) ?? 'Vendor menu',
+            Text(getTranslated('vendor_other', context) ?? 'Vendor menu',
                 style: Theme.of(context)
                     .textTheme
                     .titleLarge
@@ -50,18 +47,10 @@ class MenuBottomSheetWidget extends StatelessWidget {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             const SizedBox(height: 18),
             _section(context, 'vendor_business_tools', [
-              _MenuEntry(
-                  Icons.account_balance_wallet_outlined,
-                  'finance_my_wallet',
-                  () => _open(context, const SellerFinanceScreen())),
-              _MenuEntry(Icons.inventory_2_outlined, 'products',
-                  () => _open(context, const ProductListMenuScreen())),
               _MenuEntry(Icons.person_outline, 'vendor_account',
                   () => _open(context, const VendorAccountScreen())),
               _MenuEntry(Icons.receipt_long_outlined, 'vendor_invoices',
                   () => _open(context, const VendorInvoicesScreen())),
-              _MenuEntry(Icons.inventory_2_outlined, 'my_order',
-                  () => _open(context, const OrderScreen())),
               _MenuEntry(
                   Icons.mail_outline,
                   'administration_messages',
@@ -73,21 +62,25 @@ class MenuBottomSheetWidget extends StatelessWidget {
                   () => _open(context, const SellerPackageScreen())),
             ]),
             const SizedBox(height: 14),
-            ListTile(
-              tileColor: AppDesign.danger.withValues(alpha: .07),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDesign.radiusMedium)),
-              leading: const Icon(Icons.logout, color: AppDesign.danger),
-              title: Text(getTranslated('logout', context) ?? 'Logout',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, color: AppDesign.danger)),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () async {
-                Navigator.pop(context);
-                await showModalBottomSheet(
-                    context: Get.context!,
-                    builder: (_) => const SignOutConfirmationDialogWidget());
-              },
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                tileColor: AppDesign.danger.withValues(alpha: .07),
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(AppDesign.radiusMedium)),
+                leading: const Icon(Icons.logout, color: AppDesign.danger),
+                title: Text(getTranslated('logout', context) ?? 'Logout',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, color: AppDesign.danger)),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await showModalBottomSheet(
+                      context: Get.context!,
+                      builder: (_) => const SignOutConfirmationDialogWidget());
+                },
+              ),
             ),
             const SizedBox(height: 12),
             Center(

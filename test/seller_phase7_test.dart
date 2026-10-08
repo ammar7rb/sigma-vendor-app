@@ -30,9 +30,20 @@ void main() {
   });
 
   test('wallet distinguishes restricted balances and invoice receivables', () {
-    final finance=File('lib/features/wallet/screens/seller_finance_screen.dart').readAsStringSync();
-    for(final key in ['available_balance','payments_balance','security_deposit_balance']) {expect(finance,contains(key));}
-    expect(File('lib/features/wallet/screens/vendor_invoices_screen.dart').readAsStringSync(),contains('sales_invoices_hint'));
+    final finance =
+        File('lib/features/wallet/screens/seller_finance_screen.dart')
+            .readAsStringSync();
+    for (final key in [
+      'available_balance',
+      'payments_balance',
+      'security_deposit_balance'
+    ]) {
+      expect(finance, contains(key));
+    }
+    expect(
+        File('lib/features/wallet/screens/vendor_invoices_screen.dart')
+            .readAsStringSync(),
+        contains('sales_invoices_hint'));
   });
 
   test('phase previews remove order-detail floating action and shipping note',
@@ -62,11 +73,21 @@ void main() {
   });
 
   test('dashboard keeps financial details in wallet and invoices', () {
-    final source=File('lib/features/home/widgets/seller_dashboard_overview_widget.dart').readAsStringSync();
-    expect(File('lib/features/menu/widgets/vendor_menu_widget.dart').readAsStringSync(),contains('VendorInvoicesScreen'));
-    expect(source,isNot(contains('VendorInvoicesScreen')));expect(File('lib/features/menu/widgets/vendor_menu_widget.dart').readAsStringSync(),contains('SellerFinanceScreen'));
-    expect(source,isNot(contains('SellerFinanceScreen')));
-    expect(source,isNot(contains("balances['operating']")));expect(source,isNot(contains('seller_wallet_total')));
+    final source =
+        File('lib/features/home/widgets/seller_dashboard_overview_widget.dart')
+            .readAsStringSync();
+    expect(
+        File('lib/features/menu/widgets/vendor_menu_widget.dart')
+            .readAsStringSync(),
+        contains('VendorInvoicesScreen'));
+    expect(source, isNot(contains('VendorInvoicesScreen')));
+    expect(
+        File('lib/features/dashboard/screens/dashboard_screen.dart')
+            .readAsStringSync(),
+        contains('SellerFinanceScreen'));
+    expect(source, isNot(contains('SellerFinanceScreen')));
+    expect(source, isNot(contains("balances['operating']")));
+    expect(source, isNot(contains('seller_wallet_total')));
   });
 
   test('purchase and insurance wallets have independent funding targets', () {

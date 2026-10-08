@@ -10,23 +10,25 @@ void main() {
     expect(menu, isNot(contains('ClearanceSaleScreen')));
     expect(menu, isNot(contains('VatManagementScreen')));
     expect(menu, isNot(contains('RestockListScreen')));
-    expect(menu, contains('SellerFinanceScreen'));
+    expect(menu, isNot(contains('SellerFinanceScreen')));
+    expect(menu, isNot(contains('OrderScreen')));
+    expect(menu, isNot(contains('ProductListMenuScreen')));
     expect(menu, contains('VendorAccountScreen'));
     expect(menu, contains('VendorInvoicesScreen'));
     expect(menu, contains('VendorInboxScreen'));
     expect(menu, contains('SellerPackageScreen'));
   });
 
-  test(
-      'bottom navigation separates wallet orders and account',
-      () {
+  test('bottom navigation separates home wallet products orders and other', () {
     final dashboard =
         File('lib/features/dashboard/screens/dashboard_screen.dart')
             .readAsStringSync();
     expect(dashboard, contains('List.generate(5'));
     expect(dashboard, contains('SellerFinanceScreen()'));
     expect(dashboard, contains('Icons.account_balance_wallet_outlined'));
-    expect(dashboard, contains('VendorAccountScreen()'));
+    expect(dashboard, contains('ProductListMenuScreen(fromDashboard: true)'));
+    expect(dashboard, contains("getTranslated('vendor_other', context)"));
+    expect(dashboard, isNot(contains('VendorAccountScreen()')));
     expect(dashboard, isNot(contains('RefundScreen')));
     expect(dashboard, isNot(contains('Icons.assignment_return_outlined')));
   });

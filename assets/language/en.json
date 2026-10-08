@@ -1999,5 +1999,7 @@
     "grow_your_catalogue_hint": "Add its images, specifications and price to reach buyers.",
     "vendor_manage_payment_methods": "Manage payment methods",
 "vendor_login_welcome": "Welcome to your store dashboard",
-"vendor_login_welcome_hint": "Manage your products, follow your orders, and keep your store up to date."
+"vendor_login_welcome_hint": "Manage your products, follow your orders, and keep your store up to date.",
+  "vendor_other": "Other",
+  "sold_units": "Units sold"
 }
