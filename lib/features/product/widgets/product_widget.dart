@@ -389,6 +389,9 @@ class _SellerProductCard extends StatelessWidget {
                   ],
                 ),
               ]),
+              Text(getTranslated('product_price', context) ?? '',
+                  style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 4),
               Text(PriceConverter.convertPrice(context, product.unitPrice),
                   style: robotoBold.copyWith(
                       color: Theme.of(context).brightness == Brightness.dark

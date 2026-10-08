@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_tab_view_screen.dart';
-import 'package:sixvalley_vendor_app/features/barcode/controllers/barcode_controller.dart';
 import 'package:sixvalley_vendor_app/features/product/domain/models/filter_model.dart';
 import 'package:sixvalley_vendor_app/features/product/domain/models/product_model.dart';
 import 'package:sixvalley_vendor_app/features/product/widgets/limited_stock_product_update_dialog.dart';
@@ -22,7 +21,6 @@ import 'package:sixvalley_vendor_app/common/basewidgets/confirmation_dialog_widg
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_image_widget.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
 import 'package:sixvalley_vendor_app/features/product_details/screens/product_details_screen.dart';
-import 'package:sixvalley_vendor_app/features/barcode/screens/bar_code_generator_screen.dart';
 
 
 
@@ -213,18 +211,6 @@ class _StockOutProductWidgetState extends State<StockOutProductWidget> {
                 ),
               ),
 
-
-              Positioned(bottom: 15, right: Provider.of<LocalizationController>(context, listen: false).isLtr? 70 : null,
-                left: Provider.of<LocalizationController>(context, listen: false).isLtr? null : 70,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
-                  child: Center(child:  InkWell(onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => BarCodeGenerateScreen(product: widget.productModel)));
-                    Provider.of<BarcodeController>(context, listen: false).setBarCodeQuantity(4);
-                  },
-                    child: Image.asset(Images.barcodeIcon, width: 30,),),
-                  ),
-                ),) ,
 
               Consumer<RestockController>(
                   builder: (context, productProvider, _) {

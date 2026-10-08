@@ -50,14 +50,14 @@ class MenuBottomSheetWidget extends StatelessWidget {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             const SizedBox(height: 18),
             _section(context, 'vendor_business_tools', [
-              _MenuEntry(Icons.inventory_2_outlined, 'products',
-                  () => _open(context, const ProductListMenuScreen())),
-              _MenuEntry(Icons.person_outline, 'vendor_account',
-                  () => _open(context, const VendorAccountScreen())),
               _MenuEntry(
                   Icons.account_balance_wallet_outlined,
                   'finance_my_wallet',
                   () => _open(context, const SellerFinanceScreen())),
+              _MenuEntry(Icons.inventory_2_outlined, 'products',
+                  () => _open(context, const ProductListMenuScreen())),
+              _MenuEntry(Icons.person_outline, 'vendor_account',
+                  () => _open(context, const VendorAccountScreen())),
               _MenuEntry(Icons.receipt_long_outlined, 'vendor_invoices',
                   () => _open(context, const VendorInvoicesScreen())),
               _MenuEntry(Icons.inventory_2_outlined, 'my_order',
