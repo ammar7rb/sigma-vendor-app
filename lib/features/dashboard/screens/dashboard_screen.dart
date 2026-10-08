@@ -27,7 +27,8 @@ import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_scre
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, this.showWelcome = false});
+  final bool showWelcome;
 
   @override
   DashboardScreenState createState() => DashboardScreenState();
@@ -44,6 +45,40 @@ class DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     VendorWorkspace.instance.start();
+    if (widget.showWelcome) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.white,
+          duration: const Duration(seconds: 5),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Row(children: [
+            Icon(Icons.check_circle_outline,
+                color: Theme.of(context).primaryColor),
+            const SizedBox(width: 12),
+            Expanded(
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Text(getTranslated('vendor_login_welcome', context) ?? '',
+                      style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 4),
+                  Text(
+                      getTranslated('vendor_login_welcome_hint', context) ?? '',
+                      style: Theme.of(context).textTheme.bodySmall),
+                ])),
+            IconButton(
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                onPressed: () =>
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+                icon: const Icon(Icons.close, color: Color(0xff52627a))),
+          ]),
+        ));
+      });
+    }
     String languageCode =
         Provider.of<LocalizationController>(context, listen: false)
                     .locale

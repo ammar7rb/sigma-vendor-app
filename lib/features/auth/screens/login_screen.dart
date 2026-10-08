@@ -216,8 +216,8 @@ class LoginScreenState extends State<LoginScreen> {
                                   Navigator.pushAndRemoveUntil(
                                       Get.context!,
                                       MaterialPageRoute(
-                                          builder: (_) =>
-                                              const DashboardScreen()),
+                                          builder: (_) => const DashboardScreen(
+                                              showWelcome: true)),
                                       (route) => false);
                                 } else {}
                               });

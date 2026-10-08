@@ -2000,5 +2000,7 @@
     "notifications": "الإشعارات",
     "vendor_manage_payment_methods": "إدارة طرق الدفع",
     "flat": "مبلغ ثابت",
-    "fixed": "مبلغ ثابت"
+    "fixed": "مبلغ ثابت",
+"vendor_login_welcome": "أهلًا بك في لوحة تحكم متجرك",
+"vendor_login_welcome_hint": "تابع منتجاتك وطلباتك، وأدر متجرك من مكان واحد."
 }

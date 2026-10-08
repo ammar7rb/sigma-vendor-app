@@ -63,7 +63,9 @@ void main() {
 
   test('dashboard keeps financial details in wallet and invoices', () {
     final source=File('lib/features/home/widgets/seller_dashboard_overview_widget.dart').readAsStringSync();
-    expect(source,contains('VendorInvoicesScreen'));expect(source,contains('SellerFinanceScreen'));
+    expect(File('lib/features/menu/widgets/vendor_menu_widget.dart').readAsStringSync(),contains('VendorInvoicesScreen'));
+    expect(source,isNot(contains('VendorInvoicesScreen')));expect(File('lib/features/menu/widgets/vendor_menu_widget.dart').readAsStringSync(),contains('SellerFinanceScreen'));
+    expect(source,isNot(contains('SellerFinanceScreen')));
     expect(source,isNot(contains("balances['operating']")));expect(source,isNot(contains('seller_wallet_total')));
   });
 

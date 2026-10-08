@@ -65,7 +65,8 @@ void main() {
     expect(File('lib/features/profile/widgets/vendor_navigation_actions.dart').readAsStringSync(), contains('AddProductTabView'));
     expect(overview, contains('const ProductListMenuScreen()'));
     expect(dashboard,contains('const OrderScreen()'));
-    expect(overview, contains('VendorInvoicesScreen'));
+    expect(File('lib/features/menu/widgets/vendor_menu_widget.dart').readAsStringSync(), contains('VendorInvoicesScreen'));
+    expect(overview, isNot(contains('VendorInvoicesScreen')));
     expect(mainSource, contains('if (_showSetupGuideOverlay() &&'));
     expect(mainSource, contains('bool _showSetupGuideOverlay() => false;'));
   });

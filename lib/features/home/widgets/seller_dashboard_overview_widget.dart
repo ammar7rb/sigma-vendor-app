@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
-import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
-import 'package:sixvalley_vendor_app/features/wallet/screens/vendor_invoices_screen.dart';
-import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 
 class SellerDashboardOverviewWidget extends StatelessWidget {
@@ -101,18 +98,6 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                       onPressed: () => open(const ProductListMenuScreen()),
                       icon: const Icon(Icons.inventory_2_outlined),
                       label: Text(tr('manage_products'))),
-                  const SizedBox(height: 12),
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    OutlinedButton(
-                        onPressed: () => open(const SellerFinanceScreen()),
-                        child: Text(tr('finance_my_wallet'))),
-                    OutlinedButton(
-                        onPressed: () => open(const VendorInvoicesScreen()),
-                        child: Text(tr('vendor_invoices'))),
-                    OutlinedButton(
-                        onPressed: () => open(const SellerPackageScreen()),
-                        child: Text(tr('ads_manager')))
-                  ])
                 ]));
       });
 }

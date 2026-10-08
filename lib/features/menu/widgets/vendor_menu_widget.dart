@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_account_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/vendor_invoices_screen.dart';
@@ -49,6 +50,8 @@ class MenuBottomSheetWidget extends StatelessWidget {
                 style: TextStyle(color: Theme.of(context).hintColor)),
             const SizedBox(height: 18),
             _section(context, 'vendor_business_tools', [
+              _MenuEntry(Icons.inventory_2_outlined, 'products',
+                  () => _open(context, const ProductListMenuScreen())),
               _MenuEntry(Icons.person_outline, 'vendor_account',
                   () => _open(context, const VendorAccountScreen())),
               _MenuEntry(
