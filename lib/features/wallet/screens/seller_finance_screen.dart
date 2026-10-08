@@ -65,13 +65,14 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
         'security_page': securityPage,
         'withdrawals_page': withdrawalsPage
       });
-      if (mounted)
+      if (mounted) {
         setState(() {
           data = Map<String, dynamic>.from(r.data);
           error = null;
           final methods = data!['withdrawal_methods'] as List? ?? [];
           if (!methods.any((m) => m['id'] == methodId)) methodId = null;
         });
+      }
     } catch (e) {
       if (mounted) setState(() => error = financeError(context, e));
     } finally {
@@ -386,12 +387,13 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                       child: ListTile(
                                     title: Text(
                                         '${tr(row['direction'] == 'credit' ? 'wallet_credit' : 'wallet_debit')}: ${money(row['amount'])}'),
-                                    subtitle: Text('WLT-${row['id']} · ${tr({
-                                          'available': 'available_balance',
-                                          'operating': 'payments_balance',
-                                          'order_insurance_credit':
-                                              'security_deposit_balance'
-                                        }[row['bucket']] ?? 'balance')}\n${financeDate(context, row['created_at'])}'),
+                                    subtitle: Text(
+                                        '${row['transaction_number'] ?? 'WLT-${row['id']}'} · ${tr({
+                                              'available': 'available_balance',
+                                              'operating': 'payments_balance',
+                                              'order_insurance_credit':
+                                                  'security_deposit_balance'
+                                            }[row['bucket']] ?? 'balance')}\n${financeDate(context, row['created_at'])}'),
                                     isThreeLine: true,
                                   )),
                                 if ((transactions['data'] as List? ?? [])
@@ -417,7 +419,7 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                         child: ListTile(
                                       title: Text(money(row['amount'])),
                                       subtitle: Text(
-                                          '${tr('funding_status_${row['status']}')} · ${tr(row['metadata']?['wallet_target'] == 'insurance' ? 'security_deposit_balance' : 'payments_balance')}\n${row['transaction_reference'] ?? row['payment_request_id'] ?? '—'} · ${financeDate(context, row['created_at'])}${row['rejection_reason'] == null ? '' : '\n${row['rejection_reason']}'}'),
+                                          '${tr('funding_status_${row['status']}')} · ${tr(row['metadata']?['wallet_target'] == 'insurance' ? 'security_deposit_balance' : 'payments_balance')}\n${row['transaction_number'] ?? (row['metadata']?['wallet_target'] == 'insurance' ? 'AIM${row['id']}' : 'ADM${row['id']}')} · ${row['transaction_reference'] ?? row['payment_request_id'] ?? '—'} · ${financeDate(context, row['created_at'])}${row['rejection_reason'] == null ? '' : '\n${row['rejection_reason']}'}'),
                                       isThreeLine: true,
                                     )),
                                   if ((deposits['data'] as List? ?? []).isEmpty)
@@ -443,7 +445,7 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                         child: ListTile(
                                             title: Text(money(row['amount'])),
                                             subtitle: Text(
-                                                '${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr('withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}'),
+                                                '${row['transaction_number'] ?? 'MP${row['id']}'} · ${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr('withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}'),
                                             isThreeLine: true,
                                             trailing: row['approved'] == 0
                                                 ? TextButton(
