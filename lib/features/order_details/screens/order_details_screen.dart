@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_dialog_widget.dart';
@@ -33,9 +32,7 @@ import 'package:sixvalley_vendor_app/features/order_details/widgets/order_top_se
 import 'package:sixvalley_vendor_app/features/order_details/widgets/payment_status_widget.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/shipping_and_biilling_widget.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/third_party_delivery_info_widget.dart';
-import 'package:sixvalley_vendor_app/features/order_details/widgets/seller_order_insurance_gate_widget.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/seller_shipping_assignment_widget.dart';
-import 'package:sixvalley_vendor_app/theme/app_design.dart';
 import '../../../common/basewidgets/custom_confirmation_dialog_widget.dart'
     show CustomConfirmationDialogWidget;
 
@@ -55,7 +52,6 @@ class OrderDetailsScreen extends StatefulWidget {
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     with WidgetsBindingObserver {
-  Timer? _refreshTimer;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Future<void> _loadData(BuildContext context) async {
     if (widget.fromNotification &&
@@ -78,13 +74,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadData(context));
-    _refreshTimer = Timer.periodic(const Duration(seconds: 20), (_) {
-      if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
-      final controller = context.read<OrderDetailsController>();
-      if (!controller.actionInProgress &&
-          controller.sellerOrderInsurance?.insurance?.detailsHidden == true)
-        _loadData(context);
-    });
   }
 
   @override
@@ -98,7 +87,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
   @override
   void dispose() {
-    _refreshTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -173,12 +161,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           label: Text(getTranslated('refresh', context) ?? '')),
                     ]);
               }
-              if (orderDetailsController
-                      .sellerOrderInsurance?.insurance?.detailsHidden ==
-                  true) {
-                return SellerOrderInsuranceGateWidget(
-                    orderId: widget.accessToken ?? widget.orderId.toString());
-              }
+
               double itemsPrice = 0;
               double discount = 0;
               double? eeDiscount = 0;
@@ -261,11 +244,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          if (orderDetailsController
-                                                  .sellerOrderInsurance
-                                                  ?.enabled ==
-                                              false)
-                                            const _NoInsuranceRequiredCard(),
                                           OrderPaymentInfoWidget(),
                                           SellerShippingAssignmentWidget(
                                               order: orderDetailsController
@@ -1460,48 +1438,4 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     }
     return '';
   }
-}
-
-class _NoInsuranceRequiredCard extends StatelessWidget {
-  const _NoInsuranceRequiredCard();
-
-  @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xff16A06A).withValues(alpha: .09),
-          borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
-          border:
-              Border.all(color: const Color(0xff16A06A).withValues(alpha: .28)),
-        ),
-        child: Row(children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: const Color(0xff16A06A).withValues(alpha: .13),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.verified_user_outlined,
-                color: Color(0xff11865A)),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                getTranslated('no_order_insurance_required', context) ?? '',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 3),
-              Text(getTranslated('no_order_insurance_hint', context) ?? '',
-                  style: Theme.of(context).textTheme.bodySmall),
-            ]),
-          ),
-        ]),
-      );
 }

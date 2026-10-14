@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:sixvalley_vendor_app/features/order/controllers/order_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
@@ -182,25 +181,22 @@ class _OrderWidgetState extends State<OrderWidget> {
                               color: _getStatusBgColor(
                                   context,
                                   widget.orderModel.detailsLocked
-                                      ? widget.orderModel.sellerInsuranceStatus
+                                      ? widget.orderModel.orderStatus
                                       : widget.orderModel.orderStatus),
                             ),
                             child: Text(
                               getTranslated(
                                       widget.orderModel.detailsLocked
-                                          ? widget
-                                              .orderModel.sellerInsuranceStatus
+                                          ? widget.orderModel.orderStatus
                                           : widget.orderModel.orderStatus,
                                       context) ??
-                                  (widget.orderModel.sellerInsuranceStatus ??
-                                      ''),
+                                  (widget.orderModel.orderStatus ?? ''),
                               style: robotoBold.copyWith(
                                 fontSize: Dimensions.fontSizeSmall,
                                 color: _getStatusTextColor(
                                     context,
                                     widget.orderModel.detailsLocked
-                                        ? widget
-                                            .orderModel.sellerInsuranceStatus
+                                        ? widget.orderModel.orderStatus
                                         : widget.orderModel.orderStatus),
                               ),
                             ),
@@ -237,12 +233,6 @@ class _OrderWidgetState extends State<OrderWidget> {
                           if (widget.orderModel.shipmentReference != null)
                             Text(
                                 '${getTranslated('shipment_reference', context) ?? 'Shipment'}: ${widget.orderModel.shipmentReference}',
-                                style: robotoRegular.copyWith(
-                                    color: Theme.of(context).hintColor,
-                                    fontSize: Dimensions.fontSizeSmall)),
-                          if (widget.orderModel.detailsLocked)
-                            Text(
-                                '${getTranslated('insurance_amount', context) ?? 'Insurance'}: ${PriceConverter.convertPrice(context, widget.orderModel.sellerInsuranceAmount ?? 0)}\n${getTranslated('payment_deadline', context) ?? 'Deadline'}: ${widget.orderModel.sellerInsuranceExpiresAt ?? '-'}',
                                 style: robotoRegular.copyWith(
                                     color: Theme.of(context).hintColor,
                                     fontSize: Dimensions.fontSizeSmall)),
@@ -310,70 +300,15 @@ class _OrderWidgetState extends State<OrderWidget> {
     );
   }
 
-  Widget _lockedOrderCard(BuildContext context) {
-    Future<void> openPayment() async {
-      await Navigator.push(context, MaterialPageRoute(builder: (_) =>
-          OrderDetailsScreen(orderId: widget.orderModel.id,
-              accessToken: widget.orderModel.restrictedAccessToken)));
-      if (!context.mounted) return;
-      final orders = context.read<OrderController>();
-      await orders.getOrderList(context, 1, orders.orderType, orders.filterModel);
-    }
-
-    final lastThree = (widget.orderModel.maskedOrderReference ?? '')
-        .replaceAll(RegExp(r'[^0-9]'), '').padLeft(3, '0');
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            FilledButton.icon(
-              onPressed: openPayment,
-              icon: const Icon(Icons.shield_outlined),
-              label: Text('${getTranslated('insurance_amount', context) ?? 'قيمة التأمين'}: '
-                  '${PriceConverter.convertPrice(context, widget.orderModel.sellerInsuranceAmount ?? 0)}'),
-            ),
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: openPayment,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Stack(children: [
-                  Container(
-                    height: 110,
-                    color: Theme.of(context).primaryColor.withValues(alpha: .08),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Container(width: 140, height: 12, color: Theme.of(context).dividerColor),
-                      const SizedBox(height: 14),
-                      Container(width: 210, height: 12, color: Theme.of(context).dividerColor),
-                    ]),
-                  ),
-                  Positioned.fill(child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: ColoredBox(color: Theme.of(context).cardColor.withValues(alpha: .7)),
-                  )),
-                  Positioned.fill(child: Center(child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('•••${lastThree.substring(lastThree.length - 3)}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 5),
-                      Text('${getTranslated('order_amount', context) ?? 'قيمة الطلب'}: '
-                          '${PriceConverter.convertPrice(context, widget.orderModel.orderAmount ?? 0)}'),
-                    ],
-                  ))),
-                ]),
-              ),
-            ),
-          ]),
+  Widget _lockedOrderCard(BuildContext context) => Card(
+        child: ListTile(
+          leading: const Icon(Icons.hourglass_empty),
+          title: Text(getTranslated('pending_admin_review', context) ?? ''),
+          subtitle: Text(getTranslated(
+                  'vendor_order_waiting_for_administrative_release', context) ??
+              ''),
         ),
-      ),
-    );
-  }
-
+      );
   Color _getStatusBgColor(BuildContext context, String? status) {
     switch (status) {
       case 'delivered':

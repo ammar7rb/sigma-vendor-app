@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/order/domain/models/order_model.dart';
 import 'package:sixvalley_vendor_app/features/order_details/controllers/order_details_controller.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/seller_shipping_assignment_widget.dart';
-import 'package:sixvalley_vendor_app/features/order_details/widgets/seller_order_insurance_gate_widget.dart';
+import 'package:sixvalley_vendor_app/features/home/widgets/order_widget.dart';
 import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/models/config_model.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/services/splash_service_interface.dart';
@@ -41,13 +41,17 @@ class LoadedLocale extends LocalizationsDelegate<AppLocalization> {
 }
 
 void main() {
-  testWidgets('locked order reveals only its last three digits and value', (tester) async {
-    final controller = OrderDetailsController(orderDetailsServiceInterface: OrderServiceFake());
+  testWidgets('administrative restriction has no payment or blurred details',
+      (tester) async {
+    final controller = OrderDetailsController(
+        orderDetailsServiceInterface: OrderServiceFake());
     final splash = FinanceSplashFake();
     addTearDown(controller.dispose);
     addTearDown(splash.dispose);
     final locale = AppLocalization(const Locale('ar'));
-    await tester.runAsync(() async { await locale.load(); });
+    await tester.runAsync(() async {
+      await locale.load();
+    });
     await controller.getOrderDetails('opaque-token');
     await tester.pumpWidget(MultiProvider(
       providers: [
@@ -56,14 +60,23 @@ void main() {
       ],
       child: MaterialApp(
         locale: const Locale('ar'),
-        localizationsDelegates: [LoadedLocale(locale), GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
-        home: const Scaffold(body: SellerOrderInsuranceGateWidget(orderId: 'opaque-token')),
+        localizationsDelegates: [
+          LoadedLocale(locale),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate
+        ],
+        home: Scaffold(
+            body: OrderWidget(
+                orderModel: Order.fromJson(
+                    {'details_locked': true, 'order_amount': 100}))),
       ),
     ));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    expect(find.text('•••012'), findsOneWidget);
-    expect(find.textContaining('100'), findsOneWidget);
+    expect(
+        find.textContaining('الطلب في انتظار اعتماد الإدارة'), findsOneWidget);
+    expect(find.byType(FilledButton), findsNothing);
     expect(find.textContaining('ORD-'), findsNothing);
     expect(find.textContaining('customer'), findsNothing);
   });

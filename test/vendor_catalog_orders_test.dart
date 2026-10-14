@@ -31,7 +31,7 @@ void main() {
         File('lib/features/order/domain/repositories/order_repository.dart')
             .readAsStringSync();
 
-    for (final index in ['index: 0', 'index: 10', 'index: 9', 'index: 11']) {
+    for (final index in ['index: 0', 'index: 10', 'index: 11']) {
       expect(orders, contains(index));
     }
     expect(repository, contains("status == 'disputed'"));

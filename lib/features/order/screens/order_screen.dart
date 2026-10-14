@@ -75,11 +75,6 @@ class _OrderScreenState extends State<OrderScreen> {
                             'seller_journey_active_orders', context),
                         index: 10),
                     const SizedBox(width: 8),
-                    OrderTypeButton(
-                        text: getTranslated(
-                                'insurance_pending_orders', context) ??
-                            'Insurance pending',
-                        index: 9),
                     const SizedBox(width: 8),
                     OrderTypeButton(
                         text: getTranslated('disputed_orders', context) ??

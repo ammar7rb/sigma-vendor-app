@@ -157,9 +157,10 @@ void main() {
         client.submissions[1]['request_key']);
     expect(client.submissions[1]['saved_method_id'], 12);
     expect(client.submissions[1]['amount'], 40);
-    await tester.tap(find.text('رصيد التأمين المتاح'));
+    expect(find.text('رصيد التأمين المتاح'), findsNothing);
+    await tester.tap(find.text('رصيد المدفوعات').last);
     await tester.pumpAndSettle();
-    expect(find.text('التأمين المحجوز'), findsOneWidget);
+    expect(find.text('التأمين المحجوز'), findsNothing);
     expect(find.byType(DropdownButtonFormField<int>), findsNothing);
     expect(find.text('سجل الإيداعات'), findsOneWidget);
     expect(tester.takeException(), isNull);

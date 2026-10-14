@@ -6,11 +6,6 @@ import 'package:sixvalley_vendor_app/interface/repository_interface.dart';
 abstract class OrderDetailsRepositoryInterface implements RepositoryInterface {
   Future<ApiResponse> setUpOrder(OrderSetupModel orderSetUpModel);
   Future<ApiResponse> getOrderDetails(String orderID);
-  Future<ApiResponse> getSellerOrderInsurance(String orderID);
-  Future<ApiResponse> paySellerOrderInsurance(
-      String orderID, String paymentMethod);
-  Future<ApiResponse> submitSellerOrderInsuranceOffline(
-      String orderID, String methodId, String proofPath, String note);
   Future<ApiResponse> getShippingProofs(String orderID);
   Future<ApiResponse> respondToShipping(
       String orderID, String decision, String reason);

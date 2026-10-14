@@ -16,12 +16,16 @@ class AppLocalization {
   late Map<String, String> _localizedValues;
 
   Future<void> load() async {
-    String jsonStringValues = await rootBundle.loadString('assets/language/${locale.languageCode}.json');
+    String jsonStringValues = await rootBundle
+        .loadString('assets/language/${locale.languageCode}.json');
     Map<String, dynamic> mappedJson = json.decode(jsonStringValues);
-    final insuranceLanguage = ['en', 'ar'].contains(locale.languageCode) ? locale.languageCode : 'en';
-    final insuranceJson = await rootBundle.loadString('assets/language/insurance_$insuranceLanguage.json');
-    mappedJson.addAll(json.decode(insuranceJson) as Map<String, dynamic>);
-    _localizedValues = mappedJson.map((key, value) => MapEntry(key, value.toString()));
+    final workspaceLanguage =
+        ['en', 'ar'].contains(locale.languageCode) ? locale.languageCode : 'en';
+    final workspaceJson = await rootBundle
+        .loadString('assets/language/vendor_workspace_$workspaceLanguage.json');
+    mappedJson.addAll(json.decode(workspaceJson) as Map<String, dynamic>);
+    _localizedValues =
+        mappedJson.map((key, value) => MapEntry(key, value.toString()));
   }
 
   String? translate(String? key) {
@@ -29,10 +33,12 @@ class AppLocalization {
     return _localizedValues[key];
   }
 
-  static const LocalizationsDelegate<AppLocalization> delegate = _DemoLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalization> delegate =
+      _DemoLocalizationsDelegate();
 }
 
-class _DemoLocalizationsDelegate extends LocalizationsDelegate<AppLocalization> {
+class _DemoLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalization> {
   const _DemoLocalizationsDelegate();
 
   @override
@@ -55,15 +61,16 @@ class _DemoLocalizationsDelegate extends LocalizationsDelegate<AppLocalization> 
   bool shouldReload(LocalizationsDelegate<AppLocalization> old) => false;
 }
 
-
 extension StringExtension on String {
-  String toCapitalized() => length > 0 ?'${this[0].toUpperCase()}${substring(1).toLowerCase()}':'';
-  String toTitleCase() => replaceAll(RegExp('_'), ' ').split(' ').map((str) => str.toCapitalized()).join(' ');
+  String toCapitalized() =>
+      length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
+  String toTitleCase() => replaceAll(RegExp('_'), ' ')
+      .split(' ')
+      .map((str) => str.toCapitalized())
+      .join(' ');
 
   String camelCaseToSnakeCase() {
-    return replaceAllMapped(
-        RegExp(r'([A-Z])'),
-            (Match match) =>
-        "_${match.group(1)!.toLowerCase()}");
+    return replaceAllMapped(RegExp(r'([A-Z])'),
+        (Match match) => "_${match.group(1)!.toLowerCase()}");
   }
 }

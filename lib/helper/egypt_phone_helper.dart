@@ -3,12 +3,17 @@ class EgyptPhoneHelper {
 
   static final RegExp _localPattern = RegExp(r'^01[0125][0-9]{8}$');
 
-  static String digitsOnly(String value) => value.replaceAll(RegExp(r'\D'), '');
+  static String digitsOnly(String value) => value.trim().replaceAllMapped(
+    RegExp(r'[٠-٩۰-۹]'), (match) {
+      final code = match[0]!.codeUnitAt(0);
+      return (code >= 0x06f0 ? code - 0x06f0 : code - 0x0660).toString();
+    }).replaceAll(RegExp(r'[\s()\-\u200e\u200f]'), '');
 
   static String normalizeLocal(String value) {
     var digits = digitsOnly(value);
-    if (digits.startsWith('0020')) digits = digits.substring(4);
-    if (digits.startsWith('20')) digits = digits.substring(2);
+    if (digits.startsWith('+20')) { digits = '0${digits.substring(3)}'; }
+    else if (digits.startsWith('0020')) { digits = '0${digits.substring(4)}'; }
+    else if (digits.startsWith('20')) { digits = '0${digits.substring(2)}'; }
     return digits;
   }
 

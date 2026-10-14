@@ -14,37 +14,16 @@ ApiResponse reply(dynamic body, [int code = 200]) =>
         data: body));
 
 class OrderServiceFake implements OrderDetailsServiceInterface {
-  bool locked = true, offline = false, failInsurance = false;
+  bool failDetails = false;
   int detailCalls = 0, proofCalls = 0;
   String status = 'processing';
   Completer<ApiResponse>? delayed;
   Completer<ApiResponse>? proofRequest;
   @override
-  Future<ApiResponse> getSellerOrderInsurance(String id) async {
-    if (delayed != null) return delayed!.future;
-    if (failInsurance) throw StateError('transport failed');
-    return reply({
-      'enabled': true,
-      'seller_order_insurance': {
-        'order_id': locked ? null : 12,
-        'order_reference': '***012',
-        'order_last_three_digits': '012',
-        'order_amount': 100,
-        'amount': 10,
-        'details_hidden': locked,
-        'can_view_order_details': !locked,
-        'status': offline
-            ? 'pending_review'
-            : locked
-                ? 'pending_payment'
-                : 'paid'
-      }
-    });
-  }
-
-  @override
   Future<ApiResponse> getOrderDetails(String id) async {
     detailCalls++;
+    if (delayed != null) return delayed!.future;
+    if (failDetails) throw StateError('transport failed');
     return reply([
       {
         'id': 1,
@@ -73,21 +52,6 @@ class OrderServiceFake implements OrderDetailsServiceInterface {
             : []
       });
   @override
-  Future<ApiResponse> paySellerOrderInsurance(String id, String method) async {
-    if (method == 'seller_order_insurance_credit') locked = false;
-    return reply(method == 'gateway'
-        ? {'redirect_link': 'https://example.com/pay'}
-        : {});
-  }
-
-  @override
-  Future<ApiResponse> submitSellerOrderInsuranceOffline(
-      String id, String method, String path, String note) async {
-    offline = true;
-    return reply({});
-  }
-
-  @override
   Future<ApiResponse> submitShippingProof(
       String id, String status, String path, String note) async {
     proofCalls++;
@@ -101,64 +65,49 @@ class OrderServiceFake implements OrderDetailsServiceInterface {
 }
 
 void main() {
-  test(
-      'locked insurance never requests private details; credit payment unlocks',
-      () async {
+  test('order opens directly and retains shipping proof loading', () async {
     final service = OrderServiceFake();
     final c = OrderDetailsController(orderDetailsServiceInterface: service);
-    await c.getOrderDetails('opaque-token');
-    expect(service.detailCalls, 0);
-    expect(c.orderDetails, isEmpty);
-    await c.paySellerOrderInsurance(
-        'opaque-token', 'seller_order_insurance_credit');
-    expect(c.orderDetails!.first.order!.id, 12);
+    await c.getOrderDetails('12');
     expect(service.detailCalls, 1);
-    c.dispose();
-  });
-  test('opening gateway or submitting offline receipt does not unlock order',
-      () async {
-    final service = OrderServiceFake();
-    final c = OrderDetailsController(orderDetailsServiceInterface: service);
-    await c.getOrderDetails('opaque');
-    expect(await c.paySellerOrderInsurance('opaque', 'gateway'),
-        'https://example.com/pay');
-    expect(service.detailCalls, 0);
-    await c.submitSellerOrderInsuranceOffline('opaque', '1', 'proof.jpg', '');
-    expect(c.sellerOrderInsurance!.insurance!.status, 'pending_review');
-    expect(service.detailCalls, 0);
-    service.locked = false;
-    service.offline = false;
-    await c.getOrderDetails('opaque');
     expect(c.orderDetails!.first.order!.id, 12);
-    c.dispose();
-  });
-  test('insurance connection failure fails closed and allows retry', () async {
-    final service = OrderServiceFake()..failInsurance = true;
-    final c = OrderDetailsController(orderDetailsServiceInterface: service);
-    await c.getOrderDetails('12');
-    expect(service.detailCalls, 0);
-    expect(c.loadError, isNotNull);
-    expect(c.insuranceLoading, isFalse);
-    service.failInsurance = false;
-    await c.getOrderDetails('12');
     expect(c.loadError, isNull);
     c.dispose();
   });
-  test('late response cannot restore details after leaving order', () async {
+  test('administrative access failure remains closed and retry loads the order',
+      () async {
+    final service = OrderServiceFake()..failDetails = true;
+    final c = OrderDetailsController(orderDetailsServiceInterface: service);
+    await c.getOrderDetails('12');
+    expect(c.orderDetails, isEmpty);
+    expect(c.loadError, isNotNull);
+    expect(c.actionInProgress, isFalse);
+    service.failDetails = false;
+    await c.getOrderDetails('12');
+    expect(c.loadError, isNull);
+    expect(c.orderDetails!.first.order!.id, 12);
+    c.dispose();
+  });
+  test('late order response cannot restore data after leaving the screen',
+      () async {
     final service = OrderServiceFake()..delayed = Completer<ApiResponse>();
     final c = OrderDetailsController(orderDetailsServiceInterface: service);
     final request = c.getOrderDetails('12');
     c.emptyOrderDetails();
-    service.delayed!.complete(reply({'enabled': false}));
+    service.delayed!.complete(reply([
+      {
+        'id': 1,
+        'order': {'id': 12}
+      }
+    ]));
     await request;
     expect(c.orderDetails, isNull);
-    expect(service.detailCalls, 0);
-    expect(c.insuranceLoading, isFalse);
+    expect(c.actionInProgress, isFalse);
     c.dispose();
   });
   test('delivery proof completes order and refreshes private history',
       () async {
-    final service = OrderServiceFake()..locked = false;
+    final service = OrderServiceFake();
     final c = OrderDetailsController(orderDetailsServiceInterface: service);
     await c.getOrderDetails('12');
     expect(
@@ -171,9 +120,7 @@ void main() {
   });
   test('duplicate delivery submit blocked and failure releases action lock',
       () async {
-    final service = OrderServiceFake()
-      ..locked = false
-      ..proofRequest = Completer<ApiResponse>();
+    final service = OrderServiceFake()..proofRequest = Completer<ApiResponse>();
     final c = OrderDetailsController(orderDetailsServiceInterface: service);
     await c.getOrderDetails('12');
     final pending =

@@ -38,9 +38,10 @@ class _PackagePaymentState extends State<SellerPackagePaymentScreen> {
     try {
       final r =
           await VendorWorkspace.instance.client.get('/api/v3/seller/balance');
-      if (mounted)
+      if (mounted) {
         setState(() => balance =
             double.tryParse('${r.data['financial_summary']['operating']}'));
+      }
     } catch (e) {
       if (mounted) setState(() => error = financeError(context, e));
     }
@@ -88,6 +89,25 @@ class _PackagePaymentState extends State<SellerPackagePaymentScreen> {
                 : purchase,
             child: Text(financeText(context,
                 loading ? 'loading' : 'purchase_from_payments_balance'))),
+        if (widget.overview.offlinePaymentAvailable)
+          ...widget.overview.offlinePaymentMethods
+              .where((method) =>
+                  ['wallet', 'instapay'].contains(method.paymentChannel))
+              .map((method) => OutlinedButton(
+                    onPressed: loading
+                        ? null
+                        : () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        SellerPackageOfflinePaymentScreen(
+                                            plan: widget.plan,
+                                            method: method)));
+                            if (mounted) Navigator.of(this.context).pop(true);
+                          },
+                    child: Text(method.methodName),
+                  )),
         TextButton(
             onPressed: () async {
               await Navigator.push(
@@ -117,6 +137,7 @@ class _SellerPackageOfflinePaymentScreenState
     extends State<SellerPackageOfflinePaymentScreen> {
   final _formKey = GlobalKey<FormState>();
   final _noteController = TextEditingController();
+  final _transferReference = TextEditingController();
   final _senderNameController = TextEditingController();
   final _senderPhoneController = TextEditingController();
   final Map<String, TextEditingController> _informationControllers = {};
@@ -134,6 +155,13 @@ class _SellerPackageOfflinePaymentScreenState
       widget.method.methodInformations
           .where((field) =>
               field.inputName.isNotEmpty &&
+              !const [
+                'transfer_reference',
+                'transaction_reference',
+                'transaction_id',
+                'reference_number',
+                'reference'
+              ].contains(field.inputName) &&
               !_isProofField(field) &&
               field.inputName != 'sender_name' &&
               field.inputName != 'sender_wallet_or_phone')
@@ -141,6 +169,7 @@ class _SellerPackageOfflinePaymentScreenState
 
   @override
   void dispose() {
+    _transferReference.dispose();
     _noteController.dispose();
     _senderNameController.dispose();
     _senderPhoneController.dispose();
@@ -162,6 +191,17 @@ class _SellerPackageOfflinePaymentScreenState
               padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
               children: [
                 _PackageAmountCard(plan: widget.plan),
+                TextFormField(
+                    controller: _transferReference,
+                    maxLength: 191,
+                    decoration: InputDecoration(
+                        labelText:
+                            Localizations.localeOf(context).languageCode == 'ar'
+                                ? 'رقم عملية التحويل'
+                                : 'Transfer reference'),
+                    validator: (v) => (v ?? '').trim().isEmpty
+                        ? (getTranslated('field_is_required', context) ?? '')
+                        : null),
                 if (widget.method.methodFields.isNotEmpty) ...[
                   const SizedBox(height: Dimensions.paddingSizeLarge),
                   Text(getTranslated('transfer_details', context) ?? '',
@@ -284,6 +324,7 @@ class _SellerPackageOfflinePaymentScreenState
     }
 
     final information = <String, String>{
+      'transfer_reference': _transferReference.text.trim(),
       'sender_name': _senderNameController.text.trim(),
       'sender_wallet_or_phone': _senderPhoneController.text.trim(),
       for (final entry in _informationControllers.entries)

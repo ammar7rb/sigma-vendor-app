@@ -50,7 +50,6 @@ void main() {
       'ProductListMenuScreen',
       'OrderScreen',
       'WalletScreen',
-      "balances['order_insurance_credit']",
       'SellerBankInfoScreen'
     ]) {
       expect(profile, contains(value));

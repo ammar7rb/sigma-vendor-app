@@ -47,11 +47,8 @@ class OrderRepository implements OrderRepositoryInterface {
         });
       }
 
-      final response = status == 'insurance_pending'
-          ? await dioClient!.get(AppConstants.insurancePendingOrdersUri,
-              queryParameters: {'limit': 10, 'offset': offset})
-          : await dioClient!
-              .post(AppConstants.orderListUri, data: queryParameters);
+      final response = await dioClient!
+          .post(AppConstants.orderListUri, data: queryParameters);
       return ApiResponse.withSuccess(response);
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));

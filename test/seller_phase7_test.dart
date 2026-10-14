@@ -33,11 +33,7 @@ void main() {
     final finance =
         File('lib/features/wallet/screens/seller_finance_screen.dart')
             .readAsStringSync();
-    for (final key in [
-      'available_balance',
-      'payments_balance',
-      'security_deposit_balance'
-    ]) {
+    for (final key in ['available_balance', 'payments_balance']) {
       expect(finance, contains(key));
     }
     expect(
@@ -100,8 +96,8 @@ void main() {
     final repository =
         File('lib/features/wallet/domain/repositories/wallet_repository.dart')
             .readAsStringSync();
-    expect(dashboard, contains("fund('insurance')"));
-    expect(funding, contains('walletTarget: widget.walletTarget'));
+    expect(dashboard, isNot(contains("fund('insurance')")));
+    expect(funding, contains("'wallet_target': 'operating'"));
     expect(repository, contains("'wallet_target': walletTarget"));
   });
 
@@ -109,8 +105,8 @@ void main() {
     final finance =
         File('lib/features/wallet/screens/seller_finance_screen.dart')
             .readAsStringSync();
-    expect(finance, contains("row['return_at']"));
-    expect(finance, contains("totals['next_return_amount']"));
+    expect(finance, isNot(contains("row['return_at']")));
+    expect(finance, isNot(contains("totals['next_return_amount']")));
   });
 
   test('home header exposes language switch beside notifications', () {

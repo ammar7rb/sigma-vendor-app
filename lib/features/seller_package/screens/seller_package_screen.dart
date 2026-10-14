@@ -1,465 +1,248 @@
-import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
-import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
-import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
-import 'package:sixvalley_vendor_app/features/seller_promotion/screens/seller_promotion_screen.dart';
-import 'package:sixvalley_vendor_app/features/coupon/screens/coupon_list_screen.dart';
+import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_extra_ads_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
-import 'package:sixvalley_vendor_app/features/seller_package/controllers/seller_package_controller.dart';
+import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/domain/models/seller_package_overview_model.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_payment_screen.dart';
-import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
-import 'package:sixvalley_vendor_app/utill/dimensions.dart';
-import 'package:sixvalley_vendor_app/utill/styles.dart';
+import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
 
 class SellerPackageScreen extends StatefulWidget {
   const SellerPackageScreen({super.key});
-
   @override
   State<SellerPackageScreen> createState() => _SellerPackageScreenState();
 }
 
 class _SellerPackageScreenState extends State<SellerPackageScreen> {
-  dynamic paymentsBalance;
-  Future<void> loadPayments() async {
-    try {
-      final r =
-          await VendorWorkspace.instance.client.get('/api/v3/seller/balance');
-      if (mounted)
-        setState(
-            () => paymentsBalance = r.data['financial_summary']['operating']);
-    } catch (_) {}
-  }
+  SellerPackageOverviewModel? overview;
+  Map<String, dynamic>? summary;
+  List<Map<String, dynamic>> slots = [];
+  List<Map<String, dynamic>> products = [];
+  bool loading = true;
+  bool saving = false;
+  String? error;
+  String? transitionEndsAt;
+  bool get arabic => Localizations.localeOf(context).languageCode == 'ar';
+  String label(String ar, String en) => arabic ? ar : en;
 
   @override
   void initState() {
     super.initState();
-    loadPayments();
-    Future.microtask(() async {
-      final controller =
-          Provider.of<SellerPackageController>(context, listen: false);
-      await controller.getOverview();
+    load();
+  }
+
+  Future<void> load() async {
+    try {
+      final client = VendorWorkspace.instance.client;
+      final response = await client.get('/api/v3/seller/packages');
+      final data = Map<String, dynamic>.from(response.data as Map);
+      final spaces = await client.get('/api/v3/seller/packages/slots');
       if (!mounted) return;
-      final active = controller.overview?.subscription.active;
-      if (active != null) await controller.getPerformance(active.id);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBarWidget(
-          title:
-              getTranslated('ads_manager', context) ?? 'Advertising packages'),
-      body: Consumer<SellerPackageController>(
-        builder: (context, controller, _) {
-          final overview = controller.overview;
-          if (overview == null) {
-            return controller.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _EmptyState(onRefresh: controller.getOverview);
-          }
-
-          return RefreshIndicator(
-            onRefresh: controller.getOverview,
-            child: ListView(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-              children: [
-                FinancePanel(
-                    title: getTranslated('payments_balance', context) ??
-                        'Payments balance',
-                    amount: paymentsBalance == null
-                        ? '—'
-                        : financeMoney(context, paymentsBalance),
-                    hint: getTranslated('ads_payments_balance_hint', context),
-                    child: OutlinedButton.icon(
-                        onPressed: () async {
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const SellerFinanceScreen(
-                                      initialSection: 'operating')));
-                          await loadPayments();
-                        },
-                        icon: const Icon(Icons.account_balance_wallet_outlined),
-                        label: Text(
-                            getTranslated('view_balance_details', context) ??
-                                'Balance details'))),
-                const SizedBox(height: 16),
-                _CurrentPackageCard(summary: overview.subscription),
-                Wrap(spacing: 8, children: [
-                  TextButton.icon(
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const SellerPromotionScreen())),
-                      icon: const Icon(Icons.campaign_outlined),
-                      label: Text(getTranslated('manage_promotions', context) ??
-                          'Manage promotions')),
-                  TextButton.icon(
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const CouponListScreen())),
-                      icon: const Icon(Icons.local_offer_outlined),
-                      label:
-                          Text(getTranslated('coupons', context) ?? 'Coupons'))
-                ]),
-                const SizedBox(height: Dimensions.paddingSizeLarge),
-                Text(
-                    getTranslated('available_advertising_packages', context) ??
-                        'Available advertising packages',
-                    style: titilliumSemiBold.copyWith(
-                        fontSize: Dimensions.fontSizeLarge)),
-                const SizedBox(height: Dimensions.paddingSizeSmall),
-                ...overview.packages.map((plan) => Padding(
-                      padding: const EdgeInsets.only(
-                          bottom: Dimensions.paddingSizeSmall),
-                      child: _PackagePlanCard(plan: plan, overview: overview),
-                    )),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _CurrentPackageCard extends StatelessWidget {
-  final SellerPackageSummary summary;
-
-  const _CurrentPackageCard({required this.summary});
-
-  @override
-  Widget build(BuildContext context) {
-    final subscription = summary.active;
-    if (subscription == null) {
-      final waiting = summary.pending;
-      return _SectionCard(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-              waiting == null
-                  ? (getTranslated('no_active_package', context) ??
-                      'No active package')
-                  : (getTranslated('package_payment_under_review', context) ??
-                      'Package payment is under review'),
-              style: titilliumSemiBold),
-          if (waiting == null) ...[
-            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-            Text(
-                getTranslated('choose_package_to_activate', context) ??
-                    'Choose a package below to renew or activate your subscription.',
-                style: titilliumRegular.copyWith(
-                    color: Theme.of(context).hintColor)),
-          ],
-          if (waiting != null) ...[
-            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-            Text(waiting.packageName, style: titilliumRegular),
-            Text(
-                '${getTranslated('payment_status', context) ?? 'Payment status'}: ${waiting.paymentStatus}',
-                style: titilliumRegular.copyWith(
-                    color: Theme.of(context).hintColor)),
-          ],
-        ]),
-      );
+      setState(() {
+        overview = SellerPackageOverviewModel.fromJson(data);
+        summary = Map<String, dynamic>.from(data['subscription'] as Map);
+        transitionEndsAt = data['transition_ends_at']?.toString();
+        slots = (spaces.data['slots'] as List)
+            .map((v) => Map<String, dynamic>.from(v as Map))
+            .toList();
+        products = (spaces.data['products'] as List)
+            .map((v) => Map<String, dynamic>.from(v as Map))
+            .toList();
+        error = null;
+      });
+    } catch (e) {
+      if (mounted) setState(() => error = financeError(context, e));
+    } finally {
+      if (mounted) setState(() => loading = false);
     }
-
-    return _SectionCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.inventory_2_outlined),
-          const SizedBox(width: Dimensions.paddingSizeSmall),
-          Expanded(
-              child: Text(subscription.packageName,
-                  style: titilliumSemiBold.copyWith(
-                      fontSize: Dimensions.fontSizeLarge))),
-          Text(subscription.paidPackagePrice.toStringAsFixed(2),
-              style: titilliumSemiBold),
-        ]),
-        const Divider(height: Dimensions.paddingSizeLarge),
-        _QuotaRow(
-            icon: Icons.add_box_outlined,
-            title: getTranslated('product_listings', context) ??
-                'Product listings',
-            value: subscription.remainingProductLimit),
-        _QuotaRow(
-            icon: Icons.search_outlined,
-            title: getTranslated('search_promotions', context) ??
-                'Search promotions',
-            value: subscription.remainingSearchPromotionLimit),
-        _QuotaRow(
-            icon: Icons.home_outlined,
-            title: getTranslated('homepage_promotions', context) ??
-                'Homepage promotions',
-            value: subscription.remainingHomepagePromotionLimit),
-        _QuotaRow(
-            icon: Icons.confirmation_number_outlined,
-            title: getTranslated('coupons', context) ?? 'Coupons',
-            value: subscription.remainingCouponLimit),
-        Text(_durationText(context, subscription),
-            style:
-                titilliumRegular.copyWith(color: Theme.of(context).hintColor)),
-        if (subscription.startedAt != null)
-          Text(
-              '${getTranslated('started', context) ?? 'Started'}: ${_dateText(subscription.startedAt!)}',
-              style: titilliumRegular.copyWith(
-                  color: Theme.of(context).hintColor)),
-        Text(
-            '${getTranslated('payment_status', context) ?? 'Payment status'}: ${subscription.paymentStatus}',
-            style:
-                titilliumRegular.copyWith(color: Theme.of(context).hintColor)),
-        const SizedBox(height: Dimensions.paddingSizeSmall),
-        Consumer<SellerPackageController>(builder: (context, controller, _) {
-          final performance = controller.performance;
-          return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (performance != null)
-                  Wrap(spacing: 12, runSpacing: 4, children: [
-                    Text(
-                        '${getTranslated('search_impressions', context) ?? 'Impressions'}: ${performance.impressions}',
-                        style: titilliumRegular),
-                    Text(
-                        '${getTranslated('product_visits', context) ?? 'Visits'}: ${performance.visits}',
-                        style: titilliumRegular),
-                    Text(
-                        '${getTranslated('orders', context) ?? 'Orders'}: ${performance.orders}',
-                        style: titilliumRegular),
-                    Text(
-                        '${getTranslated('sales_amount', context) ?? 'Sales'}: ${performance.salesAmount.toStringAsFixed(2)}',
-                        style: titilliumRegular),
-                  ]),
-                if (!subscription.cancelAtPeriodEnd)
-                  TextButton.icon(
-                    onPressed: controller.isSubmittingPayment
-                        ? null
-                        : () => _requestCancellation(
-                            context, controller, subscription),
-                    icon: const Icon(Icons.cancel_outlined),
-                    label: Text(
-                        getTranslated('cancel_package_no_refund', context) ??
-                            'Cancel package (no refund)'),
-                  )
-                else
-                  Text(
-                      getTranslated('cancellation_scheduled_for_period_end',
-                              context) ??
-                          'Cancellation scheduled for period end.',
-                      style: titilliumRegular.copyWith(
-                          color: Theme.of(context).colorScheme.error)),
-              ]);
-        }),
-        if (subscription.expiresAt != null) ...[
-          const SizedBox(height: Dimensions.paddingSizeSmall),
-          Text(
-              '${getTranslated('valid_until', context) ?? 'Valid until'}: ${_dateText(subscription.expiresAt!)}',
-              style: titilliumRegular.copyWith(
-                  color: Theme.of(context).hintColor)),
-        ],
-      ]),
-    );
   }
 
-  String _durationText(
-      BuildContext context, SellerPackageSubscription subscription) {
-    if (subscription.durationStatus == 'lifetime' ||
-        subscription.durationUnit == 'lifetime')
-      return '${getTranslated('duration', context) ?? 'Duration'}: ${getTranslated('lifetime', context) ?? 'Lifetime'}';
-    if (subscription.remainingDays != null)
-      return '${getTranslated('remaining', context) ?? 'Remaining'}: ${subscription.remainingDays} ${getTranslated('days', context) ?? 'days'}';
-    return '${getTranslated('duration', context) ?? 'Duration'}: ${subscription.durationValue} ${getTranslated(subscription.durationUnit, context) ?? subscription.durationUnit}';
+  Future<void> assign(Map<String, dynamic> slot, int? productId) async {
+    if (saving) return;
+    setState(() => saving = true);
+    try {
+      final response = await VendorWorkspace.instance.client.post(
+          '/api/v3/seller/packages/slots/${slot['id']}',
+          data: {'product_id': productId});
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${response.data['message']}')));
+      await load();
+    } catch (e) {
+      if (mounted) setState(() => error = financeError(context, e));
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
   }
-
-  String _dateText(String value) {
-    final parsed = DateTime.tryParse(value);
-    return parsed == null
-        ? value
-        : parsed.toLocal().toString().split(' ').first;
-  }
-
-  Future<void> _requestCancellation(
-      BuildContext context,
-      SellerPackageController controller,
-      SellerPackageSubscription subscription) async {
-    final reason = TextEditingController();
-    final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-              title: Text(
-                  getTranslated('cancel_package', context) ?? 'Cancel package'),
-              content: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(subscription.cancellationEffect == 'immediate'
-                    ? (getTranslated(
-                            'package_cancel_immediate_no_refund', context) ??
-                        'Benefits stop immediately. No refund will be issued.')
-                    : (getTranslated(
-                            'package_cancel_period_end_no_refund', context) ??
-                        'Benefits continue until the paid period ends. No refund will be issued.')),
-                const SizedBox(height: 12),
-                TextField(
-                    controller: reason,
-                    minLines: 2,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                        labelText:
-                            getTranslated('cancellation_reason', context) ??
-                                'Cancellation reason')),
-              ]),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(dialogContext, false),
-                    child: Text(getTranslated('back', context) ?? 'Back')),
-                FilledButton(
-                    onPressed: () => Navigator.pop(
-                        dialogContext, reason.text.trim().length >= 3),
-                    child: Text(
-                        getTranslated('confirm_cancellation', context) ??
-                            'Confirm cancellation')),
-              ],
-            ));
-    if (confirmed == true)
-      await controller.cancelPackage(
-          subscriptionId: subscription.id, reason: reason.text.trim());
-    reason.dispose();
-  }
-}
-
-class _PackagePlanCard extends StatelessWidget {
-  final SellerPackagePlan plan;
-  final SellerPackageOverviewModel overview;
-
-  const _PackagePlanCard({required this.plan, required this.overview});
 
   @override
   Widget build(BuildContext context) {
-    final canSelect = !overview.subscription.pendingReview;
-    return InkWell(
-      // Keep a pending offline request immutable until an admin approves or rejects it.
-      onTap: canSelect
-          ? () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    SellerPackagePaymentScreen(plan: plan, overview: overview),
-              ))
-          : null,
-      borderRadius: BorderRadius.circular(8),
-      child: _SectionCard(
+    final active = summary?['active'] as Map?;
+    final pending = summary?['pending'] as Map?;
+    final scheduled = summary?['scheduled'] as List? ?? [];
+    return Scaffold(
+        appBar: VendorFinanceAppBar(
+            title: label(
+                'الباقات ومساحات الإعلانات', 'Packages and advertising slots')),
+        body: loading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: load,
+                child: ListView(padding: const EdgeInsets.all(20), children: [
+                  if (error != null) ...[
+                    Text(error!,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error)),
+                    TextButton(
+                        onPressed: load,
+                        child: Text(label('إعادة المحاولة', 'Retry')))
+                  ],
+                  Text(label(
+                      'كل مساحة مدتها 30 يومًا من بداية الاشتراك. تغيير المنتج لا يمددها. الأسعار نهائية والتجديد يدوي.',
+                      'Every slot lasts 30 days from subscription start. Replacing a product keeps its expiry. Prices are final; renewal is manual.')),
+                  const SizedBox(height: 16),
+                  if (active != null)
+                    _panel('${active['package_name']}',
+                        '${active['product_limit']} ${label('مساحة — حتى', 'slots — until')} ${active['expires_at']}')
+                  else
+                    _panel(
+                        label('لا يوجد اشتراك سارٍ', 'No active subscription'),
+                        label(
+                            'اشترك لنشر المنتجات واستقبال طلبات جديدة. يمكنك إكمال الطلبات القائمة. للبائعين الحاليين مهلة انتقالية 7 أيام من الإطلاق.',
+                            'Subscribe to publish products and receive new orders. Existing orders can still be completed. Existing vendors have a seven-day transition period.')),
+                  if (pending != null)
+                    _panel(label('طلب دفع قيد المتابعة', 'Pending payment'),
+                        '${pending['package_name']} — ${pending['status']}'),
+                  for (final next in scheduled)
+                    _panel(label('الدورة القادمة مدفوعة', 'Next cycle is paid'),
+                        '${next['package_name']} — ${label('تبدأ', 'starts')} ${next['starts_at']}'),
+                  const SizedBox(height: 12),
+                  if (active == null && transitionEndsAt != null)
+                    Text(
+                        '${label('نهاية مهلة البائعين الحاليين بتوقيت القاهرة:', 'Existing vendors transition ends (Cairo):')} $transitionEndsAt'),
+                  if (overview != null)
+                    Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: OutlinedButton.icon(
+                            icon: const Icon(Icons.add_business_outlined),
+                            label: Text(label('شراء ومتابعة المساحات الإضافية',
+                                'Buy and track extra slots')),
+                            onPressed: () async {
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => SellerExtraAdsScreen(
+                                          subscription: active == null
+                                              ? null
+                                              : Map<String, dynamic>.from(
+                                                  active),
+                                          overview: overview!)));
+                              if (mounted) await load();
+                            })),
+                  Text(label('الباقات المتاحة', 'Available packages'),
+                      style: Theme.of(context).textTheme.titleLarge),
+                  for (final plan
+                      in overview?.packages ?? <SellerPackagePlan>[])
+                    Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(plan.name,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge),
+                                  Text(
+                                      '${plan.productLimit} ${label('مساحة • 30 يومًا', 'slots • 30 days')}'),
+                                  Text(financeMoney(context, plan.packagePrice),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall),
+                                  const SizedBox(height: 8),
+                                  FilledButton(
+                                      onPressed:
+                                          summary?['pending_review'] == true
+                                              ? null
+                                              : () async {
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              SellerPackagePaymentScreen(
+                                                                  plan: plan,
+                                                                  overview:
+                                                                      overview!)));
+                                                  if (mounted) await load();
+                                                },
+                                      child: Text(label(
+                                          'شراء أو تجديد', 'Buy or renew'))),
+                                ]))),
+                  const SizedBox(height: 16),
+                  Text(label('مساحاتي', 'My slots'),
+                      style: Theme.of(context).textTheme.titleLarge),
+                  Text(label(
+                      'المنتج البديل يخضع لمراجعة الإدارة. عند تخفيض الباقة اختر المنتجات التي ستستمر.',
+                      'Replacement products require admin review. When downgrading, choose which products continue.')),
+                  if (slots.isEmpty)
+                    Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Text(label(
+                            'لا توجد مساحات سارية.', 'No current slots.'))),
+                  for (final slot in slots)
+                    Card(
+                        child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      '${label('المساحة', 'Slot')} ${slot['position']}'),
+                                  if (slot['editable'] == false)
+                                    Text(label('مجمدة حتى تجديد الاشتراك',
+                                        'Frozen until renewal')),
+                                  Text(
+                                      '${label('حتى', 'Until')} ${slot['expires_at']}'),
+                                  if (slot['product'] is Map)
+                                    Text(
+                                        '${slot['product']['name']} — ${slot['product']['request_status'] == 1 ? label('معتمد', 'Approved') : label('بانتظار المراجعة', 'Awaiting review')}'),
+                                  DropdownButtonFormField<int>(
+                                      key: ValueKey(
+                                          '${slot['id']}-${slot['product_id']}'),
+                                      initialValue: products.any((p) =>
+                                              p['id'] == slot['product_id'])
+                                          ? slot['product_id'] as int?
+                                          : null,
+                                      isExpanded: true,
+                                      decoration: InputDecoration(
+                                          labelText: label('المنتج المرتبط',
+                                              'Assigned product')),
+                                      items: [
+                                        DropdownMenuItem<int>(
+                                            value: null,
+                                            child: Text(label('إفراغ المساحة',
+                                                'Empty slot'))),
+                                        ...products.map((p) =>
+                                            DropdownMenuItem<int>(
+                                                value: p['id'] as int,
+                                                child: Text('${p['name']}',
+                                                    overflow:
+                                                        TextOverflow.ellipsis)))
+                                      ],
+                                      onChanged:
+                                          saving || slot['editable'] == false
+                                              ? null
+                                              : (id) => assign(slot, id)),
+                                ]))),
+                ])));
+  }
+
+  Widget _panel(String title, String detail) => Card(
+      child: Padding(
+          padding: const EdgeInsets.all(16),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(
-              child: Text(plan.name,
-                  style: titilliumSemiBold.copyWith(
-                      fontSize: Dimensions.fontSizeLarge))),
-          Text(plan.packagePrice.toStringAsFixed(2),
-              style: titilliumSemiBold.copyWith(
-                  color: Theme.of(context).primaryColor)),
-        ]),
-        if (plan.description.isNotEmpty) ...[
-          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-          Text(plan.description, style: titilliumRegular),
-        ],
-        const SizedBox(height: Dimensions.paddingSizeSmall),
-        Wrap(
-            spacing: Dimensions.paddingSizeDefault,
-            runSpacing: Dimensions.paddingSizeExtraSmall,
-            children: [
-              _PlanFact(
-                  label: getTranslated('search', context) ?? 'Search',
-                  value: plan.searchPromotionLimit),
-              _PlanFact(
-                  label: getTranslated('homepage', context) ?? 'Homepage',
-                  value: plan.homepagePromotionLimit),
-              _PlanFact(
-                  label: getTranslated('coupons', context) ?? 'Coupons',
-                  value: plan.couponLimit),
-              Text(_planDurationText(context, plan),
-                  style: titilliumRegular.copyWith(
-                      color: Theme.of(context).hintColor)),
-            ]),
-      ])),
-    );
-  }
-}
-
-String _planDurationText(BuildContext context, SellerPackagePlan plan) {
-  if (plan.durationUnit == 'lifetime')
-    return '${getTranslated('duration', context) ?? 'Duration'}: ${getTranslated('lifetime', context) ?? 'Lifetime'}';
-  return '${getTranslated('duration', context) ?? 'Duration'}: ${plan.durationValue} ${getTranslated(plan.durationUnit, context) ?? plan.durationUnit}';
-}
-
-class _SectionCard extends StatelessWidget {
-  final Widget child;
-
-  const _SectionCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: Theme.of(context).hintColor.withValues(alpha: .25)),
-      ),
-      child: child,
-    );
-  }
-}
-
-class _QuotaRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final int value;
-
-  const _QuotaRow(
-      {required this.icon, required this.title, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeExtraSmall),
-      child: Row(children: [
-        Icon(icon,
-            size: Dimensions.iconSizeSmall, color: Theme.of(context).hintColor),
-        const SizedBox(width: Dimensions.paddingSizeSmall),
-        Expanded(child: Text(title, style: titilliumRegular)),
-        Text(value.toString(), style: titilliumSemiBold),
-      ]),
-    );
-  }
-}
-
-class _PlanFact extends StatelessWidget {
-  final String label;
-  final int value;
-
-  const _PlanFact({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text('$label: $value',
-        style: titilliumRegular.copyWith(color: Theme.of(context).hintColor));
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  final Future<void> Function() onRefresh;
-
-  const _EmptyState({required this.onRefresh});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: IconButton(
-        tooltip: 'Retry',
-        onPressed: onRefresh,
-        icon: const Icon(Icons.refresh),
-      ),
-    );
-  }
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 6),
+            Text(detail),
+          ])));
 }

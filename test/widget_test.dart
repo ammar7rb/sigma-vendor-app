@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sixvalley_vendor_app/features/order_details/domain/models/seller_order_insurance_model.dart';
 import 'package:sixvalley_vendor_app/features/wallet/domain/models/seller_balance_model.dart';
 import 'package:sixvalley_vendor_app/helper/egypt_location_helper.dart';
 import 'package:sixvalley_vendor_app/utill/app_constants.dart';
@@ -62,10 +61,16 @@ void main() {
 
     expect(dashboard, isNot(contains('PosScreen(fromMenu: true)')));
     expect(dashboard, isNot(contains('FloatingActionButton.extended')));
-    expect(File('lib/features/profile/widgets/vendor_navigation_actions.dart').readAsStringSync(), contains('AddProductTabView'));
+    expect(
+        File('lib/features/profile/widgets/vendor_navigation_actions.dart')
+            .readAsStringSync(),
+        contains('AddProductTabView'));
     expect(overview, contains('const ProductListMenuScreen()'));
-    expect(dashboard,contains('const OrderScreen()'));
-    expect(File('lib/features/menu/widgets/vendor_menu_widget.dart').readAsStringSync(), contains('VendorInvoicesScreen'));
+    expect(dashboard, contains('const OrderScreen()'));
+    expect(
+        File('lib/features/menu/widgets/vendor_menu_widget.dart')
+            .readAsStringSync(),
+        contains('VendorInvoicesScreen'));
     expect(overview, isNot(contains('VendorInvoicesScreen')));
     expect(mainSource, contains('if (_showSetupGuideOverlay() &&'));
     expect(mainSource, contains('bool _showSetupGuideOverlay() => false;'));
@@ -79,7 +84,9 @@ void main() {
     expect(funding, contains("channel == 'instapay'"));
     expect(funding, contains('constraints.maxWidth < 420'));
     expect(funding, contains('method.methodFields'));
-    expect(funding, contains('submitOfflineBalancePayment'));
+    expect(funding, contains('/api/v3/seller/balance/offline-payment'));
+    expect(funding, contains('request_key'));
+    expect(funding, contains('transfer_reference'));
     expect(funding, contains('5 * 1024 * 1024'));
   });
 
@@ -91,30 +98,6 @@ void main() {
         EgyptLocationHelper.contains(const LatLng(23.5880, 58.3829)), isFalse);
     expect(EgyptLocationHelper.normalize(const LatLng(23.5880, 58.3829)),
         EgyptLocationHelper.center);
-  });
-
-  test('per-order insurance remains hidden until the API allows details', () {
-    final envelope = SellerOrderInsuranceEnvelope.fromJson({
-      'enabled': true,
-      'seller_order_insurance': {
-        'id': 4,
-        'order_id': 90,
-        'amount': '125.50',
-        'details_hidden': true,
-        'can_view_order_details': false,
-        'balances': {'operating': '500', 'reusable_insurance_credit': '50'},
-      },
-      'payment_options': {
-        'operating_balance': false,
-        'reusable_insurance_credit': true
-      },
-    });
-
-    expect(envelope.insurance?.detailsHidden, isTrue);
-    expect(envelope.insurance?.canViewOrderDetails, isFalse);
-    expect(envelope.insurance?.amount, 125.5);
-    expect(envelope.paymentOptions.operatingBalance, isFalse);
-    expect(envelope.paymentOptions.reusableInsuranceCredit, isTrue);
   });
 
   test('wallet presentation keeps financial tabs from the same payload', () {

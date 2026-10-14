@@ -14,7 +14,6 @@ import 'package:sixvalley_vendor_app/utill/app_constants.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/images.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_bottom_sheet_widget.dart';
-import 'package:sixvalley_vendor_app/features/coupon/screens/coupon_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:sixvalley_vendor_app/features/seller_promotion/screens/seller_promotion_screen.dart';
 import 'package:sixvalley_vendor_app/features/dashboard/screens/nav_bar_screen.dart';
@@ -24,7 +23,6 @@ import 'package:sixvalley_vendor_app/features/profile/screens/profile_view_scree
 import 'package:sixvalley_vendor_app/features/settings/screens/setting_screen.dart';
 import 'package:sixvalley_vendor_app/features/shop/screens/shop_screen.dart';
 import 'package:sixvalley_vendor_app/features/bank_info/screens/bank_info_screen.dart';
-import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
 
 import '../../../main.dart';
 
@@ -33,137 +31,171 @@ class MenuBottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ConfigModel? configModel = Provider.of<SplashController>(context, listen: false).configModel;
+    final ConfigModel? configModel =
+        Provider.of<SplashController>(context, listen: false).configModel;
 
+    return Consumer<SplashController>(builder: (context, splashController, _) {
+      // Vendor support, delivery, earnings, and review workflows are managed by admin.
+      // Keep their entry points out of the vendor navigation without removing backend support.
+      List<CustomBottomSheetWidget> activateMenu = [
+        CustomBottomSheetWidget(
+            image:
+                '${Provider.of<ProfileController>(context, listen: false).userInfoModel?.imageFullUrl?.path}',
+            isProfile: true,
+            title: getTranslated('profile', context),
+            onTap: () => _handleMenuTap(context, const ProfileScreenView())),
 
+        CustomBottomSheetWidget(
+            image: Images.myShop,
+            title: getTranslated('my_shop', context),
+            onTap: () => _handleMenuTap(context, const ShopScreen())),
 
-    return Consumer<SplashController>(
-      builder: (context, splashController, _) {
+        CustomBottomSheetWidget(
+          image: Images.addProduct,
+          title: getTranslated('add_product', context),
+          onTap: () => _openAddProductIfEligible(context),
+        ),
 
-        // Vendor support, delivery, earnings, and review workflows are managed by admin.
-        // Keep their entry points out of the vendor navigation without removing backend support.
-        List<CustomBottomSheetWidget> activateMenu = [
-          CustomBottomSheetWidget(image: '${Provider.of<ProfileController>(context, listen: false).userInfoModel?.imageFullUrl?.path}',
-            isProfile: true, title: getTranslated('profile', context),
-            onTap: () => _handleMenuTap(context, const ProfileScreenView())
+        CustomBottomSheetWidget(
+          image: Images.productIconPp,
+          title: getTranslated('products', context),
+          onTap: () => _handleMenuTap(context, const ProductListMenuScreen()),
+        ),
+
+        CustomBottomSheetWidget(
+          image: Images.wallet,
+          title: getTranslated('advertising_packages', context),
+          onTap: () => _handleMenuTap(context, const SellerPackageScreen()),
+        ),
+
+        // Premium visibility is granted only when the current seller package has remaining quota.
+        CustomBottomSheetWidget(
+          image: Images.productIconPp,
+          title: getTranslated('promotions', context),
+          onTap: () => _handleMenuTap(context, const SellerPromotionScreen()),
+        ),
+
+        if (configModel?.posActive == 1 &&
+            Provider.of<ProfileController>(context, listen: false)
+                    .userInfoModel
+                    ?.posActive ==
+                1)
+          CustomBottomSheetWidget(
+            image: Images.pos,
+            title: getTranslated('pos', context),
+            onTap: () => _handleMenuTap(context, const NavBarScreen()),
           ),
 
-          CustomBottomSheetWidget(image: Images.myShop, title: getTranslated('my_shop', context),
-            onTap: () => _handleMenuTap(context, const ShopScreen())
-          ),
+        CustomBottomSheetWidget(
+          image: Images.settings,
+          title: getTranslated('settings', context),
+          onTap: () => _handleMenuTap(context, const SettingsScreen()),
+        ),
 
-          CustomBottomSheetWidget(image: Images.addProduct, title: getTranslated('add_product', context),
-            onTap: () => _openAddProductIfEligible(context),
-          ),
+        CustomBottomSheetWidget(
+          image: Images.restockIcon,
+          title: getTranslated('restock', context),
+          onTap: () => _handleMenuTap(context, const RestockListScreen()),
+        ),
 
-          CustomBottomSheetWidget(image: Images.productIconPp, title: getTranslated('products', context),
-            onTap: () => _handleMenuTap(context, const ProductListMenuScreen()),
-          ),
+        CustomBottomSheetWidget(
+          image: Images.clearanceSaleImage,
+          title: getTranslated('clearance_sale', context),
+          onTap: () => _handleMenuTap(context, const ClearanceSaleScreen()),
+        ),
 
-          CustomBottomSheetWidget(image: Images.couponIcon, title: getTranslated('coupons', context),
-            onTap: () => _handleMenuTap(context, const CouponListScreen()),
-          ),
+        CustomBottomSheetWidget(
+          image: Images.reportIcon,
+          title: getTranslated('vat_management', context),
+          onTap: () => _handleMenuTap(context, const VatManagementScreen()),
+        ),
 
-          CustomBottomSheetWidget(image: Images.wallet, title: getTranslated('advertising_packages', context),
-            onTap: () => _handleMenuTap(context, const SellerPackageScreen()),
-          ),
-
-          // Premium visibility is granted only when the current seller package has remaining quota.
-          CustomBottomSheetWidget(image: Images.productIconPp, title: getTranslated('promotions', context),
-            onTap: () => _handleMenuTap(context, const SellerPromotionScreen()),
-          ),
-
-          if(configModel?.posActive == 1 && Provider.of<ProfileController>(context, listen: false).userInfoModel?.posActive == 1)
-            CustomBottomSheetWidget(image: Images.pos, title: getTranslated('pos', context),
-              onTap: () => _handleMenuTap(context, const NavBarScreen()),
-            ),
-
-
-          CustomBottomSheetWidget(image: Images.settings, title: getTranslated('settings', context),
-            onTap: () => _handleMenuTap(context, const SettingsScreen()),
-          ),
-
-
-          CustomBottomSheetWidget(image: Images.restockIcon, title: getTranslated('restock', context),
-            onTap: () => _handleMenuTap(context, const RestockListScreen()),
-          ),
-
-
-          CustomBottomSheetWidget(image: Images.clearanceSaleImage, title: getTranslated('clearance_sale', context),
-            onTap: () => _handleMenuTap(context, const ClearanceSaleScreen()),
-          ),
-
-
-          CustomBottomSheetWidget(image: Images.reportIcon, title: getTranslated('vat_management', context),
-            onTap: () => _handleMenuTap(context, const VatManagementScreen()),
-          ),
-
-          if (configModel?.isAuctionFeatureEnabled == true || Provider.of<ProfileController>(context, listen: false).userInfoModel?.showAuctionMenuForVendor == true)
-          CustomBottomSheetWidget(image: Images.auctionMenuIcon, title: getTranslated('auctions', context),
+        if (configModel?.isAuctionFeatureEnabled == true ||
+            Provider.of<ProfileController>(context, listen: false)
+                    .userInfoModel
+                    ?.showAuctionMenuForVendor ==
+                true)
+          CustomBottomSheetWidget(
+            image: Images.auctionMenuIcon,
+            title: getTranslated('auctions', context),
             onTap: () => _handleMenuTap(context, const AuctionMenuScreen()),
           ),
 
-          CustomBottomSheetWidget(image: Images.bankingInfo, title: getTranslated('bank_info', context),
-            onTap: () => _handleMenuTap(context, const BankInfoScreen()),
-          ),
+        CustomBottomSheetWidget(
+          image: Images.bankingInfo,
+          title: getTranslated('bank_info', context),
+          onTap: () => _handleMenuTap(context, const BankInfoScreen()),
+        ),
 
-
-          CustomBottomSheetWidget(image: Images.logOut, title: getTranslated('logout', context),
+        CustomBottomSheetWidget(
+            image: Images.logOut,
+            title: getTranslated('logout', context),
             onTap: () async {
               Navigator.pop(context); // Close bottom sheet
               Future.microtask(
-                await showModalBottomSheet(context: context, builder: (_) => const SignOutConfirmationDialogWidget()),
+                await showModalBottomSheet(
+                    context: context,
+                    builder: (_) => const SignOutConfirmationDialogWidget()),
               );
-            }
-          ),
+            }),
 
-          CustomBottomSheetWidget(image: Images.appInfo, title: 'v - ${AppConstants.appVersion}',
-              onTap: (){}),
+        CustomBottomSheetWidget(
+            image: Images.appInfo,
+            title: 'v - ${AppConstants.appVersion}',
+            onTap: () {}),
 
-          // CustomBottomSheetWidget(
-          //   image: Images.appInfo, title: 'vat',
-          //   onTap: () { }
-          // ),
+        // CustomBottomSheetWidget(
+        //   image: Images.appInfo, title: 'vat',
+        //   onTap: () { }
+        // ),
+      ];
 
-        ];
-
-        return Container(decoration: BoxDecoration(
+      return Container(
+        decoration: BoxDecoration(
             color: Provider.of<ThemeController>(context).darkTheme
-                ? Theme.of(context).highlightColor : Theme.of(context).highlightColor,
-            borderRadius: const BorderRadius.only(topLeft:  Radius.circular(25), topRight: Radius.circular(25))),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-              GestureDetector(onTap: ()=> Navigator.pop(context),
-                child: Icon(Icons.keyboard_arrow_down_outlined,color: Theme.of(context).hintColor, size: Dimensions.iconSizeLarge,)),
-
-              const SizedBox(height: Dimensions.paddingSizeVeryTiny),
-              Consumer<ProfileController>(
+                ? Theme.of(context).highlightColor
+                : Theme.of(context).highlightColor,
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Icon(
+                  Icons.keyboard_arrow_down_outlined,
+                  color: Theme.of(context).hintColor,
+                  size: Dimensions.iconSizeLarge,
+                )),
+            const SizedBox(height: Dimensions.paddingSizeVeryTiny),
+            Consumer<ProfileController>(
                 builder: (context, profileProvider, child) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeDefault),
-                    child: GridView.count(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      children: activateMenu,
-                    ),
-                  );
-                }
-              ),
-            ],
-          ),
-        );
-      }
-    );
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: Dimensions.paddingSizeDefault,
+                    vertical: Dimensions.paddingSizeDefault),
+                child: GridView.count(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  children: activateMenu,
+                ),
+              );
+            }),
+          ],
+        ),
+      );
+    });
   }
 
   void _handleMenuTap(BuildContext context, Widget screen) {
     Navigator.pop(context); // Close bottom sheet
     Future.microtask(() => Navigator.push(
-      Get.context!,
-      MaterialPageRoute(builder: (_) => screen),
-    ));
+          Get.context!,
+          MaterialPageRoute(builder: (_) => screen),
+        ));
   }
 
   Future<void> _openAddProductIfEligible(BuildContext context) async {
@@ -171,5 +203,4 @@ class MenuBottomSheetWidget extends StatelessWidget {
     // are intentionally not consulted here because publishing is not a paid quota.
     _handleMenuTap(context, const AddProductTabView(fromHome: false));
   }
-
 }

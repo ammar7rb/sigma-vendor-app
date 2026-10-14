@@ -17,7 +17,6 @@ import 'package:sixvalley_vendor_app/features/order/controllers/order_controller
 import 'package:sixvalley_vendor_app/features/order/domain/models/order_model.dart';
 import 'package:sixvalley_vendor_app/features/order_details/domain/models/order_details_model.dart';
 import 'package:sixvalley_vendor_app/features/order_details/domain/models/order_setup_model.dart';
-import 'package:sixvalley_vendor_app/features/order_details/domain/models/seller_order_insurance_model.dart';
 import 'package:sixvalley_vendor_app/features/order_details/domain/services/order_details_service_interface.dart';
 import 'package:sixvalley_vendor_app/helper/api_checker.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
@@ -59,11 +58,7 @@ class OrderDetailsController extends ChangeNotifier {
   bool _isInvoiceLoading = false;
   bool get isInvoiceLoading => _isInvoiceLoading;
 
-  SellerOrderInsuranceEnvelope? _sellerOrderInsurance;
-  SellerOrderInsuranceEnvelope? get sellerOrderInsurance =>
-      _sellerOrderInsurance;
-  bool _insuranceLoading = false;
-  bool get insuranceLoading => _insuranceLoading;
+  bool _detailsLoading = false;
   bool _shippingProofLoading = false;
   bool get shippingProofLoading => _shippingProofLoading;
 
@@ -72,7 +67,7 @@ class OrderDetailsController extends ChangeNotifier {
   List<Map<String, dynamic>> shippingProofs = [];
   int _detailsGeneration = 0;
   String? _currentReference;
-  bool get actionInProgress => _insuranceLoading || _shippingProofLoading;
+  bool get actionInProgress => _detailsLoading || _shippingProofLoading;
 
   Future<void> getOrderDetails(String orderID) async {
     final generation = ++_detailsGeneration;
@@ -80,26 +75,13 @@ class OrderDetailsController extends ChangeNotifier {
     _currentReference = orderID;
     if (!sameOrder) {
       _orderDetails = null;
-      _sellerOrderInsurance = null;
       shippingProofs = [];
     }
     loadError = null;
     proofError = null;
-    _insuranceLoading = true;
+    _detailsLoading = true;
     notifyListeners();
     try {
-      final insuranceResponse =
-          await orderDetailsServiceInterface.getSellerOrderInsurance(orderID);
-      if (generation != _detailsGeneration) return;
-      if (insuranceResponse.response?.statusCode != 200) {
-        throw StateError('insurance_access_check_failed');
-      }
-      _sellerOrderInsurance = SellerOrderInsuranceEnvelope.fromJson(
-          Map<String, dynamic>.from(insuranceResponse.response!.data));
-      if (_sellerOrderInsurance?.insurance?.detailsHidden == true) {
-        _orderDetails = [];
-        return;
-      }
       final apiResponse =
           await orderDetailsServiceInterface.getOrderDetails(orderID);
       if (generation != _detailsGeneration) return;
@@ -134,51 +116,9 @@ class OrderDetailsController extends ChangeNotifier {
       }
     } finally {
       if (generation == _detailsGeneration) {
-        _insuranceLoading = false;
+        _detailsLoading = false;
         notifyListeners();
       }
-    }
-  }
-
-  Future<String?> paySellerOrderInsurance(
-      String orderID, String paymentMethod) async {
-    if (actionInProgress) return null;
-    _insuranceLoading = true;
-    notifyListeners();
-    try {
-      final response = await orderDetailsServiceInterface
-          .paySellerOrderInsurance(orderID, paymentMethod);
-      if (response.response?.statusCode == 200) {
-        final redirect = response.response!.data['redirect_link']?.toString();
-        if (_currentReference == orderID) await getOrderDetails(orderID);
-        return redirect;
-      }
-      ApiChecker.checkApi(response);
-      return null;
-    } finally {
-      _insuranceLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<bool> submitSellerOrderInsuranceOffline(
-      String orderID, String methodId, String proofPath, String note) async {
-    if (actionInProgress) return false;
-    _insuranceLoading = true;
-    notifyListeners();
-    try {
-      final response =
-          await orderDetailsServiceInterface.submitSellerOrderInsuranceOffline(
-              orderID, methodId, proofPath, note);
-      if (response.response?.statusCode == 200) {
-        if (_currentReference == orderID) await getOrderDetails(orderID);
-        return true;
-      }
-      ApiChecker.checkApi(response);
-      return false;
-    } finally {
-      _insuranceLoading = false;
-      notifyListeners();
     }
   }
 
@@ -215,7 +155,8 @@ class OrderDetailsController extends ChangeNotifier {
       final response = await orderDetailsServiceInterface.submitShippingProof(
           orderID, status, proofPath, note);
       if (response.response?.statusCode == 201) {
-        if (_currentReference == reference) await getOrderDetails(reference ?? orderID);
+        if (_currentReference == reference)
+          await getOrderDetails(reference ?? orderID);
         return true;
       }
       ApiChecker.checkApi(response);
@@ -396,8 +337,10 @@ class OrderDetailsController extends ChangeNotifier {
         bool fileExists = await savedFile.exists();
 
         if (fileExists) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(
-              SnackBar(content: Text(getTranslated('file_already_downloaded', Get.context!) ?? '')));
+          ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
+              content: Text(
+                  getTranslated('file_already_downloaded', Get.context!) ??
+                      '')));
           _isDownloadLoading = false;
         } else {
           apiResponse.listen((d) => downloadData.addAll(d), onDone: () {
@@ -479,11 +422,10 @@ class OrderDetailsController extends ChangeNotifier {
   void emptyOrderDetails() {
     _detailsGeneration++;
     _currentReference = null;
-    _sellerOrderInsurance = null;
     shippingProofs = [];
     _orderDetails = null;
     loadError = null;
-    _insuranceLoading = false;
+    _detailsLoading = false;
     notifyListeners();
   }
 

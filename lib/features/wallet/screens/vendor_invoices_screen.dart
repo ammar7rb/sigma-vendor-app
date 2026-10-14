@@ -90,7 +90,8 @@ class _VendorInvoicesState extends State<VendorInvoicesScreen> {
                                     hint:
                                         '${tr('due_on_nearest_date')}: ${money(summary['next_due_amount'])}'),
                                 const SizedBox(height: 24),
-                                for (final raw in records['data'] as List? ?? [])
+                                for (final raw
+                                    in records['data'] as List? ?? [])
                                   Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 16),
@@ -102,7 +103,8 @@ class _VendorInvoicesState extends State<VendorInvoicesScreen> {
                                               ? raw['order_amount']
                                               : raw['receivable']),
                                           hint: raw['locked'] == true
-                                              ? '${tr('security_deposit_required')}: ${money(raw['security_deposit_amount'])}'
+                                              ? tr(
+                                                  'vendor_order_waiting_for_administrative_release')
                                               : '${financeDate(context, raw['due_at'])} · ${tr('settlement_${raw['status']}')}',
                                           child: OutlinedButton.icon(
                                               onPressed: () => open(raw),
@@ -110,8 +112,7 @@ class _VendorInvoicesState extends State<VendorInvoicesScreen> {
                                                   ? Icons.lock_outline
                                                   : Icons
                                                       .receipt_long_outlined),
-                                              label: Text(tr(
-                                                  raw['locked'] == true ? 'pay_security_deposit' : 'view_order'))))),
+                                              label: Text(tr('view_order'))))),
                                 if ((records['data'] as List? ?? []).isEmpty)
                                   Text(tr('no_data_found')),
                                 Row(

@@ -54,25 +54,37 @@ void main() {
     expect(fundingAmountError('21', {'max_amount': 20}), 'finance_above_max');
     expect(fundingAmountError('20', {'max_amount': 20}), isNull);
   });
-  test('financial summary keeps separate insurance credit from legacy payload',
-      () {
+  test('legacy credit fields cannot recreate a removed wallet', () {
     final model = SellerBalanceModel.fromJson({
       'summary': {'order_insurance_credit': '35.5', 'available': 9},
       'financial_summary': {'available': 12, 'operating': '50'},
     });
-    expect(model.summary['order_insurance_credit'], 35.5);
+    expect(model.summary.containsKey('order_insurance_credit'), isFalse);
     expect(model.summary['available'], 12);
     expect(model.summary['operating'], 50);
   });
-  test('transfer choice follows payment channel even with a custom method name', () {
+  test('transfer choice follows payment channel even with a custom method name',
+      () {
     final balance = SellerBalanceModel.fromJson({
       'offline_payment_methods': [
-        {'id': 1, 'method_name': 'حساب التحويل الأول', 'payment_channel': 'wallet'},
-        {'id': 2, 'method_name': 'حساب التحويل الثاني', 'payment_channel': 'instapay'},
+        {
+          'id': 1,
+          'method_name': 'حساب التحويل الأول',
+          'payment_channel': 'wallet'
+        },
+        {
+          'id': 2,
+          'method_name': 'حساب التحويل الثاني',
+          'payment_channel': 'instapay'
+        },
       ],
     });
-    expect(transferMethodForChannel(balance.offlinePaymentMethods, 'wallet')?.id, 1);
-    expect(transferMethodForChannel(balance.offlinePaymentMethods, 'instapay')?.id, 2);
+    expect(
+        transferMethodForChannel(balance.offlinePaymentMethods, 'wallet')?.id,
+        1);
+    expect(
+        transferMethodForChannel(balance.offlinePaymentMethods, 'instapay')?.id,
+        2);
   });
   test('wallet labels have complete Arabic and English translations', () {
     final en =

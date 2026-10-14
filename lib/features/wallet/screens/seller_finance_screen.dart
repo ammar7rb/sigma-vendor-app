@@ -21,13 +21,9 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
   Map<String, dynamic>? data;
   String? error;
   bool loading = false, submitting = false;
-  int securityPage = 1,
-      withdrawalsPage = 1,
-      transactionsPage = 1,
-      depositsPage = 1;
-  bool get isInsurance => widget.initialSection == 'insurance';
+  int withdrawalsPage = 1, transactionsPage = 1, depositsPage = 1;
   bool get isPayments => widget.initialSection == 'operating';
-  bool get isOverview => !isInsurance && !isPayments;
+  bool get isOverview => !isPayments;
   int? methodId;
   final amount = TextEditingController();
   String requestKey = withdrawalRequestKey();
@@ -62,7 +58,6 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
         'deposits_page': depositsPage,
         if (!isOverview) 'wallet_target': widget.initialSection,
         if (isOverview) 'ledger_bucket': 'available',
-        'security_page': securityPage,
         'withdrawals_page': withdrawalsPage
       });
       if (mounted) {
@@ -155,19 +150,12 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
   Widget build(BuildContext context) {
     final summary = data?['financial_summary'] as Map? ?? {};
     final transactions = data?['transactions'] as Map? ?? {};
-    final security = data?['security_deposits'] as Map? ?? {};
-    final totals = security['summary'] as Map? ?? {};
-    final records = security['records'] as Map? ?? {};
     final deposits = data?['deposits'] as Map? ?? {};
     final withdrawals = data?['withdrawals'] as Map? ?? {};
     final methods = data?['withdrawal_methods'] as List? ?? [];
     return Scaffold(
         appBar: VendorFinanceAppBar(
-            title: tr(isInsurance
-                ? 'security_deposit_balance'
-                : isPayments
-                    ? 'payments_balance'
-                    : 'finance_my_wallet')),
+            title: tr(isPayments ? 'payments_balance' : 'finance_my_wallet')),
         body: loading && data == null
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -262,118 +250,33 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                           ])),
                                   const SizedBox(height: 16),
                                 ],
-                                if (!isInsurance)
-                                  FinancePanel(
-                                      onTap: isOverview
-                                          ? () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      const SellerFinanceScreen(
-                                                          initialSection:
-                                                              'operating')))
-                                          : null,
-                                      title: tr('payments_balance'),
-                                      amount: money(summary['operating']),
-                                      hint: tr('payments_balance_hint'),
-                                      child: OutlinedButton(
-                                          onPressed: () => isOverview
-                                              ? Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          const SellerFinanceScreen(
-                                                              initialSection:
-                                                                  'operating')))
-                                              : fund('operating'),
-                                          child: Text(tr(isOverview
-                                              ? 'view_balance_details'
-                                              : 'fund_purchase_balance')))),
+                                FinancePanel(
+                                    onTap: isOverview
+                                        ? () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const SellerFinanceScreen(
+                                                        initialSection:
+                                                            'operating')))
+                                        : null,
+                                    title: tr('payments_balance'),
+                                    amount: money(summary['operating']),
+                                    hint: tr('payments_balance_hint'),
+                                    child: OutlinedButton(
+                                        onPressed: () => isOverview
+                                            ? Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        const SellerFinanceScreen(
+                                                            initialSection:
+                                                                'operating')))
+                                            : fund('operating'),
+                                        child: Text(tr(isOverview
+                                            ? 'view_balance_details'
+                                            : 'fund_purchase_balance')))),
                                 const SizedBox(height: 16),
-                                if (!isPayments)
-                                  FinancePanel(
-                                      onTap: isOverview
-                                          ? () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      const SellerFinanceScreen(
-                                                          initialSection:
-                                                              'insurance')))
-                                          : null,
-                                      title: tr('security_deposit_balance'),
-                                      amount: money(
-                                          summary['order_insurance_credit']),
-                                      hint: tr(
-                                          'order_insurance_credit_purpose_hint'),
-                                      child: OutlinedButton(
-                                          onPressed: () => isOverview
-                                              ? Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          const SellerFinanceScreen(
-                                                              initialSection:
-                                                                  'insurance')))
-                                              : fund('insurance'),
-                                          child: Text(
-                                              tr(isOverview ? 'view_balance_details' : 'fund_insurance_balance')))),
-                                const SizedBox(height: 28),
-                                if (isInsurance) ...[
-                                  FinancePanel(
-                                      title: tr('held_security_total'),
-                                      amount: money(totals['held_total'])),
-                                  const SizedBox(height: 12),
-                                  Text(tr('paid_security_deposits'),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge),
-                                  const SizedBox(height: 12),
-                                  FinancePanel(
-                                      title: tr('total_security_deposits_paid'),
-                                      amount: money(totals['total_paid'])),
-                                  const SizedBox(height: 12),
-                                  FinancePanel(
-                                      title: tr('nearest_return_date'),
-                                      amount: financeDate(
-                                          context, totals['next_return_at']),
-                                      hint:
-                                          '${tr('due_on_nearest_date')}: ${money(totals['next_return_amount'])}'),
-                                  Text(tr('security_returns_hint')),
-                                  const SizedBox(height: 16),
-                                  for (final row in records['data'] as List? ?? [])
-                                    Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12),
-                                        child: FinancePanel(
-                                            title: '${row['reference']}',
-                                            amount: money(row['amount']),
-                                            hint:
-                                                '${financeDate(context, row['return_at'])} · ${tr('deposit_${row['status']}')}',
-                                            child: row['invoice_number'] != null
-                                                ? TextButton.icon(
-                                                    onPressed: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (_) =>
-                                                                VendorInvoiceDocumentScreen(
-                                                                    order:
-                                                                        '${row['order_reference']}'))),
-                                                    icon: const Icon(
-                                                        Icons.receipt_long_outlined),
-                                                    label: Text('${tr('view_invoice')} #${row['invoice_number']}'))
-                                                : null)),
-                                  if ((records['data'] as List? ?? []).isEmpty)
-                                    Text(tr('no_data_found')),
-                                  pager(records, securityPage, () {
-                                    securityPage--;
-                                    load();
-                                  }, () {
-                                    securityPage++;
-                                    load();
-                                  }),
-                                  const SizedBox(height: 28),
-                                ],
                                 Text(tr('wallet_transactions'),
                                     style:
                                         Theme.of(context).textTheme.titleLarge),
@@ -391,8 +294,6 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                         '${row['transaction_number'] ?? 'WLT-${row['id']}'} · ${tr({
                                               'available': 'available_balance',
                                               'operating': 'payments_balance',
-                                              'order_insurance_credit':
-                                                  'security_deposit_balance'
                                             }[row['bucket']] ?? 'balance')}\n${financeDate(context, row['created_at'])}'),
                                     isThreeLine: true,
                                   )),
@@ -419,7 +320,7 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                         child: ListTile(
                                       title: Text(money(row['amount'])),
                                       subtitle: Text(
-                                          '${tr('funding_status_${row['status']}')} · ${tr(row['metadata']?['wallet_target'] == 'insurance' ? 'security_deposit_balance' : 'payments_balance')}\n${row['transaction_number'] ?? (row['metadata']?['wallet_target'] == 'insurance' ? 'AIM${row['id']}' : 'ADM${row['id']}')} · ${row['transaction_reference'] ?? row['payment_request_id'] ?? '—'} · ${financeDate(context, row['created_at'])}${row['rejection_reason'] == null ? '' : '\n${row['rejection_reason']}'}'),
+                                          '${tr('funding_status_${row['status']}')} · ${tr('payments_balance')}\n${row['transaction_number'] ?? 'ADM${row['id']}'} · ${row['transaction_reference'] ?? row['payment_request_id'] ?? '—'} · ${financeDate(context, row['created_at'])}${row['rejection_reason'] == null ? '' : '\n${row['rejection_reason']}'}'),
                                       isThreeLine: true,
                                     )),
                                   if ((deposits['data'] as List? ?? []).isEmpty)

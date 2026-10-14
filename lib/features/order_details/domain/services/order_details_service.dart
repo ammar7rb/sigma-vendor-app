@@ -14,21 +14,6 @@ class OrderDetailsService implements OrderDetailsServiceInterface {
   }
 
   @override
-  Future getSellerOrderInsurance(String orderID) =>
-      orderDetailsRepositoryInterface.getSellerOrderInsurance(orderID);
-
-  @override
-  Future paySellerOrderInsurance(String orderID, String paymentMethod) =>
-      orderDetailsRepositoryInterface.paySellerOrderInsurance(
-          orderID, paymentMethod);
-
-  @override
-  Future submitSellerOrderInsuranceOffline(
-          String orderID, String methodId, String proofPath, String note) =>
-      orderDetailsRepositoryInterface.submitSellerOrderInsuranceOffline(
-          orderID, methodId, proofPath, note);
-
-  @override
   Future respondToShipping(String orderID, String decision, String reason) =>
       orderDetailsRepositoryInterface.respondToShipping(
           orderID, decision, reason);

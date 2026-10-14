@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
+import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/domain/models/add_product_model.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/domain/models/edt_product_model.dart';
@@ -117,6 +119,7 @@ class _AddProductTabViewState extends State<AddProductTabView>
               (getTranslated('seller_product_activation_required', context) ??
                   'Activate your seller account before adding products.'),
           action: _eligibilityAction,
+          onRetry: _checkNewProductEligibility,
         ),
       );
     }
@@ -240,6 +243,33 @@ class _AddProductTabViewState extends State<AddProductTabView>
       return;
     }
 
+    try {
+      final response =
+          await VendorWorkspace.instance.client.get('/api/v3/seller/packages');
+      if (!mounted) return;
+      if (response.data['product_creation_allowed'] != true) {
+        setState(() {
+          _eligibilityReason = Localizations.localeOf(context).languageCode ==
+                  'ar'
+              ? 'يلزم اشتراك سارٍ لإنشاء منتجات جديدة. يمكنك إكمال الطلبات القائمة.'
+              : 'An active subscription is required to create products. Existing orders can still be completed.';
+          _eligibilityAction = 'packages';
+          _canAddNewProduct = false;
+          _eligibilityChecked = true;
+        });
+        return;
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _eligibilityReason =
+            getTranslated('seller_product_eligibility_unavailable', context);
+        _eligibilityAction = 'back';
+        _canAddNewProduct = false;
+        _eligibilityChecked = true;
+      });
+      return;
+    }
     setState(() {
       _eligibilityReason = null;
       _eligibilityAction = null;
@@ -252,8 +282,10 @@ class _AddProductTabViewState extends State<AddProductTabView>
 class _AddProductEligibilityBlocked extends StatelessWidget {
   final String reason;
   final String? action;
+  final VoidCallback? onRetry;
 
-  const _AddProductEligibilityBlocked({required this.reason, this.action});
+  const _AddProductEligibilityBlocked(
+      {required this.reason, this.action, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -268,8 +300,14 @@ class _AddProductEligibilityBlocked extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeDefault),
           if (action != null)
             OutlinedButton.icon(
-              onPressed: () {
-                if (action == 'activation_ticket') {
+              onPressed: () async {
+                if (action == 'packages') {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const SellerPackageScreen()));
+                  if (context.mounted) onRetry?.call();
+                } else if (action == 'activation_ticket') {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -291,6 +329,9 @@ class _AddProductEligibilityBlocked extends StatelessWidget {
 
   String _actionLabel(BuildContext context) {
     return switch (action) {
+      'packages' => Localizations.localeOf(context).languageCode == 'ar'
+          ? 'اختيار باقة'
+          : 'Choose a package',
       'activation_ticket' =>
         getTranslated('complete_seller_activation', context) ??
             'Complete activation',

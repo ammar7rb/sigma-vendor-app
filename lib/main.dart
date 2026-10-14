@@ -141,7 +141,7 @@ Future<void> main() async {
       ChangeNotifierProvider(
           create: (context) => di.sl<EmergencyContactController>()),
       ChangeNotifierProvider(create: (context) => di.sl<CouponController>()),
-      // Makes package and insurance state available to the seller package screen.
+      // Makes package state available to the seller package screen.
       ChangeNotifierProvider(
           create: (context) => di.sl<SellerPackageController>()),
       // Provides the premium search and homepage promotion quotas to their seller-only screen.

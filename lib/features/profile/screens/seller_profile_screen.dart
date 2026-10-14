@@ -174,12 +174,6 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
                           'Due balance',
                       value: _money(balances['available']),
                       onTap: () => _open(const WalletScreen())),
-                  _SummaryCard(
-                      icon: Icons.shield_outlined,
-                      label: getTranslated('order_insurance_credit', context) ??
-                          'Insurance',
-                      value: _money(balances['order_insurance_credit']),
-                      onTap: () => _open(const WalletScreen())),
                 ],
               );
             }),
