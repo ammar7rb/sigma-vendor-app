@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
@@ -12,20 +13,42 @@ class VendorSupportThreadScreen extends StatefulWidget {
 class _SupportThreadState extends State<VendorSupportThreadScreen> {
   Map? data;
   String? error;
+  Timer? _messagePoller;
+  bool _loading = false;
   final reading = <int>{};
   @override
   void initState() {
     super.initState();
     load();
+    _messagePoller = Timer.periodic(const Duration(seconds: 8), (_) {
+      if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+        load();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _messagePoller?.cancel();
+    super.dispose();
   }
 
   Future<void> load() async {
+    if (_loading) return;
+    _loading = true;
     try {
       final r = await VendorWorkspace.instance.client
           .get('/api/v3/seller/inbox/threads/${widget.id}');
-      if (mounted) setState(() => data = r.data);
+      if (mounted) {
+        setState(() {
+          data = r.data;
+          error = null;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => error = financeError(context, e));
+    } finally {
+      _loading = false;
     }
   }
 

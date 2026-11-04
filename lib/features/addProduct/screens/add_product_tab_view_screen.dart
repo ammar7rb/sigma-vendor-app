@@ -1,5 +1,5 @@
+import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
@@ -10,20 +10,22 @@ import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_nex
 import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_screen.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_seo_screen.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/widgets/add_product_tabbar_widget.dart';
-import 'package:sixvalley_vendor_app/features/auth/controllers/auth_controller.dart';
-import 'package:sixvalley_vendor_app/features/auth/screens/seller_activation_ticket_screen.dart';
 import 'package:sixvalley_vendor_app/features/product/domain/models/product_model.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 
 class AddProductTabView extends StatefulWidget {
   final Product? product;
+  final int? slotId;
+  final String? slotReservationToken;
   final AddProductModel? addProduct;
   final EditProductModel? editProduct;
   final bool fromHome;
   const AddProductTabView(
       {super.key,
       this.product,
+      this.slotId,
+      this.slotReservationToken,
       this.addProduct,
       this.editProduct,
       required this.fromHome});
@@ -58,7 +60,7 @@ class _AddProductTabViewState extends State<AddProductTabView>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
 
-    if (widget.product == null) {
+    if (widget.product == null && widget.slotId != null) {
       // Every new-product entry point reaches this screen, so the check cannot be bypassed from another menu.
       Future.microtask(_checkNewProductEligibility);
     } else {
@@ -100,7 +102,23 @@ class _AddProductTabViewState extends State<AddProductTabView>
   }
 
   @override
+  void dispose() {
+    if (widget.product == null && widget.slotId != null) {
+      VendorWorkspace.instance.client.post(
+          '/api/v3/seller/packages/slots/${widget.slotId}/cancel-reservation',
+          data: {
+            'reservation_token': widget.slotReservationToken
+          }).then<void>((_) {}, onError: (Object error, StackTrace stack) {});
+    }
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (widget.product == null && widget.slotId == null) {
+      return const ProductListMenuScreen(showAdvertisingSlots: true);
+    }
     final productTabs = _productTabs(context);
     if (widget.product == null && !_eligibilityChecked) {
       return Scaffold(
@@ -115,9 +133,8 @@ class _AddProductTabViewState extends State<AddProductTabView>
         appBar: CustomAppBarWidget(
             centerTitle: false, title: getTranslated('add_product', context)),
         body: _AddProductEligibilityBlocked(
-          reason: _eligibilityReason ??
-              (getTranslated('seller_product_activation_required', context) ??
-                  'Activate your seller account before adding products.'),
+          reason:
+              _eligibilityReason ?? 'تعذر إضافة المنتج. راجع متطلبات الإعلان.',
           action: _eligibilityAction,
           onRetry: _checkNewProductEligibility,
         ),
@@ -170,6 +187,8 @@ class _AddProductTabViewState extends State<AddProductTabView>
                     onTabChanged: _navigateToTab,
                   ),
                   AddProductSeoScreen(
+                    slotId: widget.slotId,
+                    slotReservationToken: widget.slotReservationToken,
                     unitPrice: productCombinedData?.unitPrice,
                     tax: productCombinedData?.tax,
                     unit: productCombinedData?.unit,
@@ -199,60 +218,16 @@ class _AddProductTabViewState extends State<AddProductTabView>
   }
 
   Future<void> _checkNewProductEligibility() async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    final activationResponse = await authController.loadActivationStatus();
-    if (!mounted) return;
-
-    // Activation is the only account gate. Advertising packages grant paid
-    // placements and never block ordinary product creation or publication.
-    if (activationResponse.response?.statusCode == 200 &&
-        activationResponse.response?.data is Map) {
-      final data =
-          Map<String, dynamic>.from(activationResponse.response!.data as Map);
-      final eligibility =
-          Map<String, dynamic>.from(data['eligibility'] as Map? ?? const {});
-      final nextStep = eligibility['next_step']?.toString();
-      if (nextStep == 'verify_phone' ||
-          nextStep == 'await_activation_ticket' ||
-          nextStep == 'await_admin_approval') {
-        setState(() {
-          _eligibilityReason = nextStep == 'verify_phone'
-              ? (getTranslated(
-                      'seller_product_phone_verification_required', context) ??
-                  'Verify your phone before adding products.')
-              : (getTranslated('seller_product_activation_required', context) ??
-                  'Activate your seller account before adding products.');
-          _eligibilityAction = nextStep == 'await_activation_ticket'
-              ? 'activation_ticket'
-              : 'back';
-          _canAddNewProduct = false;
-          _eligibilityChecked = true;
-        });
-        return;
-      }
-    } else if (authController.getRegistrationReference().isNotEmpty) {
-      // Do not let a temporary API failure turn into a bypass of the first gate.
-      setState(() {
-        _eligibilityReason =
-            getTranslated('seller_product_eligibility_unavailable', context) ??
-                'We could not verify your eligibility. Please try again.';
-        _eligibilityAction = null;
-        _canAddNewProduct = false;
-        _eligibilityChecked = true;
-      });
-      return;
-    }
-
     try {
       final response =
           await VendorWorkspace.instance.client.get('/api/v3/seller/packages');
       if (!mounted) return;
       if (response.data['product_creation_allowed'] != true) {
         setState(() {
-          _eligibilityReason = Localizations.localeOf(context).languageCode ==
-                  'ar'
-              ? 'يلزم اشتراك سارٍ لإنشاء منتجات جديدة. يمكنك إكمال الطلبات القائمة.'
-              : 'An active subscription is required to create products. Existing orders can still be completed.';
+          _eligibilityReason =
+              Localizations.localeOf(context).languageCode == 'ar'
+                  ? 'يلزم اشتراك سارٍ لإنشاء منتجات جديدة.'
+                  : 'An active subscription is required to create products.';
           _eligibilityAction = 'packages';
           _canAddNewProduct = false;
           _eligibilityChecked = true;
@@ -307,19 +282,11 @@ class _AddProductEligibilityBlocked extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (_) => const SellerPackageScreen()));
                   if (context.mounted) onRetry?.call();
-                } else if (action == 'activation_ticket') {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              const SellerActivationTicketScreen()));
                 } else {
                   Navigator.pop(context);
                 }
               },
-              icon: Icon(action == 'activation_ticket'
-                  ? Icons.support_agent_outlined
-                  : Icons.inventory_2_outlined),
+              icon: const Icon(Icons.inventory_2_outlined),
               label: Text(_actionLabel(context)),
             ),
         ]),
@@ -332,9 +299,6 @@ class _AddProductEligibilityBlocked extends StatelessWidget {
       'packages' => Localizations.localeOf(context).languageCode == 'ar'
           ? 'اختيار باقة'
           : 'Choose a package',
-      'activation_ticket' =>
-        getTranslated('complete_seller_activation', context) ??
-            'Complete activation',
       _ => getTranslated('back', context) ?? 'Back',
     };
   }

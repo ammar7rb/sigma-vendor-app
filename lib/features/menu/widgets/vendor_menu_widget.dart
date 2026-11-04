@@ -49,6 +49,8 @@ class MenuBottomSheetWidget extends StatelessWidget {
             _section(context, 'vendor_business_tools', [
               _MenuEntry(Icons.person_outline, 'vendor_account',
                   () => _open(context, const VendorAccountScreen())),
+              _MenuEntry(Icons.campaign_outlined, 'vendor_subscriptions',
+                  () => _open(context, const SellerPackageScreen())),
               _MenuEntry(Icons.receipt_long_outlined, 'vendor_invoices',
                   () => _open(context, const VendorInvoicesScreen())),
               _MenuEntry(
@@ -58,8 +60,6 @@ class MenuBottomSheetWidget extends StatelessWidget {
                       _open(context, const VendorInboxScreen(messages: true))),
               _MenuEntry(Icons.notifications_outlined, 'notification',
                   () => _open(context, const VendorInboxScreen())),
-              _MenuEntry(Icons.campaign_outlined, 'ads_manager',
-                  () => _open(context, const SellerPackageScreen())),
             ]),
             const SizedBox(height: 14),
             Material(

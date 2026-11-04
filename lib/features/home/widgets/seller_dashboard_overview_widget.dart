@@ -1,4 +1,5 @@
-import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_screen.dart';
+import 'package:sixvalley_vendor_app/features/profile/widgets/vendor_account_overview.dart';
+import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_tab_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
@@ -11,9 +12,12 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
   Widget build(BuildContext context) =>
       Consumer<WalletController>(builder: (context, wallet, child) {
         final data = wallet.dashboardOverview;
-        if (data == null) return const SizedBox.shrink();
+        if (data == null) {
+          return const Padding(
+              padding: EdgeInsets.all(16), child: VendorAccountOverview());
+        }
         final sales = data['sales'] as Map? ?? {};
-        final products = data['products'] as Map? ?? {};
+        final capacity = data['account_overview']?['capacity'] as Map? ?? {};
         String tr(String key) => getTranslated(key, context) ?? key;
         void open(Widget screen) =>
             Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
@@ -22,6 +26,8 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const VendorAccountOverview(),
+                  const SizedBox(height: 24),
                   Text(tr('store_overview'),
                       style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 16),
@@ -31,12 +37,12 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                             for (final item in [
                               (
                                 'orders',
-                                sales['orders_count'],
+                                sales['received_orders_count'],
                                 Icons.shopping_bag_outlined
                               ),
                               (
-                                'products',
-                                products['total'],
+                                'phase5_spaces',
+                                capacity['total'],
                                 Icons.inventory_2_outlined
                               ),
                               (
@@ -89,7 +95,7 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                             const SizedBox(height: 20),
                             FilledButton.icon(
                                 onPressed: () => open(
-                                    AddProductScreen(onTabChanged: (_) {})),
+                                    const AddProductTabView(fromHome: true)),
                                 icon: const Icon(Icons.add_box_outlined),
                                 label: Text(tr('add_new_product')))
                           ]))),
@@ -97,7 +103,7 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                   FilledButton.icon(
                       onPressed: () => open(const ProductListMenuScreen()),
                       icon: const Icon(Icons.inventory_2_outlined),
-                      label: Text(tr('manage_products'))),
+                      label: Text(tr('phase5_manage_spaces'))),
                 ]));
       });
 }

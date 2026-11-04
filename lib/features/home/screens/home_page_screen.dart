@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/profile_controller.dart';
 import 'package:sixvalley_vendor_app/utill/images.dart';
 
-import 'package:sixvalley_vendor_app/features/auth/widgets/seller_activation_banner_widget.dart';
 import 'package:sixvalley_vendor_app/features/home/widgets/seller_dashboard_overview_widget.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 
@@ -126,7 +125,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 4),
-                  const SellerActivationBannerWidget(),
                   const SellerDashboardOverviewWidget(),
                   const SizedBox(height: 24),
                 ],

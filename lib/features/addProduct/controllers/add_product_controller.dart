@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/dashboard/screens/dashboard_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -389,8 +390,9 @@ class AddProductController extends ChangeNotifier {
         Navigator.pushAndRemoveUntil(
             Get.context!,
             MaterialPageRoute(
-                builder: (_) =>
-                    const ProductListMenuScreen(fromNotification: true)),
+                builder: (_) => isAdd
+                    ? const DashboardScreen(openAdvertisingSlots: true)
+                    : const ProductListMenuScreen(fromNotification: true)),
             (route) => false);
         showCustomSnackBarWidget(
           isAdd
@@ -662,8 +664,6 @@ class AddProductController extends ChangeNotifier {
     required Product? existingProduct, // For update checks/ For update checks
     required String? youtubeLink,
   }) {
-    bool isUpdate = existingProduct != null;
-
     // 1. Check Titles
     if (titleControllerList.isNotEmpty && titleControllerList[0].text.isEmpty) {
       showCustomSnackBarWidget(
@@ -715,52 +715,6 @@ class AddProductController extends ChangeNotifier {
       showCustomSnackBarWidget(
           getTranslated('product_code_minimum_6_digit', context), context,
           sanckBarType: SnackBarType.warning);
-      return false;
-    }
-
-    // 5. Check Thumbnail
-    bool hasExistingThumbnail = isUpdate &&
-        (existingProduct.thumbnailFullUrl?.path != null &&
-            existingProduct.thumbnailFullUrl?.path != '');
-
-    if (!isUpdate && imageController.selectedLogoFile == null) {
-      showCustomSnackBarWidget(
-          getTranslated('upload_thumbnail_image', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
-    } else if (isUpdate &&
-        imageController.selectedLogoFile == null &&
-        !hasExistingThumbnail) {
-      showCustomSnackBarWidget(
-          getTranslated('upload_thumbnail_image', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
-    }
-
-    // 6. Require five product images. The thumbnail is intentionally not part
-    // of this count because the API stores it separately from product images.
-    bool hasExistingImages = isUpdate &&
-        (existingProduct.imagesFullUrl != null &&
-            existingProduct.imagesFullUrl!.isNotEmpty);
-    final existingImageCount = hasExistingImages
-        ? existingProduct.imagesFullUrl!
-            .where((image) => image.path?.isNotEmpty ?? false)
-            .length
-        : 0;
-    final newColorImageCount = imageController.imagesWithColor
-        .where((image) => image.image != null)
-        .length;
-    final productImageCount = isUpdate
-        ? existingImageCount +
-            imageController.withoutColor.length +
-            newColorImageCount
-        : imageController.withoutColor.length + newColorImageCount;
-    if (productImageCount < 5) {
-      showCustomSnackBarWidget(
-        '${getTranslated('seller_product_minimum_images_required', context)} ($productImageCount/5)',
-        context,
-        sanckBarType: SnackBarType.warning,
-      );
       return false;
     }
 
@@ -958,22 +912,6 @@ class AddProductController extends ChangeNotifier {
       }
     }
 
-    // 3. Color Image Checks
-    bool isColorImageEmpty = false;
-    if (imageController.imagesWithColor.isNotEmpty) {
-      for (int i = 0; i < imageController.imagesWithColor.length; i++) {
-        if (!isUpdate &&
-            imageController.imagesWithColor[i].image == null &&
-            !isColorImageEmpty) {
-          isColorImageEmpty = true;
-        } else if (isUpdate &&
-            imageController.imagesWithColor[i].colorImage?.imageName == null &&
-            !isColorImageEmpty) {
-          isColorImageEmpty = true;
-        }
-      }
-    }
-
     // 4. MAIN VALIDATIONS
     if (unitPrice.isEmpty) {
       showCustomSnackBarWidget(
@@ -1046,14 +984,6 @@ class AddProductController extends ChangeNotifier {
         taxController.selectedTaxList.isEmpty) {
       showCustomSnackBarWidget(
           getTranslated('please_add_your_product_tax', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
-    } else if (!isUpdate &&
-        variationController.attributeList![0].active &&
-        variationController.attributeList![0].variants.isNotEmpty &&
-        isColorImageEmpty) {
-      showCustomSnackBarWidget(
-          getTranslated('upload_product_color_image', context), context,
           sanckBarType: SnackBarType.warning);
       return false;
     }

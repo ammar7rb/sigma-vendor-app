@@ -156,6 +156,7 @@ class ProductModel {
 }
 
 class Product {
+  int? productViewCount;
   int? id;
   String? addedBy;
   int? userId;
@@ -191,6 +192,9 @@ class Product {
   int? status;
   int? requestStatus;
   String? sellerReviewStatus;
+  int? privateReference;
+  bool? advertisingVisible;
+  bool legacySubscriptionExempt = false;
   String? sellerReviewReason;
   String? saleUnitType;
   int? piecesPerUnit;
@@ -344,6 +348,7 @@ class Product {
   }
 
   Product.fromJson(Map<String, dynamic> json, {bool fromGetProducts = false}) {
+    productViewCount = int.tryParse(json['product_view_count']?.toString() ?? '');
     id = json['id'];
     addedBy = json['added_by'];
     userId = json['user_id'];
@@ -425,7 +430,13 @@ class Product {
       }
     }
     deniedNote = json['denied_note'];
-    sellerReviewStatus = json['seller_review_status'];
+    sellerReviewStatus = json['vendor_workspace'] != null
+        ? null : json['seller_review_status'];
+    privateReference = int.tryParse(
+        json['vendor_workspace']?['private_reference']?.toString() ?? '');
+    advertisingVisible = json['vendor_workspace']?['advertising_visible'];
+    legacySubscriptionExempt =
+        json['vendor_workspace']?['legacy_exempt'] == true;
     sellerReviewReason = json['seller_review_reason'];
     categoryReviewRequired = json['category_review_required'] == true ||
         json['category_review_required'] == 1;
@@ -636,6 +647,13 @@ class Product {
     data['denied_note'] = deniedNote;
     data['request_status'] = requestStatus;
     data['seller_review_status'] = sellerReviewStatus;
+    if (privateReference != null) {
+      data['vendor_workspace'] = {
+        'private_reference': privateReference,
+        'advertising_visible': advertisingVisible,
+        'legacy_exempt': legacySubscriptionExempt
+      };
+    }
     data['seller_review_reason'] = sellerReviewReason;
     data['sale_unit_type'] = saleUnitType;
     data['pieces_per_unit'] = piecesPerUnit;

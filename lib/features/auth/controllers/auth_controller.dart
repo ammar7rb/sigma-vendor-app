@@ -1,3 +1,5 @@
+import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
+import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -207,6 +209,8 @@ class AuthController with ChangeNotifier {
   }
 
   Future<bool> clearSharedData({bool fromUnAuthorizationError = false}) async {
+    VendorWorkspace.instance.stop();
+    Provider.of<WalletController>(Get.context!, listen: false).clearAccountOverview();
     _activation = null;
     _activationJustApproved = false;
     await saveRegistrationReference('');

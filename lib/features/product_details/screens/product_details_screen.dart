@@ -1,4 +1,8 @@
+import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/utill/images.dart';
+import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
@@ -87,11 +91,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
                     children: [
-                      _ProductImage(image: product.thumbnailFullUrl?.path),
+                      if (product.privateReference != null)
+                        _VendorWorkspaceNotice(product: product),
+                      ImageFiltered(
+                          imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                          enabled: product.advertisingVisible == false,
+                          child: _ProductImage(
+                              image: product.thumbnailFullUrl?.path)),
                       const SizedBox(height: 12),
                       _ProductHeader(
                         product: product,
                         onStatusChanged: (active) async {
+                          if (active && !product.legacySubscriptionExempt) {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const ProductListMenuScreen(
+                                        showAdvertisingSlots: true)));
+                            return;
+                          }
                           await controller.productStatusOnOff(
                             context,
                             product.id,
@@ -178,7 +196,9 @@ class _ProductImage extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDesign.radiusLarge),
         ),
         clipBehavior: Clip.antiAlias,
-        child: CustomImageWidget(image: image ?? '', fit: BoxFit.contain),
+        child: image?.isNotEmpty == true
+            ? CustomImageWidget(image: image!, fit: BoxFit.contain)
+            : Image.asset(Images.placeholderImage, fit: BoxFit.contain),
       );
 }
 
@@ -190,7 +210,11 @@ class _ProductHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isActive = product.status == 1 || product.requestStatus != 1;
+    final isActive = product.privateReference == null
+        ? product.status == 1 || product.requestStatus != 1
+        : product.status == 1 &&
+            product.requestStatus == 1 &&
+            product.advertisingVisible != false;
     return _SectionCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -200,6 +224,9 @@ class _ProductHeader extends StatelessWidget {
               children: [
                 Text(product.name ?? '',
                     style: robotoBold.copyWith(fontSize: 18)),
+                if (product.productViewCount != null)
+                  Text('${getTranslated('product_views', context) ?? 'Views'}: ${product.productViewCount}',
+                      style: robotoRegular.copyWith(fontSize: 14)),
                 Text(
                   PriceConverter.convertPrice(context, product.unitPrice),
                   style: robotoBold.copyWith(
@@ -213,7 +240,11 @@ class _ProductHeader extends StatelessWidget {
             ),
           ),
           Column(children: [
-            Switch(value: isActive, onChanged: onStatusChanged),
+            Switch(
+                value: isActive,
+                onChanged: product.advertisingVisible == false
+                    ? null
+                    : onStatusChanged),
             Text(
               getTranslated(isActive ? 'active' : 'inactive', context) ?? '',
               style: robotoMedium.copyWith(
@@ -410,6 +441,48 @@ class _Pill extends StatelessWidget {
               : (success ? AppDesign.success : Theme.of(context).primaryColor),
         ),
       ),
+    );
+  }
+}
+
+class _VendorWorkspaceNotice extends StatelessWidget {
+  final Product product;
+  const _VendorWorkspaceNotice({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final ar = Localizations.localeOf(context).languageCode == 'ar';
+    final restricted = product.advertisingVisible == false;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('AD-${product.privateReference}',
+            style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 6),
+        Text(ar
+            ? 'هذه بيانات إعلانك المحفوظة كما أرسلتها.'
+            : 'Your saved advertisement details, exactly as you submitted them.'),
+        if (!restricted)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+                ar ? 'نشط' : 'Active',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          ),
+        if (restricted) ...[
+          const SizedBox(height: 8),
+          Text(
+              ar
+                  ? 'الإعلان غير نشط؛ يلزم اشتراك نشط ومساحة سارية.'
+                  : 'The advertisement is inactive. An active package and valid slot are required.',
+              style: const TextStyle(color: AppDesign.danger)),
+          TextButton(
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const SellerPackageScreen())),
+            child: Text(ar ? 'الاشتراكات' : 'Subscriptions'),
+          ),
+        ],
+      ]),
     );
   }
 }

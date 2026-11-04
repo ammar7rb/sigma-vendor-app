@@ -27,18 +27,45 @@ class WalletController with ChangeNotifier {
   double get availableBalance => _sellerBalance?.summary['available'] ?? 0;
   Map<String, dynamic>? _dashboardOverview;
   Map<String, dynamic>? get dashboardOverview => _dashboardOverview;
+  bool _overviewLoading = false;
+  bool _overviewFailed = false;
+  bool get overviewLoading => _overviewLoading;
+  bool get overviewFailed => _overviewFailed;
+  int _overviewGeneration = 0;
+
+  void clearAccountOverview() {
+    _overviewGeneration++;
+    _dashboardOverview = null;
+    _sellerBalance = null;
+    _overviewLoading = _overviewFailed = false;
+    notifyListeners();
+  }
 
   Future<void> getSellerDashboardOverview() async {
-    final response = await walletServiceInterface.getSellerDashboardOverview();
-    if (response.response != null &&
-        response.response!.statusCode == 200 &&
-        response.response!.data is Map) {
-      _dashboardOverview =
-          Map<String, dynamic>.from(response.response!.data as Map);
-      notifyListeners();
-      return;
+    if (_overviewLoading) return;
+    final generation = _overviewGeneration;
+    _overviewLoading = true;
+    _overviewFailed = false;
+    notifyListeners();
+    try {
+      final response =
+          await walletServiceInterface.getSellerDashboardOverview();
+      if (generation != _overviewGeneration) return;
+      if (response.response?.statusCode == 200 &&
+          response.response?.data is Map) {
+        _dashboardOverview =
+            Map<String, dynamic>.from(response.response!.data as Map);
+      } else {
+        _overviewFailed = true;
+      }
+    } catch (_) {
+      if (generation == _overviewGeneration) _overviewFailed = true;
+    } finally {
+      if (generation == _overviewGeneration) {
+        _overviewLoading = false;
+        notifyListeners();
+      }
     }
-    ApiChecker.checkApi(response);
   }
 
   Future<bool> getSellerBalance([BuildContext? context]) async {

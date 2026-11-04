@@ -51,9 +51,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     } else if (auth.passwordController.text !=
         auth.confirmPasswordController.text) {
       _warning('password_is_mismatch', 'كلمتا المرور غير متطابقتين');
-    } else if (auth.isTermsAndCondition != true) {
-      _warning('terms_and_conditions_must_be_accepted',
-          'يجب الموافقة على الشروط والسياسات');
     } else {
       final model = RegisterModel(
         phone: EgyptPhoneHelper.toInternational(phone),
@@ -220,15 +217,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           focusNode: auth.confirmPasswordNode,
                           textInputAction: TextInputAction.done),
                       const SizedBox(height: 10),
-                      CheckboxListTile(
-                          contentPadding: EdgeInsets.zero,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          value: auth.isTermsAndCondition ?? false,
-                          onChanged: auth.updateTermsAndCondition,
-                          title: Text(
-                              tr('agree_to_terms_privacy_and_confidentiality',
-                                  'أوافق على الشروط وسياسة الخصوصية'),
-                              style: Theme.of(context).textTheme.bodySmall)),
                       RequiredRegistrationPolicyLinks(
                         policies: _displayPolicies(auth),
                       ),

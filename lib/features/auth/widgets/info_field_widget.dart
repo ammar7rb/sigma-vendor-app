@@ -3,23 +3,16 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sixvalley_vendor_app/common/basewidgets/custom_asset_image_widget.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/textfeild/custom_pass_textfeild_widget.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/textfeild/custom_text_feild_widget.dart';
 import 'package:sixvalley_vendor_app/features/auth/widgets/pass_view.dart';
-import 'package:sixvalley_vendor_app/features/shop/controllers/shop_controller.dart';
-import 'package:sixvalley_vendor_app/features/shop/screens/vacation_mode_setup_screen.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/models/business_pages_model.dart';
-import 'package:sixvalley_vendor_app/helper/date_converter.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/features/auth/controllers/auth_controller.dart';
 import 'package:sixvalley_vendor_app/theme/controllers/theme_controller.dart';
 import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/images.dart';
 import 'package:sixvalley_vendor_app/utill/styles.dart';
-import 'package:sixvalley_vendor_app/features/more/screens/html_view_screen.dart';
-
-
 
 class InfoFieldVIewWidget extends StatefulWidget {
   final bool isShopInfo;
@@ -30,7 +23,7 @@ class InfoFieldVIewWidget extends StatefulWidget {
 }
 
 class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
-  String currency = '',  country = '', selectedTimeZone = '';
+  String currency = '', country = '', selectedTimeZone = '';
 
   @override
   void initState() {
@@ -40,90 +33,139 @@ class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
 
     authController.setCountryDialCode('+20');
 
-    authController.validPassCheck(authController.passwordController.text, isUpdate: false);
-    if(authController.passwordController.text.isEmpty && authController.showPassView){
+    authController.validPassCheck(authController.passwordController.text,
+        isUpdate: false);
+    if (authController.passwordController.text.isEmpty &&
+        authController.showPassView) {
       authController.showHidePass(isUpdate: false);
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthController>(
-      builder: (authContext, authProvider, _) {
-        return SingleChildScrollView(
-          child: Column( crossAxisAlignment: CrossAxisAlignment.start, children: [
-              if(!widget.isShopInfo) Column( crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return Consumer<AuthController>(builder: (authContext, authProvider, _) {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!widget.isShopInfo)
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Padding(
                   padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                      border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha:0.04)),
-                      boxShadow: [
-                        BoxShadow(color: Provider.of<ThemeController>(context, listen: false).darkTheme? Theme.of(context).primaryColor.withValues(alpha:0):
-                        Theme.of(context).primaryColor.withValues(alpha:.10),
-                          offset: const Offset(0, 2.0), blurRadius: 4.0,
-                        )
-                      ]
-                    ),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        color: Theme.of(context).cardColor,
+                        borderRadius: const BorderRadius.all(
+                            Radius.circular(Dimensions.paddingEye)),
+                        border: Border.all(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.04)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Provider.of<ThemeController>(context,
+                                        listen: false)
+                                    .darkTheme
+                                ? Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0)
+                                : Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: .10),
+                            offset: const Offset(0, 2.0),
+                            blurRadius: 4.0,
+                          )
+                        ]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         const SizedBox(height: Dimensions.paddingSizeSmall),
                         Align(
-                          alignment: Alignment.center,
-                          child: Text(getTranslated('create_an_account', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color))
-                        ),
+                            alignment: Alignment.center,
+                            child: Text(
+                                getTranslated('create_an_account', context)!,
+                                style: robotoMedium.copyWith(
+                                    fontSize: Dimensions.fontSizeLarge,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color))),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                        Divider(color: Theme.of(context).primaryColor.withValues(alpha:0.04), height: 0, indent: 0, thickness: 1),
+                        Divider(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.04),
+                            height: 0,
+                            indent: 0,
+                            thickness: 1),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
-
-
                         Container(
-                          margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall, bottom: Dimensions.paddingSizeSmall),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(getTranslated('email', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
-                              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                              CustomTextFieldWidget(
-                                border: true,
-                                hintText: getTranslated('email_hint', context),
-                                focusNode: authProvider.emailNode,
-                                nextNode: authProvider.phoneNode,
-                                textInputType: TextInputType.emailAddress,
-                                controller: authProvider.emailController,
-                                textInputAction: TextInputAction.next,
-                              )
-                            ],
-                          )
-                        ),
-                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
+                            margin: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall,
+                                bottom: Dimensions.paddingSizeSmall),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(getTranslated('email', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeSmall),
+                                CustomTextFieldWidget(
+                                  border: true,
+                                  hintText:
+                                      getTranslated('email_hint', context),
+                                  focusNode: authProvider.emailNode,
+                                  nextNode: authProvider.phoneNode,
+                                  textInputType: TextInputType.emailAddress,
+                                  controller: authProvider.emailController,
+                                  textInputAction: TextInputAction.next,
+                                )
+                              ],
+                            )),
+                        const SizedBox(
+                            height: Dimensions.paddingSizeExtraSmall),
                         Padding(
-                          padding: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall),
-                          child: Text(getTranslated('phone', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault))),
+                            padding: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall),
+                            child: Text(getTranslated('phone', context)!,
+                                style: robotoRegular.copyWith(
+                                    fontSize: Dimensions.fontSizeDefault))),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
                         Container(
                           decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Theme.of(context).hintColor.withValues(alpha:.35)),
+                            border: Border.all(
+                                width: 1,
+                                color: Theme.of(context)
+                                    .hintColor
+                                    .withValues(alpha: .35)),
                             color: Theme.of(context).highlightColor,
-                            borderRadius: BorderRadius.circular(Dimensions.paddingSizeExtraSmall),
+                            borderRadius: BorderRadius.circular(
+                                Dimensions.paddingSizeExtraSmall),
                           ),
-                          margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall),
+                          margin: const EdgeInsets.only(
+                              left: Dimensions.paddingSizeSmall,
+                              right: Dimensions.paddingSizeSmall),
                           child: Row(children: [
                             Container(
                               height: 56,
                               alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Theme.of(context).hintColor.withValues(alpha: .35)),
-                                borderRadius: BorderRadius.circular(Dimensions.paddingSizeExtraSmall),
+                                border: Border.all(
+                                    color: Theme.of(context)
+                                        .hintColor
+                                        .withValues(alpha: .35)),
+                                borderRadius: BorderRadius.circular(
+                                    Dimensions.paddingSizeExtraSmall),
                               ),
                               child: const Text('+20'),
                             ),
-
-                            Expanded(child: CustomTextFieldWidget(
+                            Expanded(
+                                child: CustomTextFieldWidget(
                               hintText: getTranslated('mobile_hint', context),
                               controller: authProvider.phoneController,
                               focusNode: authProvider.phoneNode,
@@ -137,64 +179,86 @@ class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
                           ]),
                         ),
                         const SizedBox(height: Dimensions.paddingSizeMedium),
-
-                        Container(margin: EdgeInsets.only(left: Dimensions.paddingSizeSmall,
-                          right: Dimensions.paddingSizeSmall, bottom: authProvider.showPassView ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeDefault),
-                          child: Column( crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text(getTranslated('new_password', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
-                              const SizedBox(height: Dimensions.paddingSizeMedium),
+                        Container(
+                          margin: EdgeInsets.only(
+                              left: Dimensions.paddingSizeSmall,
+                              right: Dimensions.paddingSizeSmall,
+                              bottom: authProvider.showPassView
+                                  ? Dimensions.paddingSizeExtraSmall
+                                  : Dimensions.paddingSizeDefault),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(getTranslated('new_password', context)!,
+                                  style: robotoRegular.copyWith(
+                                      fontSize: Dimensions.fontSizeDefault)),
+                              const SizedBox(
+                                  height: Dimensions.paddingSizeMedium),
                               CustomPasswordTextFieldWidget(
-                                border: true,
-                                hintTxt: getTranslated('enter_your_password', context),
-                                textInputAction: TextInputAction.next,
-                                focusNode: authProvider.passwordNode,
-                                nextNode: authProvider.confirmPasswordNode,
-                                controller: authProvider.passwordController,
-                                onChanged: (value) {
-                                  if(value != null && value.isNotEmpty){
-                                    if(!authProvider.showPassView){
-                                      authProvider.showHidePass();
+                                  border: true,
+                                  hintTxt: getTranslated(
+                                      'enter_your_password', context),
+                                  textInputAction: TextInputAction.next,
+                                  focusNode: authProvider.passwordNode,
+                                  nextNode: authProvider.confirmPasswordNode,
+                                  controller: authProvider.passwordController,
+                                  onChanged: (value) {
+                                    if (value != null && value.isNotEmpty) {
+                                      if (!authProvider.showPassView) {
+                                        authProvider.showHidePass();
+                                      }
+                                      authProvider.validPassCheck(value);
+                                    } else {
+                                      if (authProvider.showPassView) {
+                                        authProvider.showHidePass();
+                                      }
                                     }
-                                    authProvider.validPassCheck(value);
-                                  }else{
-                                    if(authProvider.showPassView){
-                                      authProvider.showHidePass();
-                                    }
-                                  }
-                                }
-                            )
+                                  })
                             ],
                           ),
                         ),
-
-                        authProvider.showPassView ? const Padding(
-                          padding:  EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall),
-                          child: PassView()) : const SizedBox(),
-                        authProvider.showPassView ? const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
-
-                        Container(margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall,
-                          right: Dimensions.paddingSizeSmall, bottom: Dimensions.paddingSizeDefault),
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(getTranslated('confirm_password', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
-                            const SizedBox(height: Dimensions.paddingSizeMedium),
-                            CustomPasswordTextFieldWidget(
-                              border: true,
-                              hintTxt: getTranslated('confirm_password', context),
-                              textInputAction: TextInputAction.done,
-                              focusNode: authProvider.confirmPasswordNode,
-                              controller: authProvider.confirmPasswordController,
-                            ),
-                          ],
-                          )
-                        ),
+                        authProvider.showPassView
+                            ? const Padding(
+                                padding: EdgeInsets.only(
+                                    left: Dimensions.paddingSizeSmall,
+                                    right: Dimensions.paddingSizeSmall),
+                                child: PassView())
+                            : const SizedBox(),
+                        authProvider.showPassView
+                            ? const SizedBox(
+                                height: Dimensions.paddingSizeSmall)
+                            : const SizedBox(),
+                        Container(
+                            margin: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall,
+                                bottom: Dimensions.paddingSizeDefault),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    getTranslated('confirm_password', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeMedium),
+                                CustomPasswordTextFieldWidget(
+                                  border: true,
+                                  hintTxt: getTranslated(
+                                      'confirm_password', context),
+                                  textInputAction: TextInputAction.done,
+                                  focusNode: authProvider.confirmPasswordNode,
+                                  controller:
+                                      authProvider.confirmPasswordController,
+                                ),
+                              ],
+                            )),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
                         const SizedBox(height: 100),
                       ],
                     ),
                   ),
                 ),
-
-
 
                 // Padding( padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
                 //   child: Align(alignment: Alignment.center, child:
@@ -345,52 +409,80 @@ class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
                 //       controller: authProvider.confirmPasswordController,
                 //     )),
                 // const SizedBox(height: Dimensions.paddingSizeSmall),
-
               ]),
-
-
-              if(widget.isShopInfo)
+            if (widget.isShopInfo)
               Column(children: [
                 Padding(
                   padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                      border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha:0.04)),
-                      boxShadow: [
-                        BoxShadow(color: Provider.of<ThemeController>(context, listen: false).darkTheme? Theme.of(context).primaryColor.withValues(alpha:0):
-                        Theme.of(context).primaryColor.withValues(alpha:.10),
-                          offset: const Offset(0, 2.0), blurRadius: 4.0,
-                        )
-                      ]
-                    ),
-                    child: Column( crossAxisAlignment: CrossAxisAlignment.start,children: [
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(getTranslated('create_an_account', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color ))
-                      ),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                      Divider(color: Theme.of(context).primaryColor.withValues(alpha:0.04), height: 0, indent: 0, thickness: 1),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                      Padding(
-                        padding: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall),
-                        child: Text(getTranslated('seller_information', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge))),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                      Container(
-                          margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                          bottom: Dimensions.paddingSizeSmall),
+                        color: Theme.of(context).cardColor,
+                        borderRadius: const BorderRadius.all(
+                            Radius.circular(Dimensions.paddingEye)),
+                        border: Border.all(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.04)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Provider.of<ThemeController>(context,
+                                        listen: false)
+                                    .darkTheme
+                                ? Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0)
+                                : Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: .10),
+                            offset: const Offset(0, 2.0),
+                            blurRadius: 4.0,
+                          )
+                        ]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                                getTranslated('create_an_account', context)!,
+                                style: robotoMedium.copyWith(
+                                    fontSize: Dimensions.fontSizeLarge,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.color))),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Divider(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.04),
+                            height: 0,
+                            indent: 0,
+                            thickness: 1),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Padding(
+                            padding: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall),
+                            child: Text(
+                                getTranslated('seller_information', context)!,
+                                style: robotoRegular.copyWith(
+                                    fontSize: Dimensions.fontSizeLarge))),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Container(
+                          margin: const EdgeInsets.only(
+                              left: Dimensions.paddingSizeSmall,
+                              right: Dimensions.paddingSizeSmall,
+                              bottom: Dimensions.paddingSizeSmall),
                           child: Column(
                             children: [
-                              TitleWidget(title: getTranslated('first_name', context)!),
-
+                              TitleWidget(
+                                  title: getTranslated('first_name', context)!),
                               CustomTextFieldWidget(
                                 border: true,
-                                hintText: getTranslated('first_name_hint', context),
+                                hintText:
+                                    getTranslated('first_name_hint', context),
                                 focusNode: authProvider.firstNameNode,
                                 nextNode: authProvider.lastNameNode,
                                 textInputType: TextInputType.name,
@@ -399,365 +491,628 @@ class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
                               )
                             ],
                           ),
-                      ),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                      Container(
-                        margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                        bottom: Dimensions.paddingSizeSmall),
-                        child: Column(
-                          children: [
-                            TitleWidget(title: getTranslated('last_name', context)!),
-
-                            CustomTextFieldWidget(
-                              border: true,
-                              hintText: getTranslated('last_name_hint', context),
-                              focusNode: authProvider.lastNameNode,
-                              nextNode: authProvider.emailNode,
-                              textInputType: TextInputType.name,
-                              controller: authProvider.lastNameController,
-                              textInputAction: TextInputAction.next,
-                            )
-                          ],
-                        )),
-
+                        ),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        Container(
+                            margin: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall,
+                                bottom: Dimensions.paddingSizeSmall),
+                            child: Column(
+                              children: [
+                                TitleWidget(
+                                    title:
+                                        getTranslated('last_name', context)!),
+                                CustomTextFieldWidget(
+                                  border: true,
+                                  hintText:
+                                      getTranslated('last_name_hint', context),
+                                  focusNode: authProvider.lastNameNode,
+                                  nextNode: authProvider.emailNode,
+                                  textInputType: TextInputType.name,
+                                  controller: authProvider.lastNameController,
+                                  textInputAction: TextInputAction.next,
+                                )
+                              ],
+                            )),
                         Padding(
-                          padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                          padding:
+                              const EdgeInsets.all(Dimensions.paddingSizeSmall),
                           child: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardColor,
-                              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                              border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha:0.04)),
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(Dimensions.paddingEye)),
+                              border: Border.all(
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withValues(alpha: 0.04)),
                             ),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-
-                                Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                                  child: Align(alignment: Alignment.center, child:
-                                    DottedBorder(
-                                      options: RoundedRectDottedBorderOptions(
-                                        color: Theme.of(context).hintColor,
-                                        dashPattern: const [5,5],
-                                        radius: const Radius.circular(Dimensions.paddingSizeSmall),
-                                      ),
-                                      child: Stack(children: [
-                                       ClipRRect(
-                                          borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                         child: authProvider.sellerProfileImage != null ?  Image.file(File(authProvider.sellerProfileImage!.path),
-                                          width: 150, height: 150, fit: BoxFit.cover,
-                                         ) :SizedBox(height: 150, width: 150,
-                                          child: Center(
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center, children: [
-                                                Image.asset(Images.uploadImageIcon,scale: 3),
-                                                const SizedBox(height: Dimensions.paddingSizeSmall),
-                                                Text(getTranslated('upload_file', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor))
-                                              ]
-                                            ),
-                                          ),
-                                        )),
-                                        Positioned( bottom: 0, right: 0, top: 0, left: 0,
-                                         child: InkWell(
-                                          onTap: () => authProvider.pickImage(true,false, false),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context).hintColor.withValues(alpha:.08),
-                                              borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                            ),
-                                          ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: Dimensions.paddingSizeSmall),
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: DottedBorder(
+                                        options: RoundedRectDottedBorderOptions(
+                                          color: Theme.of(context).hintColor,
+                                          dashPattern: const [5, 5],
+                                          radius: const Radius.circular(
+                                              Dimensions.paddingSizeSmall),
                                         ),
-                                      ),
-                                    ]),
-                                  )),
+                                        child: Stack(children: [
+                                          ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Dimensions
+                                                          .paddingSizeSmall),
+                                              child: authProvider
+                                                          .sellerProfileImage !=
+                                                      null
+                                                  ? Image.file(
+                                                      File(authProvider
+                                                          .sellerProfileImage!
+                                                          .path),
+                                                      width: 150,
+                                                      height: 150,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : SizedBox(
+                                                      height: 150,
+                                                      width: 150,
+                                                      child: Center(
+                                                        child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Image.asset(
+                                                                  Images
+                                                                      .uploadImageIcon,
+                                                                  scale: 3),
+                                                              const SizedBox(
+                                                                  height: Dimensions
+                                                                      .paddingSizeSmall),
+                                                              Text(
+                                                                  getTranslated(
+                                                                      'upload_file',
+                                                                      context)!,
+                                                                  style: robotoMedium.copyWith(
+                                                                      fontSize:
+                                                                          Dimensions
+                                                                              .fontSizeSmall,
+                                                                      color: Theme.of(
+                                                                              context)
+                                                                          .hintColor))
+                                                            ]),
+                                                      ),
+                                                    )),
+                                          Positioned(
+                                            bottom: 0,
+                                            right: 0,
+                                            top: 0,
+                                            left: 0,
+                                            child: InkWell(
+                                              onTap: () =>
+                                                  authProvider.pickImage(
+                                                      true, false, false),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context)
+                                                      .hintColor
+                                                      .withValues(alpha: .08),
+                                                  borderRadius: BorderRadius
+                                                      .circular(Dimensions
+                                                          .paddingSizeSmall),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                      )),
                                 ),
-                                const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                                Text(getTranslated('store_logo', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge,  color: Theme.of(context).textTheme.bodyLarge?.color)),
-                                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                                Text(getTranslated('image_ratio', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).hintColor)),
-                                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                                Text(getTranslated('image_size_2_mb', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,  color: Theme.of(context).hintColor)),
-                                const SizedBox(height: Dimensions.paddingSizeDefault),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeSmall),
+                                Text(getTranslated('store_logo', context)!,
+                                    style: robotoMedium.copyWith(
+                                        fontSize: Dimensions.fontSizeLarge,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeExtraSmall),
+                                Text(getTranslated('image_ratio', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault,
+                                        color: Theme.of(context).hintColor)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeExtraSmall),
+                                Text(getTranslated('image_size_2_mb', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault,
+                                        color: Theme.of(context).hintColor)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeDefault),
                               ],
                             ),
                           ),
                         ),
-
-                        Divider(color: Theme.of(context).primaryColor.withValues(alpha:0.04), height: 0, indent: 0, thickness: 1),
+                        Divider(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.04),
+                            height: 0,
+                            indent: 0,
+                            thickness: 1),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
-
-
-                        Container(margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                          bottom: Dimensions.paddingSizeSmall,top: Dimensions.paddingSizeSmall),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TitleWidget(title: getTranslated('shop_name', context)!),
-                              CustomTextFieldWidget(
-                                border: true,
-                                hintText: getTranslated('store_name_hint', context),
-                                focusNode: authProvider.shopNameNode,
-                                nextNode: authProvider.shopAddressNode,
-                                textInputType: TextInputType.name,
-                                controller: authProvider.shopNameController,
-                                textInputAction: TextInputAction.next,
-                              )
-                            ],
-                          )
-                        ),
+                        Container(
+                            margin: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall,
+                                bottom: Dimensions.paddingSizeSmall,
+                                top: Dimensions.paddingSizeSmall),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TitleWidget(
+                                    title:
+                                        getTranslated('shop_name', context)!),
+                                CustomTextFieldWidget(
+                                  border: true,
+                                  hintText:
+                                      getTranslated('store_name_hint', context),
+                                  focusNode: authProvider.shopNameNode,
+                                  nextNode: authProvider.shopAddressNode,
+                                  textInputType: TextInputType.name,
+                                  controller: authProvider.shopNameController,
+                                  textInputAction: TextInputAction.next,
+                                )
+                              ],
+                            )),
                         const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                        Container(margin: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                          bottom: Dimensions.paddingSizeSmall),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TitleWidget(title: getTranslated('shop_address', context)!),
-                              CustomTextFieldWidget(
-                                border: true,
-                                hintText: getTranslated('address_hint', context),
-                                focusNode: authProvider.shopAddressNode,
-                                textInputType: TextInputType.name,
-                                controller: authProvider.shopAddressController,
-                                textInputAction: TextInputAction.done,
-                              )
-                            ],
-                          )
-                        ),
+                        Container(
+                            margin: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeSmall,
+                                right: Dimensions.paddingSizeSmall,
+                                bottom: Dimensions.paddingSizeSmall),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TitleWidget(
+                                    title: getTranslated(
+                                        'shop_address', context)!),
+                                CustomTextFieldWidget(
+                                  border: true,
+                                  hintText:
+                                      getTranslated('address_hint', context),
+                                  focusNode: authProvider.shopAddressNode,
+                                  textInputType: TextInputType.name,
+                                  controller:
+                                      authProvider.shopAddressController,
+                                  textInputAction: TextInputAction.done,
+                                )
+                              ],
+                            )),
                         const SizedBox(height: Dimensions.paddingSizeDefault),
-
                         Padding(
-                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                            border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha:0.04)),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-
-                              Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                                child: Align(alignment: Alignment.center, child:
-                                  DottedBorder(
-                                    options: RoundedRectDottedBorderOptions(
-                                      color: Theme.of(context).hintColor,
-                                      dashPattern: const [5,5],
-                                      radius: const Radius.circular(Dimensions.paddingSizeSmall),
-                                    ),
-                                    child: Stack(children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                        child: authProvider.shopLogo != null ?  Image.file(File(authProvider.shopLogo!.path),
-                                          width: 150, height: 150, fit: BoxFit.cover,
-                                        ) : SizedBox(height: 150, width: 150,
-                                          child: Center(
-                                            child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center, children: [
-                                              Image.asset(Images.uploadImageIcon,scale: 3),
-                                              const SizedBox(height: Dimensions.paddingSizeSmall),
-                                              Text(getTranslated('upload_file', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor))
-                                            ]
-                                          )),
-                                        )
-                                      ),
-                                      Positioned(
-                                        bottom: 0, right: 0, top: 0, left: 0,
-                                        child: InkWell(
-                                          onTap: () => authProvider.pickImage(false,true, false),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context).hintColor.withValues(alpha:.08),
-                                              borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+                          padding:
+                              const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(Dimensions.paddingEye)),
+                              border: Border.all(
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withValues(alpha: 0.04)),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: Dimensions.paddingSizeSmall),
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: DottedBorder(
+                                        options: RoundedRectDottedBorderOptions(
+                                          color: Theme.of(context).hintColor,
+                                          dashPattern: const [5, 5],
+                                          radius: const Radius.circular(
+                                              Dimensions.paddingSizeSmall),
+                                        ),
+                                        child: Stack(children: [
+                                          ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      Dimensions
+                                                          .paddingSizeSmall),
+                                              child:
+                                                  authProvider.shopLogo != null
+                                                      ? Image.file(
+                                                          File(authProvider
+                                                              .shopLogo!.path),
+                                                          width: 150,
+                                                          height: 150,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : SizedBox(
+                                                          height: 150,
+                                                          width: 150,
+                                                          child: Center(
+                                                              child: Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                Image.asset(
+                                                                    Images
+                                                                        .uploadImageIcon,
+                                                                    scale: 3),
+                                                                const SizedBox(
+                                                                    height: Dimensions
+                                                                        .paddingSizeSmall),
+                                                                Text(
+                                                                    getTranslated(
+                                                                        'upload_file',
+                                                                        context)!,
+                                                                    style: robotoMedium.copyWith(
+                                                                        fontSize:
+                                                                            Dimensions
+                                                                                .fontSizeSmall,
+                                                                        color: Theme.of(context)
+                                                                            .hintColor))
+                                                              ])),
+                                                        )),
+                                          Positioned(
+                                            bottom: 0,
+                                            right: 0,
+                                            top: 0,
+                                            left: 0,
+                                            child: InkWell(
+                                              onTap: () =>
+                                                  authProvider.pickImage(
+                                                      false, true, false),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context)
+                                                      .hintColor
+                                                      .withValues(alpha: .08),
+                                                  borderRadius: BorderRadius
+                                                      .circular(Dimensions
+                                                          .paddingSizeSmall),
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ]),
-                                  )
+                                        ]),
+                                      )),
                                 ),
-                              ),
-                              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                              Text(getTranslated('store_image', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color)),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(getTranslated('image_ratio', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).hintColor)),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(getTranslated('image_size_2_mb', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,  color: Theme.of(context).hintColor)),
-                              const SizedBox(height: Dimensions.paddingSizeDefault),
-                            ],
-                          ),
-                        ),
-                      ),
-
-
-                      Padding(
-                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                            border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha:0.04)),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                                child: Align(alignment: Alignment.center, child: Align(alignment: Alignment.center,
-                                  child: DottedBorder(
-                                    options: RoundedRectDottedBorderOptions(
-                                      dashPattern: const [10,5],
-                                      color: Theme.of(context).hintColor,
-                                      radius: const Radius.circular(Dimensions.paddingSizeSmall),
-                                  ),
-
-                                  child: Stack(children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                      child: authProvider.shopBanner != null ?  Image.file(File(authProvider.shopBanner!.path),
-                                        width: MediaQuery.of(context).size.width - 40, height: 120, fit: BoxFit.cover,
-                                      ) :SizedBox(height: 120,
-                                        child: Center(
-                                            child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center, children: [
-                                              Image.asset(Images.uploadImageIcon,scale: 3),
-                                              const SizedBox(height: Dimensions.paddingSizeSmall),
-                                              Text(getTranslated('upload_file', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor))
-                                            ]
-                                            )),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: 0, right: 0, top: 0, left: 0,
-                                      child: InkWell(
-                                          onTap: () => authProvider.pickImage(false,false, false),
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Theme.of(context).hintColor.withValues(alpha:0.08),
-                                                  borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall)))),
-                                    ),
-                                  ]),
-                                ))
-                                ),
-                              ),
-                              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                              Text(getTranslated('store_banner', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color)),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(getTranslated('image_ratio3', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).hintColor)),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(getTranslated('image_size_2_mb', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,  color: Theme.of(context).hintColor)),
-                              const SizedBox(height: Dimensions.paddingSizeDefault),
-                            ],
-                          ),
-                        ),
-                      ),
-
-
-                      Provider.of<SplashController>(context,listen: false).configModel!.activeTheme != "default" ?
-                      Padding(
-                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
-                            border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha:0.04)),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                                child: Align(alignment: Alignment.center, child: DottedBorder(
-                                  options: RoundedRectDottedBorderOptions(
-                                    color: Theme.of(context).hintColor,
-                                    dashPattern: const [5,5],
-                                    radius: const Radius.circular(Dimensions.paddingSizeSmall),
-                                  ),
-                                  child: Stack(children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                      child: authProvider.secondaryBanner != null ?  Image.file(File(authProvider.secondaryBanner!.path),
-                                        width: MediaQuery.of(context).size.width - 40, height: 120, fit: BoxFit.cover,
-                                      ) : SizedBox(height: 120,
-                                        child: Center(
-                                            child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center, children: [
-                                              Image.asset(Images.uploadImageIcon,scale: 3),
-                                              const SizedBox(height: Dimensions.paddingSizeSmall),
-                                              Text(getTranslated('upload_file', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor))
-                                            ]
-                                            )),
-                                      )
-                                    ),
-                                    Positioned(
-                                      bottom: 0, right: 0, top: 0, left: 0,
-                                      child: InkWell(
-                                          onTap: () => authProvider.pickImage(false,false, false, secondary: true),
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Theme.of(context).hintColor.withValues(alpha:0.08),
-                                                  borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall)))),
-                                    ),
-                                  ]),
-                                ))
-                              ),
-                              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                              Text(getTranslated('secondary_banner', context)!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color)),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(getTranslated('image_ratio3', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).hintColor)),
-                              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                              Text(getTranslated('image_size_2_mb', context)!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,  color: Theme.of(context).hintColor)),
-                              const SizedBox(height: Dimensions.paddingSizeDefault),
-                            ],
-                          ),
-                        ),
-                      ) : const SizedBox(),
-
-
-                      Container(
-                        margin: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [Row(children: [
-                            Consumer<AuthController>(
-                              builder: (context, authProvider, child) => Checkbox(
-                                checkColor: Theme.of(context).colorScheme.secondaryContainer,
-                                activeColor: Theme.of(context).primaryColor,
-                                value: authProvider.isTermsAndCondition,
-                                onChanged: authProvider.updateTermsAndCondition)),
-
-                            Consumer<SplashController>(
-                              builder: (context, splashController, _) {
-                                return InkWell(onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (_) => HtmlViewScreen(
-                                    page : getPageBySlug('terms-and-conditions', splashController.defaultBusinessPages),
-                                  )));
-                                },
-                                    child: Row(children: [
-                                      Text(getTranslated('i_agree_to_your', context)!, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),),
-                                      const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                      Text(getTranslated('terms_and_condition', context)!,style: robotoMedium),
-                                    ]));
-                              }
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeSmall),
+                                Text(getTranslated('store_image', context)!,
+                                    style: robotoMedium.copyWith(
+                                        fontSize: Dimensions.fontSizeLarge,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeExtraSmall),
+                                Text(getTranslated('image_ratio', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault,
+                                        color: Theme.of(context).hintColor)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeExtraSmall),
+                                Text(getTranslated('image_size_2_mb', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault,
+                                        color: Theme.of(context).hintColor)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeDefault),
+                              ],
                             ),
-                          ],),
-                          ],
+                          ),
                         ),
-                      ),
-
+                        Padding(
+                          padding:
+                              const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(Dimensions.paddingEye)),
+                              border: Border.all(
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withValues(alpha: 0.04)),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: Dimensions.paddingSizeSmall),
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: Align(
+                                          alignment: Alignment.center,
+                                          child: DottedBorder(
+                                            options:
+                                                RoundedRectDottedBorderOptions(
+                                              dashPattern: const [10, 5],
+                                              color:
+                                                  Theme.of(context).hintColor,
+                                              radius: const Radius.circular(
+                                                  Dimensions.paddingSizeSmall),
+                                            ),
+                                            child: Stack(children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        Dimensions
+                                                            .paddingSizeSmall),
+                                                child:
+                                                    authProvider.shopBanner !=
+                                                            null
+                                                        ? Image.file(
+                                                            File(authProvider
+                                                                .shopBanner!
+                                                                .path),
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width -
+                                                                40,
+                                                            height: 120,
+                                                            fit: BoxFit.cover,
+                                                          )
+                                                        : SizedBox(
+                                                            height: 120,
+                                                            child: Center(
+                                                                child: Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                  Image.asset(
+                                                                      Images
+                                                                          .uploadImageIcon,
+                                                                      scale: 3),
+                                                                  const SizedBox(
+                                                                      height: Dimensions
+                                                                          .paddingSizeSmall),
+                                                                  Text(
+                                                                      getTranslated(
+                                                                          'upload_file',
+                                                                          context)!,
+                                                                      style: robotoMedium.copyWith(
+                                                                          fontSize: Dimensions
+                                                                              .fontSizeSmall,
+                                                                          color:
+                                                                              Theme.of(context).hintColor))
+                                                                ])),
+                                                          ),
+                                              ),
+                                              Positioned(
+                                                bottom: 0,
+                                                right: 0,
+                                                top: 0,
+                                                left: 0,
+                                                child: InkWell(
+                                                    onTap: () =>
+                                                        authProvider.pickImage(
+                                                            false,
+                                                            false,
+                                                            false),
+                                                    child: Container(
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                                Theme.of(context)
+                                                                    .hintColor
+                                                                    .withValues(
+                                                                        alpha:
+                                                                            0.08),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                    Dimensions
+                                                                        .paddingSizeSmall)))),
+                                              ),
+                                            ]),
+                                          ))),
+                                ),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeSmall),
+                                Text(getTranslated('store_banner', context)!,
+                                    style: robotoMedium.copyWith(
+                                        fontSize: Dimensions.fontSizeLarge,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeExtraSmall),
+                                Text(getTranslated('image_ratio3', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault,
+                                        color: Theme.of(context).hintColor)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeExtraSmall),
+                                Text(getTranslated('image_size_2_mb', context)!,
+                                    style: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeDefault,
+                                        color: Theme.of(context).hintColor)),
+                                const SizedBox(
+                                    height: Dimensions.paddingSizeDefault),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Provider.of<SplashController>(context, listen: false)
+                                    .configModel!
+                                    .activeTheme !=
+                                "default"
+                            ? Padding(
+                                padding: const EdgeInsets.all(
+                                    Dimensions.paddingSizeSmall),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(Dimensions.paddingEye)),
+                                    border: Border.all(
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withValues(alpha: 0.04)),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical:
+                                                  Dimensions.paddingSizeSmall),
+                                          child: Align(
+                                              alignment: Alignment.center,
+                                              child: DottedBorder(
+                                                options:
+                                                    RoundedRectDottedBorderOptions(
+                                                  color: Theme.of(context)
+                                                      .hintColor,
+                                                  dashPattern: const [5, 5],
+                                                  radius: const Radius.circular(
+                                                      Dimensions
+                                                          .paddingSizeSmall),
+                                                ),
+                                                child: Stack(children: [
+                                                  ClipRRect(
+                                                      borderRadius: BorderRadius
+                                                          .circular(Dimensions
+                                                              .paddingSizeSmall),
+                                                      child: authProvider
+                                                                  .secondaryBanner !=
+                                                              null
+                                                          ? Image.file(
+                                                              File(authProvider
+                                                                  .secondaryBanner!
+                                                                  .path),
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width -
+                                                                  40,
+                                                              height: 120,
+                                                              fit: BoxFit.cover,
+                                                            )
+                                                          : SizedBox(
+                                                              height: 120,
+                                                              child: Center(
+                                                                  child: Column(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                    Image.asset(
+                                                                        Images
+                                                                            .uploadImageIcon,
+                                                                        scale:
+                                                                            3),
+                                                                    const SizedBox(
+                                                                        height:
+                                                                            Dimensions.paddingSizeSmall),
+                                                                    Text(
+                                                                        getTranslated(
+                                                                            'upload_file',
+                                                                            context)!,
+                                                                        style: robotoMedium.copyWith(
+                                                                            fontSize:
+                                                                                Dimensions.fontSizeSmall,
+                                                                            color: Theme.of(context).hintColor))
+                                                                  ])),
+                                                            )),
+                                                  Positioned(
+                                                    bottom: 0,
+                                                    right: 0,
+                                                    top: 0,
+                                                    left: 0,
+                                                    child: InkWell(
+                                                        onTap: () =>
+                                                            authProvider.pickImage(
+                                                                false,
+                                                                false,
+                                                                false,
+                                                                secondary:
+                                                                    true),
+                                                        child: Container(
+                                                            decoration: BoxDecoration(
+                                                                color: Theme.of(context)
+                                                                    .hintColor
+                                                                    .withValues(
+                                                                        alpha:
+                                                                            0.08),
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        Dimensions.paddingSizeSmall)))),
+                                                  ),
+                                                ]),
+                                              ))),
+                                      const SizedBox(
+                                          height: Dimensions.paddingSizeSmall),
+                                      Text(
+                                          getTranslated(
+                                              'secondary_banner', context)!,
+                                          style: robotoMedium.copyWith(
+                                              fontSize:
+                                                  Dimensions.fontSizeLarge,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge
+                                                  ?.color)),
+                                      const SizedBox(
+                                          height:
+                                              Dimensions.paddingSizeExtraSmall),
+                                      Text(
+                                          getTranslated(
+                                              'image_ratio3', context)!,
+                                          style: robotoRegular.copyWith(
+                                              fontSize:
+                                                  Dimensions.fontSizeDefault,
+                                              color:
+                                                  Theme.of(context).hintColor)),
+                                      const SizedBox(
+                                          height:
+                                              Dimensions.paddingSizeExtraSmall),
+                                      Text(
+                                          getTranslated(
+                                              'image_size_2_mb', context)!,
+                                          style: robotoRegular.copyWith(
+                                              fontSize:
+                                                  Dimensions.fontSizeDefault,
+                                              color:
+                                                  Theme.of(context).hintColor)),
+                                      const SizedBox(
+                                          height:
+                                              Dimensions.paddingSizeDefault),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
                       ],
                     ),
                   ),
                 ),
-
-
-
-
-
-
-
 
                 // Container(margin: const EdgeInsets.only(left: Dimensions.paddingSizeLarge, right: Dimensions.paddingSizeLarge,
                 //     bottom: Dimensions.paddingSizeSmall,top: Dimensions.paddingSizeSmall),
@@ -962,21 +1317,19 @@ class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
                 //     ],
                 //   ),
                 // ),
-
-
               ])
-            ],
-          ),
-        );
-      }
-    );
+          ],
+        ),
+      );
+    });
   }
 
-  BusinessPageModel? getPageBySlug(String slug, List<BusinessPageModel>? pagesList) {
+  BusinessPageModel? getPageBySlug(
+      String slug, List<BusinessPageModel>? pagesList) {
     BusinessPageModel? pageModel;
-    if(pagesList != null && pagesList.isNotEmpty){
+    if (pagesList != null && pagesList.isNotEmpty) {
       for (var page in pagesList) {
-        if(page.slug == slug) {
+        if (page.slug == slug) {
           pageModel = page;
         }
       }
@@ -985,7 +1338,6 @@ class _InfoFieldVIewWidgetState extends State<InfoFieldVIewWidget> {
   }
 }
 
-
 class TitleWidget extends StatelessWidget {
   final String title;
   final bool? isRequired;
@@ -993,12 +1345,16 @@ class TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    return Column(
       children: [
         Row(children: [
-          Text(title, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
-          if(isRequired ?? false)
-          Text(' *', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge, color: Colors.red)),
+          Text(title,
+              style:
+                  robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
+          if (isRequired ?? false)
+            Text(' *',
+                style: robotoRegular.copyWith(
+                    fontSize: Dimensions.fontSizeLarge, color: Colors.red)),
         ]),
         const SizedBox(height: Dimensions.paddingSizeSmall),
       ],

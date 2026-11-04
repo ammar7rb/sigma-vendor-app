@@ -87,6 +87,7 @@ class SellerPackageRepository implements SellerPackageRepositoryInterface {
     required Map<String, String> methodInformations,
     required XFile paymentProof,
     String? paymentNote,
+    double? expectedPrice,
   }) async {
     try {
       final proof = MultipartFile.fromBytes(await paymentProof.readAsBytes(),
@@ -95,6 +96,7 @@ class SellerPackageRepository implements SellerPackageRepositoryInterface {
       final response = await dioClient
           .postMultipart(AppConstants.sellerPackageOfflinePaymentUri, data: {
         'package_id': packageId,
+        'expected_package_price': expectedPrice,
         'method_id': methodId,
         'method_informations': jsonEncode(methodInformations),
         'payment_note': paymentNote ?? '',

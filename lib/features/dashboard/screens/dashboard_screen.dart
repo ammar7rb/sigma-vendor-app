@@ -26,7 +26,9 @@ import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_scre
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, this.showWelcome = false});
+  const DashboardScreen(
+      {super.key, this.showWelcome = false, this.openAdvertisingSlots = false});
+  final bool openAdvertisingSlots;
   final bool showWelcome;
 
   @override
@@ -44,6 +46,17 @@ class DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     VendorWorkspace.instance.start();
+    if (widget.openAdvertisingSlots) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      const ProductListMenuScreen(showAdvertisingSlots: true)));
+        }
+      });
+    }
     if (widget.showWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -164,7 +177,6 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   @override
   void dispose() {
-    VendorWorkspace.instance.stop();
     _pageController.dispose();
     super.dispose();
   }
@@ -222,7 +234,7 @@ class VendorBottomNavigation extends StatelessWidget {
                       ),
                       (
                         Icons.inventory_2_outlined,
-                        getTranslated('products', context)
+                        getTranslated('phase5_spaces', context)
                       ),
                       (
                         Icons.receipt_long_outlined,

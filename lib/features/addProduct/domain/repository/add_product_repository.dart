@@ -371,6 +371,11 @@ class AddProductRepository implements AddProductRepositoryInterface {
       isDigitalVariationActive: isDigitalVariationActive,
     );
 
+    if (isAdd) {
+      requestData['slot_id'] = addProduct.slotId;
+      requestData['slot_reservation_token'] = addProduct.slotReservationToken;
+    }
+
     if (product.productType == 'digital') {
       try {
         List<MultipartWithKey> multiPartFiles =

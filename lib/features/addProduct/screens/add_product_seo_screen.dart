@@ -12,7 +12,6 @@ import 'package:sixvalley_vendor_app/features/addProduct/controllers/add_product
 import 'package:sixvalley_vendor_app/features/addProduct/controllers/digital_product_controller.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/controllers/variation_controller.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/domain/models/add_product_model.dart';
-import 'package:sixvalley_vendor_app/features/addProduct/domain/models/image_model.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/widgets/add_product_section_widget.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/widgets/meta_seo_widget.dart';
 import 'package:sixvalley_vendor_app/features/ai/controllers/ai_controller.dart';
@@ -34,6 +33,8 @@ import 'package:textfield_tags/textfield_tags.dart';
 class AddProductSeoScreen extends StatefulWidget {
   final ValueChanged<bool>? isSelected;
   final Product? product;
+  final int? slotId;
+  final String? slotReservationToken;
   final String? unitPrice;
   final String? discount;
   final String? currentStock;
@@ -55,6 +56,8 @@ class AddProductSeoScreen extends StatefulWidget {
       {super.key,
       this.isSelected,
       required this.product,
+      this.slotId,
+      this.slotReservationToken,
       required this.addProduct,
       this.unitPrice,
       this.tax,
@@ -1403,6 +1406,12 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                   }
                                                   _addProduct =
                                                       AddProductModel();
+                                                  _addProduct!.slotId =
+                                                      widget.slotId;
+                                                  _addProduct!
+                                                          .slotReservationToken =
+                                                      widget
+                                                          .slotReservationToken;
                                                   _addProduct!.titleList =
                                                       titleList;
                                                   _addProduct!.descriptionList =
@@ -1546,25 +1555,6 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                   ];
 
                                                   if (widget.product != null) {
-                                                    for (ImageModel value
-                                                        in addProductImageController
-                                                            .imagesWithColor) {
-                                                      ///if on online -> value.colorImage?.imageName?.path
-                                                      ///if on offline -> value.image?.path
-                                                      if (value.image?.path ==
-                                                              null &&
-                                                          value
-                                                                  .colorImage
-                                                                  ?.imageName
-                                                                  ?.path ==
-                                                              null) {
-                                                        showCustomSnackBarWidget(
-                                                            '${getTranslated('please_add_color_image', context)}',
-                                                            context);
-                                                        return;
-                                                      }
-                                                    }
-
                                                     if (addProductImageController
                                                             .selectedLogoFile !=
                                                         null) {
@@ -1660,12 +1650,11 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                   .imagesWithColor
                                                                   .length;
                                                           i++) {
-                                                        if (!await addProductImageController
-                                                            .addProductImage(
-                                                                Get.context!,
-                                                                addProductImageController
-                                                                    .imagesWithColor[i],
-                                                                route)) return;
+                                                        if (addProductImageController.imagesWithColor[i].image != null &&
+                                                            !await addProductImageController.addProductImage(
+                                                                Get.context!, addProductImageController.imagesWithColor[i], route)) {
+                                                          return;
+                                                        }
                                                       }
                                                     }
 

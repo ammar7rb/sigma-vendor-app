@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/order_details/domain/models/order_setup_model.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
@@ -51,6 +52,7 @@ class _SellerShippingAssignmentWidgetState
     final needsResponse = response['required'] == true;
     final company = data['responsible_party'] == 'company';
     final completed = widget.order.orderStatus == 'delivered';
+    final nextStatuses = (data['allowed_seller_statuses'] as List? ?? []).whereType<String>().toList();
     final terminal = [
       'delivered',
       'canceled',
@@ -103,13 +105,19 @@ class _SellerShippingAssignmentWidgetState
               line('expected_delivery_date',
                   date(data['expected_delivery_date'])),
               line('sales_due_date', date(data['sales_due_at'])),
-              line('shipping_due_date', date(data['shipping_due_at'])),
               if (data['tracking_number'] != null)
                 line('tracking_id', '${data['tracking_number']}'),
               if ('${data['instructions'] ?? ''}'.isNotEmpty)
                 Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text('${data['instructions']}')),
+              Text(tr('vendor_fulfillment_cta'), style: Theme.of(context).textTheme.titleMedium),
+              for (final status in nextStatuses.where((s) => s != 'delivered'))
+                FilledButton(
+                  onPressed: controller.isLoading ? null : () => controller.setUpOrder(orderSetupModel: OrderSetupModel(
+                    orderId: widget.order.id, orderStatus: status, paymentStatus: widget.order.paymentStatus)),
+                  child: Text(tr(status)),
+                ),
               if (needsResponse && !terminal) ...[
                 const Divider(),
                 Text(tr('seller_journey_accept_terms')),
@@ -135,7 +143,7 @@ class _SellerShippingAssignmentWidgetState
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold))),
-              if (!company && !terminal && !needsResponse) ...[
+              if (!company && !terminal && !needsResponse && nextStatuses.contains('delivered')) ...[
                 const Divider(),
                 Text(tr('seller_journey_delivery_proof'),
                     style: Theme.of(context).textTheme.titleMedium),

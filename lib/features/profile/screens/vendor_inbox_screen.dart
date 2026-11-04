@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_support_thread_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
@@ -19,11 +20,23 @@ class VendorInboxScreen extends StatefulWidget {
 class _VendorInboxScreenState extends State<VendorInboxScreen> {
   final workspace = VendorWorkspace.instance;
   String? error;
+  Timer? _messagePoller;
   final Set<String> reading = {};
   @override
   void initState() {
     super.initState();
     workspace.refresh();
+    _messagePoller = Timer.periodic(const Duration(seconds: 8), (_) {
+      if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+        workspace.refresh();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _messagePoller?.cancel();
+    super.dispose();
   }
 
   String text(String key) => getTranslated(key, context) ?? key;

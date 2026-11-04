@@ -691,10 +691,7 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                                   valueListenable:
                                                                       variationController
                                                                           .totalQuantityController,
-                                                                  builder: (context, value, child) => (int.tryParse(value.text) ??
-                                                                              0) >
-                                                                          0
-                                                                      ? Column(
+                                                                  builder: (context, value, child) => Column(
                                                                           crossAxisAlignment: CrossAxisAlignment
                                                                               .stretch,
                                                                           children: [
@@ -708,9 +705,7 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                                                   }),
                                                                               if (resProvider.saleUnitType == 'package')
                                                                                 Padding(padding: const EdgeInsets.only(top: 12), child: TextField(controller: resProvider.piecesPerUnitController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: getTranslated('seller_product_pieces_per_unit', context))))
-                                                                            ])
-                                                                      : const SizedBox
-                                                                          .shrink()),
+                                                                            ])),
                                                               resProvider.productTypeIndex ==
                                                                       0
                                                                   ? const SizedBox(

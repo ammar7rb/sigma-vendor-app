@@ -58,13 +58,13 @@ class MenuBottomSheetWidget extends StatelessWidget {
 
         CustomBottomSheetWidget(
           image: Images.productIconPp,
-          title: getTranslated('products', context),
+          title: getTranslated('phase5_spaces', context),
           onTap: () => _handleMenuTap(context, const ProductListMenuScreen()),
         ),
 
         CustomBottomSheetWidget(
           image: Images.wallet,
-          title: getTranslated('advertising_packages', context),
+          title: getTranslated('vendor_subscriptions', context),
           onTap: () => _handleMenuTap(context, const SellerPackageScreen()),
         ),
 

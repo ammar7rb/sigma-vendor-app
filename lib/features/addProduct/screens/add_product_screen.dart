@@ -537,19 +537,6 @@ class AddProductScreenState extends State<AddProductScreen>
                                                                   .textTheme
                                                                   .bodyLarge
                                                                   ?.color)),
-                                                      SizedBox(
-                                                          width: Dimensions
-                                                              .paddingSizeExtraSmall),
-                                                      Text(
-                                                        '*',
-                                                        style: robotoBold.copyWith(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .error,
-                                                            fontSize: Dimensions
-                                                                .fontSizeDefault),
-                                                      ),
                                                     ],
                                                   ),
                                                   Text(

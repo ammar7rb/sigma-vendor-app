@@ -22,10 +22,12 @@ class SellerPackageController with ChangeNotifier {
   Future<void> getOverview() async {
     _isLoading = true;
     notifyListeners();
-    final ApiResponse response = await sellerPackageServiceInterface.getOverview();
+    final ApiResponse response =
+        await sellerPackageServiceInterface.getOverview();
     if (response.response != null && response.response!.statusCode == 200) {
       // Preserve the last valid overview when the request fails later due to a temporary network error.
-      _overview = SellerPackageOverviewModel.fromJson(Map<String, dynamic>.from(response.response!.data as Map));
+      _overview = SellerPackageOverviewModel.fromJson(
+          Map<String, dynamic>.from(response.response!.data as Map));
     } else {
       ApiChecker.checkApi(response);
     }
@@ -34,20 +36,24 @@ class SellerPackageController with ChangeNotifier {
   }
 
   Future<void> getPerformance(int subscriptionId) async {
-    final response = await sellerPackageServiceInterface.getPerformance(subscriptionId);
+    final response =
+        await sellerPackageServiceInterface.getPerformance(subscriptionId);
     if (response.response != null && response.response!.statusCode == 200) {
       final data = Map<String, dynamic>.from(response.response!.data as Map);
-      _performance = SellerPackagePerformance.fromJson(Map<String, dynamic>.from(data['performance'] as Map));
+      _performance = SellerPackagePerformance.fromJson(
+          Map<String, dynamic>.from(data['performance'] as Map));
       notifyListeners();
     } else {
       ApiChecker.checkApi(response);
     }
   }
 
-  Future<bool> cancelPackage({required int subscriptionId, required String reason}) async {
+  Future<bool> cancelPackage(
+      {required int subscriptionId, required String reason}) async {
     _isSubmittingPayment = true;
     notifyListeners();
-    final response = await sellerPackageServiceInterface.cancelPackage(subscriptionId: subscriptionId, reason: reason);
+    final response = await sellerPackageServiceInterface.cancelPackage(
+        subscriptionId: subscriptionId, reason: reason);
     _isSubmittingPayment = false;
     if (response.response != null && response.response!.statusCode == 200) {
       await getOverview();
@@ -58,10 +64,12 @@ class SellerPackageController with ChangeNotifier {
     return false;
   }
 
-  Future<String?> payPackage({required int packageId, required String paymentMethod}) async {
+  Future<String?> payPackage(
+      {required int packageId, required String paymentMethod}) async {
     _isSubmittingPayment = true;
     notifyListeners();
-    final response = await sellerPackageServiceInterface.payPackage(packageId: packageId, paymentMethod: paymentMethod);
+    final response = await sellerPackageServiceInterface.payPackage(
+        packageId: packageId, paymentMethod: paymentMethod);
     _isSubmittingPayment = false;
     notifyListeners();
 
@@ -76,7 +84,8 @@ class SellerPackageController with ChangeNotifier {
   Future<bool> payPackageFromOperatingBalance({required int packageId}) async {
     _isSubmittingPayment = true;
     notifyListeners();
-    final response = await sellerPackageServiceInterface.payPackageFromOperatingBalance(packageId: packageId);
+    final response = await sellerPackageServiceInterface
+        .payPackageFromOperatingBalance(packageId: packageId);
     _isSubmittingPayment = false;
     if (response.response != null && response.response!.statusCode == 200) {
       await getOverview();
@@ -88,14 +97,22 @@ class SellerPackageController with ChangeNotifier {
   }
 
   Future<bool> submitOfflinePackagePayment({
-    required int packageId, required int methodId, required Map<String, String> methodInformations,
-    required XFile paymentProof, String? paymentNote,
+    required int packageId,
+    required int methodId,
+    required Map<String, String> methodInformations,
+    required XFile paymentProof,
+    String? paymentNote,
+    double? expectedPrice,
   }) async {
     _isSubmittingPayment = true;
     notifyListeners();
     final response = await sellerPackageServiceInterface.submitOfflinePayment(
-      packageId: packageId, methodId: methodId, methodInformations: methodInformations,
-      paymentProof: paymentProof, paymentNote: paymentNote,
+      packageId: packageId,
+      methodId: methodId,
+      methodInformations: methodInformations,
+      paymentProof: paymentProof,
+      paymentNote: paymentNote,
+      expectedPrice: expectedPrice,
     );
     _isSubmittingPayment = false;
     if (response.response != null && response.response!.statusCode == 200) {
@@ -106,5 +123,4 @@ class SellerPackageController with ChangeNotifier {
     notifyListeners();
     return false;
   }
-
 }
