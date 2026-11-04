@@ -26,6 +26,7 @@ class _SellerShippingAssignmentWidgetState
   PlatformFile? proof;
   final note = TextEditingController();
   bool opening = false;
+  final GlobalKey deliveryProofKey = GlobalKey();
   String tr(String key) => getTranslated(key, context) ?? key;
   String date(dynamic value) {
     final parsed = DateTime.tryParse('$value');
@@ -83,7 +84,7 @@ class _SellerShippingAssignmentWidgetState
                         completed
                             ? Icons.task_alt
                             : Icons.local_shipping_outlined,
-                        color: Theme.of(context).colorScheme.primary)),
+                        color: completed ? Colors.green.shade700 : Theme.of(context).colorScheme.primary)),
                 const SizedBox(width: 11),
                 Expanded(
                     child: Text(tr('shipping_assignment'),
@@ -112,23 +113,33 @@ class _SellerShippingAssignmentWidgetState
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text('${data['instructions']}')),
               Text(tr('vendor_fulfillment_cta'), style: Theme.of(context).textTheme.titleMedium),
-              for (final status in nextStatuses.where((s) => s != 'delivered'))
-                FilledButton(
-                  onPressed: controller.isLoading ? null : () => controller.setUpOrder(orderSetupModel: OrderSetupModel(
-                    orderId: widget.order.id, orderStatus: status, paymentStatus: widget.order.paymentStatus)),
-                  child: Text(tr(status)),
-                ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(children: [
+                  for (final status in ['confirmed', 'processing', 'out_for_delivery', 'delivered'])
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: OutlinedButton.icon(
+                        onPressed: controller.actionInProgress || controller.isLoading || (needsResponse && status != 'confirmed') || (!needsResponse && !nextStatuses.contains(status))
+                            ? null
+                            : needsResponse && status == 'confirmed'
+                                ? () => respond(controller, 'accept')
+                            : status == 'delivered'
+                                ? () { final target = deliveryProofKey.currentContext; if (target != null) Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 250)); }
+                                : () => controller.setUpOrder(orderSetupModel: OrderSetupModel(orderId: widget.order.id, orderStatus: status, paymentStatus: widget.order.paymentStatus)),
+                        icon: Icon(widget.order.orderStatus == status ? Icons.check_circle : Icons.circle_outlined,
+                          color: completed && status == 'delivered' ? Colors.green.shade700 : null),
+                        label: Text(tr(status)),
+                      ),
+                    ),
+                ]),
+              ),
               if (needsResponse && !terminal) ...[
                 const Divider(),
                 Text(tr('seller_journey_accept_terms')),
                 line('seller_journey_response_due', date(response['due_at'])),
                 Wrap(spacing: 8, children: [
-                  FilledButton.icon(
-                      onPressed: controller.actionInProgress
-                          ? null
-                          : () => respond(controller, 'accept'),
-                      icon: const Icon(Icons.check),
-                      label: Text(tr('seller_journey_accept'))),
                   OutlinedButton(
                       onPressed: controller.actionInProgress
                           ? null
@@ -141,11 +152,11 @@ class _SellerShippingAssignmentWidgetState
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(tr('seller_journey_completed'),
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Colors.green.shade700,
                             fontWeight: FontWeight.bold))),
               if (!company && !terminal && !needsResponse && nextStatuses.contains('delivered')) ...[
                 const Divider(),
-                Text(tr('seller_journey_delivery_proof'),
+                Text(tr('seller_journey_delivery_proof'), key: deliveryProofKey,
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Text(tr('seller_journey_proof_notice')),
@@ -178,7 +189,7 @@ class _SellerShippingAssignmentWidgetState
                                 child:
                                     CircularProgressIndicator(strokeWidth: 2))
                             : const Icon(Icons.task_alt),
-                        label: Text(tr('seller_journey_complete_order')))),
+                        label: Text(tr('delivered')))),
               ],
               if (company)
                 Padding(
