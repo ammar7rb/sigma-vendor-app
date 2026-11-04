@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_withdrawal_methods_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_balance_funding_screen.dart';
+import 'package:sixvalley_vendor_app/features/wallet/screens/operating_refund_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
 
 class SellerFinanceScreen extends StatefulWidget {
@@ -277,6 +278,18 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                             ? 'view_balance_details'
                                             : 'fund_purchase_balance')))),
                                 const SizedBox(height: 16),
+                                if (isPayments)
+                                  OutlinedButton(
+                                    onPressed: () async {
+                                      await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const OperatingRefundScreen()));
+                                      if (mounted) load();
+                                    },
+                                    child: Text(tr('operating_refund')),
+                                  ),
                                 Text(tr('wallet_transactions'),
                                     style:
                                         Theme.of(context).textTheme.titleLarge),
@@ -346,7 +359,7 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                         child: ListTile(
                                             title: Text(money(row['amount'])),
                                             subtitle: Text(
-                                                '${row['transaction_number'] ?? 'MP${row['id']}'} · ${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr('withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}'),
+                                                '${row['transaction_number'] ?? 'MP${row['id']}'} · ${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr(row['approved'] == 0 && row['reviewed_at'] != null ? 'payout_approved_waiting' : 'withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}\n${tr('payout_due_date')}: ${financeDate(context, row['payout_due_at'])}'),
                                             isThreeLine: true,
                                             trailing: row['approved'] == 0
                                                 ? TextButton(

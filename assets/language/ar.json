@@ -2014,5 +2014,12 @@
 "vendor_fulfillment_cta": "حدّث حالة الطلب لمتابعة استحقاق مستحقاتك",
 "vendor_procurement_total": "إجمالي توريد بضائعك",
 "vendor_returns_managed": "تدير الإدارة المرتجعات وتسوية مستحقاتك",
-  "product_views": "مشاهدات المنتج"
+  "product_views": "مشاهدات المنتج",
+"operating_refund": "استرداد رصيد التشغيل",
+  "operating_refund_hint": "يتم حجز المبلغ عند إرسال الطلب. تراجع الإدارة طلبك وتتواصل معك لتنسيق وسيلة الصرف.",
+  "payout_days_after_approval": "مدة الصرف بالأيام من اعتماد الإدارة",
+  "request_operating_refund": "طلب الاسترداد",
+  "retry_same_payout_request": "إعادة إرسال نفس الطلب",
+  "payout_approved_waiting": "معتمد بانتظار الصرف",
+  "payout_due_date": "موعد الصرف"
 }

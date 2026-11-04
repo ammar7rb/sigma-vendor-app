@@ -2011,5 +2011,12 @@
 "vendor_fulfillment_cta": "Update fulfillment to track your dues",
 "vendor_procurement_total": "Your merchandise procurement total",
 "vendor_returns_managed": "Administration manages returns and adjustments to your dues",
-  "product_views": "Product views"
+  "product_views": "Product views",
+"operating_refund": "Refund operating balance",
+  "operating_refund_hint": "The requested amount is reserved immediately. Administration reviews your request and contacts you to arrange payment.",
+  "payout_days_after_approval": "Days from administrative approval",
+  "request_operating_refund": "Request refund",
+  "retry_same_payout_request": "Retry the same request",
+  "payout_approved_waiting": "Approved, awaiting payout",
+  "payout_due_date": "Payout date"
 }
