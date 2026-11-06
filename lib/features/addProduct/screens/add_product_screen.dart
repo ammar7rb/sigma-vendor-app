@@ -1722,7 +1722,7 @@ class AddProductScreenState extends State<AddProductScreen>
                     readOnly: true,
                     controller: resProvider.expiryDateController,
                     hintText:
-                        '${getTranslated('expiry_date', context) ?? 'Expiry date'} (${getTranslated('optional', context) ?? 'optional'})',
+                        getTranslated('expiry_date', context) ?? 'Expiry date',
                   )),
                 )),
                 IconButton(
@@ -1754,9 +1754,10 @@ class AddProductScreenState extends State<AddProductScreen>
                           const SizedBox(height: Dimensions.paddingSizeSmall),
                           const SizedBox(height: Dimensions.paddingSizeSmall),
                           Text(
-                              getTranslated(
-                                  'seller_product_optional_dimensions',
-                                  context)!,
+                              Localizations.localeOf(context).languageCode ==
+                                      'ar'
+                                  ? 'الأبعاد والوزن'
+                                  : 'Dimensions and weight',
                               style: robotoRegular.copyWith(
                                   color: Theme.of(context).hintColor)),
                           const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -2371,7 +2372,7 @@ class AddProductScreenState extends State<AddProductScreen>
             maxLines: 6,
             textInputAction: TextInputAction.newline,
             decoration: const InputDecoration(
-                labelText: 'الوصف (اختياري)', border: OutlineInputBorder()),
+                labelText: 'الوصف', border: OutlineInputBorder()),
           )),
     ]);
   }

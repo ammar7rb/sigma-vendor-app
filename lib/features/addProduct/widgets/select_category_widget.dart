@@ -82,14 +82,8 @@ class SelectCategoryWidgetState extends State<SelectCategoryWidget> {
                                     onChanged: (int? value) {
                                       categoryController.setCategoryIndex(
                                           value, true);
-                                      categoryController.getSubCategoryList(
-                                          context,
-                                          value != 0
-                                              ? categoryController
-                                                  .categorySelectedIndex
-                                              : 0,
-                                          true,
-                                          widget.product);
+                                      categoryController.setSubCategoryIndex(
+                                          0, false);
                                     },
                                     isExpanded: true,
                                     underline: const SizedBox())),
@@ -102,64 +96,6 @@ class SelectCategoryWidgetState extends State<SelectCategoryWidget> {
                       : const NoDataScreen(
                           title: 'no_category_found',
                         )
-                  : const SizedBox.shrink(),
-              categoryController.subCategoryList != null
-                  ? categoryController.subCategoryList!.isNotEmpty
-                      ? Column(
-                          children: [
-                            DropdownDecoratorWidget(
-                              child: DropdownButton<int>(
-                                icon: const Icon(
-                                    Icons.keyboard_arrow_down_outlined),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(Dimensions.paddingEye)),
-                                value: categoryController.subCategoryIndex == -1
-                                    ? 0
-                                    : categoryController.subCategoryIndex,
-                                items: categoryController.subCategoryIds
-                                    .map((int? value) {
-                                  return DropdownMenuItem<int>(
-                                    value: categoryController.subCategoryIds
-                                        .indexOf(value),
-                                    child: Text(
-                                      value != 0
-                                          ? categoryController
-                                              .subCategoryList![
-                                                  (categoryController
-                                                          .subCategoryIds
-                                                          .indexOf(value) -
-                                                      1)]
-                                              .name!
-                                          : getTranslated(
-                                              'sub_category', context)!,
-                                      style: robotoMedium.copyWith(
-                                          color: value == 0
-                                              ? Theme.of(context).hintColor
-                                              : null),
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (int? value) {
-                                  categoryController.setSubCategoryIndex(
-                                      value, true);
-                                  categoryController.getSubSubCategoryList(
-                                      value != 0
-                                          ? categoryController
-                                              .subCategorySelectedIndex
-                                          : 0,
-                                      true);
-                                },
-                                isExpanded: true,
-                                underline: const SizedBox(),
-                              ),
-                            ),
-                            addProductController.productTypeIndex == 0
-                                ? const SizedBox(
-                                    height: Dimensions.paddingSizeMedium)
-                                : const SizedBox.shrink(),
-                          ],
-                        )
-                      : const SizedBox.shrink()
                   : const SizedBox.shrink(),
             ],
           );
