@@ -27,11 +27,12 @@ class _VendorInvoicesState extends State<VendorInvoicesScreen> {
     try {
       final r = await VendorWorkspace.instance.client
           .get('/api/v3/seller/invoices', queryParameters: {'page': page});
-      if (mounted)
+      if (mounted) {
         setState(() {
           data = Map<String, dynamic>.from(r.data);
           error = null;
         });
+      }
     } catch (e) {
       if (mounted) setState(() => error = financeError(context, e));
     } finally {
@@ -77,6 +78,17 @@ class _VendorInvoicesState extends State<VendorInvoicesScreen> {
                                             .error)),
                               if (data != null) ...[
                                 const SizedBox(height: 20),
+                                FinancePanel(
+                                    title: tr('available_balance'),
+                                    amount: money(summary['available_balance']),
+                                    hint: tr('available_balance_hint')),
+                                const SizedBox(height: 12),
+                                FinancePanel(
+                                    title: tr('sigma_future_receivables'),
+                                    amount:
+                                        money(summary['upcoming_receivables']),
+                                    hint: tr('nearest_entitlement_date')),
+                                const SizedBox(height: 12),
                                 FinancePanel(
                                     title: tr('total_invoice_receivables'),
                                     amount: money(summary['total_receivables']),

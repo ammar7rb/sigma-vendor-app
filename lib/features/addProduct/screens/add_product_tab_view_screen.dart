@@ -18,6 +18,9 @@ class AddProductTabView extends StatefulWidget {
   final Product? product;
   final int? slotId;
   final String? slotReservationToken;
+  final int? extraAdSubscriptionId;
+  final double? extraAdPrice;
+  final String? extraAdRequestKey;
   final AddProductModel? addProduct;
   final EditProductModel? editProduct;
   final bool fromHome;
@@ -26,6 +29,9 @@ class AddProductTabView extends StatefulWidget {
       this.product,
       this.slotId,
       this.slotReservationToken,
+      this.extraAdSubscriptionId,
+      this.extraAdPrice,
+      this.extraAdRequestKey,
       this.addProduct,
       this.editProduct,
       required this.fromHome});
@@ -60,7 +66,8 @@ class _AddProductTabViewState extends State<AddProductTabView>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
 
-    if (widget.product == null && widget.slotId != null) {
+    if (widget.product == null &&
+        (widget.slotId != null || widget.extraAdRequestKey != null)) {
       // Every new-product entry point reaches this screen, so the check cannot be bypassed from another menu.
       Future.microtask(_checkNewProductEligibility);
     } else {
@@ -116,7 +123,9 @@ class _AddProductTabViewState extends State<AddProductTabView>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.product == null && widget.slotId == null) {
+    if (widget.product == null &&
+        widget.slotId == null &&
+        widget.extraAdRequestKey == null) {
       return const ProductListMenuScreen(showAdvertisingSlots: true);
     }
     final productTabs = _productTabs(context);
@@ -189,6 +198,9 @@ class _AddProductTabViewState extends State<AddProductTabView>
                   AddProductSeoScreen(
                     slotId: widget.slotId,
                     slotReservationToken: widget.slotReservationToken,
+                    extraAdSubscriptionId: widget.extraAdSubscriptionId,
+                    extraAdPrice: widget.extraAdPrice,
+                    extraAdRequestKey: widget.extraAdRequestKey,
                     unitPrice: productCombinedData?.unitPrice,
                     tax: productCombinedData?.tax,
                     unit: productCombinedData?.unit,

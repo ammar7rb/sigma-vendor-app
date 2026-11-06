@@ -374,6 +374,13 @@ class AddProductRepository implements AddProductRepositoryInterface {
     if (isAdd) {
       requestData['slot_id'] = addProduct.slotId;
       requestData['slot_reservation_token'] = addProduct.slotReservationToken;
+      if (addProduct.extraAdRequestKey != null) {
+        requestData['extra_ad_publish'] = '1';
+        requestData['extra_ad_subscription_id'] =
+            addProduct.extraAdSubscriptionId;
+        requestData['extra_ad_expected_price'] = addProduct.extraAdPrice;
+        requestData['extra_ad_request_key'] = addProduct.extraAdRequestKey;
+      }
     }
 
     if (product.productType == 'digital') {

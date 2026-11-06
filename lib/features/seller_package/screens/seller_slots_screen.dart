@@ -149,6 +149,39 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                 overview: overview)));
   }
 
+  Future<void> publishExtra() async {
+    final subscription = data?['subscription'] as Map?;
+    final settings = data?['extra_settings'] as Map?;
+    final id = int.tryParse('${subscription?['id']}');
+    final price = double.tryParse('${settings?['unit_price']}');
+    if (id == null || price == null || price <= 0) return;
+    final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(tr('إضافة إعلان', 'Add advertisement')),
+              content: Text(
+                  '${tr('يُخصم عند نشر المنتج من الرصيد النقدي', 'Charged from cash balance when you publish')}: ${financeMoney(context, price)}. ${tr('تنتهي صلاحيته مع الاشتراك الحالي.', 'Expires with the current subscription.')}'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(tr('رجوع', 'Back'))),
+                FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(tr('متابعة', 'Continue')))
+              ],
+            ));
+    if (confirmed != true || !mounted) return;
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => AddProductTabView(
+                fromHome: false,
+                extraAdSubscriptionId: id,
+                extraAdPrice: price,
+                extraAdRequestKey: const Uuid().v4())));
+    await load();
+  }
+
   @override
   Widget build(BuildContext context) {
     final slots = data?['slots'] as List? ?? [];
@@ -215,11 +248,25 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                                   Text(financeMoney(
                                       context, settings['unit_price'])),
                                 FilledButton(
-                                    onPressed:
-                                        busy || data?['can_buy_extra'] != true
-                                            ? null
-                                            : () => perform(buyExtra),
-                                    child: Text(tr('شراء الآن', 'Buy now'))),
+                                    onPressed: busy ||
+                                            data?['can_buy_extra'] != true
+                                        ? null
+                                        : () => perform(
+                                            data?['extra_publish_enabled'] ==
+                                                    true
+                                                ? publishExtra
+                                                : buyExtra),
+                                    child: Text(
+                                        data?['extra_publish_enabled'] == true
+                                            ? tr('إضافة إعلان',
+                                                'Add advertisement')
+                                            : tr('شراء الآن', 'Buy now'))),
+                                if (data?['extra_publish_enabled'] == true)
+                                  TextButton(
+                                      onPressed:
+                                          busy ? null : () => perform(buyExtra),
+                                      child: Text(tr('إدارة المساحات الإضافية',
+                                          'Manage extra slots'))),
                                 if (settings['enabled'] != true)
                                   Text(tr('بانتظار تفعيل الإدارة وتحديد السعر.',
                                       'Waiting for administration to enable and set a price.'))

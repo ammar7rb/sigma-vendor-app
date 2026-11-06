@@ -3,6 +3,9 @@ import 'package:image_picker/image_picker.dart';
 class AddProductModel {
   int? slotId;
   String? slotReservationToken;
+  int? extraAdSubscriptionId;
+  double? extraAdPrice;
+  String? extraAdRequestKey;
   List<String>? titleList;
   List<String>? descriptionList;
   List<String?>? languageList;

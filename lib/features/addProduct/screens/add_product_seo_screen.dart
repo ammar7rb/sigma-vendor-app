@@ -35,6 +35,9 @@ class AddProductSeoScreen extends StatefulWidget {
   final Product? product;
   final int? slotId;
   final String? slotReservationToken;
+  final int? extraAdSubscriptionId;
+  final double? extraAdPrice;
+  final String? extraAdRequestKey;
   final String? unitPrice;
   final String? discount;
   final String? currentStock;
@@ -58,6 +61,9 @@ class AddProductSeoScreen extends StatefulWidget {
       required this.product,
       this.slotId,
       this.slotReservationToken,
+      this.extraAdSubscriptionId,
+      this.extraAdPrice,
+      this.extraAdRequestKey,
       required this.addProduct,
       this.unitPrice,
       this.tax,
@@ -1408,6 +1414,9 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                       AddProductModel();
                                                   _addProduct!.slotId =
                                                       widget.slotId;
+                                                  _addProduct!.extraAdSubscriptionId = widget.extraAdSubscriptionId;
+                                                  _addProduct!.extraAdPrice = widget.extraAdPrice;
+                                                  _addProduct!.extraAdRequestKey = widget.extraAdRequestKey;
                                                   _addProduct!
                                                           .slotReservationToken =
                                                       widget

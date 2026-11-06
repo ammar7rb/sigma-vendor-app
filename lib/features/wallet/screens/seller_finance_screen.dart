@@ -1,8 +1,11 @@
+import 'dart:ui' show ImageFilter;
 import 'package:sixvalley_vendor_app/helper/price_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_withdrawal_methods_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_balance_funding_screen.dart';
+import 'package:sixvalley_vendor_app/features/wallet/screens/vendor_invoices_screen.dart';
+import 'package:sixvalley_vendor_app/features/wallet/screens/seller_cash_transfer_dialog.dart';
 import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
 
 class SellerFinanceScreen extends StatefulWidget {
@@ -27,6 +30,7 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
   int? methodId;
   final amount = TextEditingController();
   String requestKey = withdrawalRequestKey();
+  String cashTransferKey = withdrawalRequestKey();
   String tr(String key) => financeText(context, key);
   String money(dynamic v) => financeMoney(context, v);
   @override
@@ -72,6 +76,40 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
       if (mounted) setState(() => error = financeError(context, e));
     } finally {
       if (mounted) setState(() => loading = false);
+    }
+  }
+
+  Future<void> openInvoices() async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+        child: Dialog(
+          clipBehavior: Clip.antiAlias,
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+          child: SizedBox(
+            width: 680,
+            height: MediaQuery.sizeOf(dialogContext).height * 0.78,
+            child: const VendorInvoicesScreen(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> transferToCash() async {
+    final result = await showDialog<bool>(
+        context: context,
+        builder: (_) => SellerCashTransferDialog(
+            requestKey: cashTransferKey,
+            currencyCode: '${data?['transfer_currency_code'] ?? ''}',
+            ownerId: int.tryParse('${data?['transfer_owner_id'] ?? ''}') ?? 0));
+    if (result == true && mounted) {
+      cashTransferKey = withdrawalRequestKey();
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tr('sales_cash_transfer_success'))));
+      await load();
     }
   }
 
@@ -177,6 +215,33 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                                 .error))),
                               if (data != null) ...[
                                 if (isOverview) ...[
+                                  OutlinedButton.icon(
+                                      onPressed: openInvoices,
+                                      icon: const Icon(
+                                          Icons.receipt_long_outlined),
+                                      label: Text(tr('vendor_invoices'))),
+                                  const SizedBox(height: 12),
+                                  OutlinedButton.icon(
+                                      onPressed:
+                                          submitting ? null : transferToCash,
+                                      icon: const Icon(Icons.swap_horiz),
+                                      label: Text(
+                                          tr('sales_cash_transfer_title'))),
+                                  const SizedBox(height: 12),
+                                  OutlinedButton.icon(
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const VendorWithdrawalMethodsScreen()));
+                                        if (mounted) load();
+                                      },
+                                      icon: const Icon(
+                                          Icons.account_balance_outlined),
+                                      label: Text(
+                                          tr('manage_withdrawal_methods'))),
+                                  const SizedBox(height: 16),
                                   FinancePanel(
                                       title: tr('available_balance'),
                                       amount: money(summary['available']),
@@ -234,17 +299,6 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                                                 strokeWidth: 2))
                                                     : Text(tr(
                                                         'submit_withdrawal_request'))),
-                                            TextButton(
-                                                onPressed: () async {
-                                                  await Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (_) =>
-                                                              const VendorWithdrawalMethodsScreen()));
-                                                  if (mounted) load();
-                                                },
-                                                child: Text(tr(
-                                                    'manage_withdrawal_methods'))),
                                             Text(
                                                 '${tr('pending_withdrawal_amount')}: ${money(summary['pending_withdraw'])}')
                                           ])),
