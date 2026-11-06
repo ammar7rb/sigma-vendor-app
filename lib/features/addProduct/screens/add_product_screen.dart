@@ -130,13 +130,13 @@ class AddProductScreenState extends State<AddProductScreen>
       categoryId: categoryController.categoryIndex == -2
           ? 'other'
           : categoryController.categoryIndex != null &&
-                  categoryController.categoryIndex != 0
+                  categoryController.categoryIndex! > 0
               ? categoryController
                   .categoryList![categoryController.categoryIndex! - 1].id
                   .toString()
               : null,
       subCategoryId: categoryController.subCategoryIndex != null &&
-              categoryController.subCategoryIndex != 0
+              categoryController.subCategoryIndex! > 0
           ? categoryController
               .subCategoryList![categoryController.subCategoryIndex! - 1].id
               .toString()
@@ -1363,7 +1363,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                                                           1);
                                                                   // Navigator.push(context, MaterialPageRoute(builder: (_) => AddProductNextScreen(
                                                                   //   categoryId: categoryController.categoryList![categoryController.categoryIndex!-1].id.toString(),
-                                                                  //   subCategoryId: categoryController.subCategoryIndex != 0? categoryController.subCategoryList![categoryController.subCategoryIndex!-1].id.toString(): "-1",
+                                                                  //   subCategoryId: categoryController.subCategoryIndex! > 0? categoryController.subCategoryList![categoryController.subCategoryIndex!-1].id.toString(): "-1",
                                                                   //   subSubCategoryId:(categoryController.subSubCategoryIndex != 0 && categoryController.subSubCategoryIndex! != -1) ? categoryController.subSubCategoryList![categoryController.subSubCategoryIndex!-1].id.toString():"-1",
                                                                   //   brandId: Provider.of<SplashController>(Get.context!, listen: false).configModel!.brandSetting == "1" && resProvider.productTypeIndex != 1 ? brandIds[productController.brandIndex!].toString() : null,
                                                                   //   unit: (resProvider.unitValue != null && resProvider.unitValue!.isNotEmpty) ? resProvider.unitValue :  unitValue,
