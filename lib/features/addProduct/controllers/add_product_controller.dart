@@ -665,22 +665,15 @@ class AddProductController extends ChangeNotifier {
     required String? youtubeLink,
   }) {
     // 1. Check Titles
-    if (titleControllerList.isNotEmpty && titleControllerList[0].text.isEmpty) {
+    if (titleControllerList.isEmpty ||
+        titleControllerList[0].text.trim().isEmpty) {
       showCustomSnackBarWidget(
           getTranslated('please_input_all_title', context), context,
           sanckBarType: SnackBarType.warning);
       return false;
     }
 
-    // 2. Check Description and seller identity/contact policy before upload.
-    if (descriptionControllerList.isNotEmpty &&
-        descriptionControllerList[0].text.isEmpty) {
-      showCustomSnackBarWidget(
-          getTranslated('please_input_all_des', context), context,
-          sanckBarType: SnackBarType.warning);
-      return false;
-    }
-
+    // Seller identity/contact restrictions still apply when a description is supplied.
     final restrictedText = <String>[
       ...titleControllerList.map((controller) => controller.text),
       ...descriptionControllerList.map((controller) => controller.text),
@@ -691,14 +684,6 @@ class AddProductController extends ChangeNotifier {
         context,
         sanckBarType: SnackBarType.warning,
       );
-      return false;
-    }
-
-    if (categoryController.categoryIndex == null ||
-        categoryController.categoryIndex == 0) {
-      showCustomSnackBarWidget(
-          getTranslated('choose_category_or_other', context), context,
-          sanckBarType: SnackBarType.warning);
       return false;
     }
 
@@ -733,14 +718,11 @@ class AddProductController extends ChangeNotifier {
       final expiryDate = DateTime.tryParse(expiryDateController.text.trim());
       final today = DateTime.now();
       final todayOnly = DateTime(today.year, today.month, today.day);
-      if (productionDate == null || expiryDate == null) {
-        showCustomSnackBarWidget(
-            getTranslated('product_dates_are_required', context), context,
-            sanckBarType: SnackBarType.warning);
-        return false;
-      }
-      if (expiryDate.isBefore(productionDate) ||
-          !expiryDate.isAfter(todayOnly)) {
+      if ((expiryDateController.text.trim().isNotEmpty && expiryDate == null) ||
+          (expiryDate != null && !expiryDate.isAfter(todayOnly)) ||
+          (expiryDate != null &&
+              productionDate != null &&
+              expiryDate.isBefore(productionDate))) {
         showCustomSnackBarWidget(
             getTranslated('product_expiry_date_is_invalid', context), context,
             sanckBarType: SnackBarType.warning);

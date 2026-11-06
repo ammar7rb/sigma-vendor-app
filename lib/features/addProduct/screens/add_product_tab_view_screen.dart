@@ -183,6 +183,12 @@ class _AddProductTabViewState extends State<AddProductTabView>
                       key: _firstTabKey),
                   AddProductNextScreen(
                     key: _secondTabKey,
+                    detailsBuilder: (context) =>
+                        _firstTabKey.currentState
+                            ?.buildProductDetails(context) ??
+                        const SizedBox.shrink(),
+                    generalInfoReader: () =>
+                        _firstTabKey.currentState?.getCurrentFormData(),
                     categoryId: productGeneralInfoData?.categoryId,
                     subCategoryId: productGeneralInfoData?.subCategoryId,
                     subSubCategoryId: productGeneralInfoData?.subSubCategoryId,

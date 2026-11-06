@@ -36,7 +36,6 @@ import 'package:sixvalley_vendor_app/utill/styles.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/widgets/digital_product_widget.dart';
 import 'package:sixvalley_vendor_app/features/addProduct/widgets/select_category_widget.dart';
-import 'package:sixvalley_vendor_app/features/addProduct/widgets/title_and_description_widget.dart';
 
 class AddProductScreen extends StatefulWidget {
   final Product? product;
@@ -72,7 +71,7 @@ class AddProductScreenState extends State<AddProductScreen>
   FocusNode _authorFocus = FocusNode();
   final ScrollController _scrollController = ScrollController();
   double optionHeight = 0;
-  late List<int?> brandIds;
+  List<int?> brandIds = [-1, 0];
   final TextEditingController _brandNameController = TextEditingController();
 
   Future<void> _load() async {
@@ -114,6 +113,12 @@ class AddProductScreenState extends State<AddProductScreen>
     AddProductController resProvider =
         Provider.of<AddProductController>(context, listen: false);
 
+    brandIds = [
+      -1,
+      0,
+      ...?productController.brandList?.map((brand) => brand.id),
+      -2
+    ];
     final selectedBrandIndex = productController.brandIndex;
     final selectedBrandId = selectedBrandIndex != null &&
             selectedBrandIndex >= 0 &&
@@ -124,12 +129,14 @@ class AddProductScreenState extends State<AddProductScreen>
     return ProductGeneralInfoData(
       categoryId: categoryController.categoryIndex == -2
           ? 'other'
-          : categoryController.categoryIndex != 0
+          : categoryController.categoryIndex != null &&
+                  categoryController.categoryIndex != 0
               ? categoryController
                   .categoryList![categoryController.categoryIndex! - 1].id
                   .toString()
-              : '-1',
-      subCategoryId: categoryController.subCategoryIndex != 0
+              : null,
+      subCategoryId: categoryController.subCategoryIndex != null &&
+              categoryController.subCategoryIndex != 0
           ? categoryController
               .subCategoryList![categoryController.subCategoryIndex! - 1].id
               .toString()
@@ -403,117 +410,6 @@ class AddProductScreenState extends State<AddProductScreen>
                                               (aiController.titleLoading ||
                                                   aiController.descLoading),
                                           childrens: [
-                                            Container(
-                                              margin: const EdgeInsets.all(
-                                                  Dimensions.paddingSizeSmall),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        Dimensions
-                                                            .radiusDefault),
-                                                color: Theme.of(context)
-                                                    .primaryColor
-                                                    .withValues(alpha: 0.05),
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .only(
-                                                        top: Dimensions
-                                                            .paddingSizeSmall),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .only(
-                                                          top: Dimensions
-                                                              .paddingSizeMedium,
-                                                          left: Dimensions
-                                                              .paddingEye,
-                                                          bottom: Dimensions
-                                                              .paddingEye),
-                                                      child: SizedBox(
-                                                        width: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width,
-                                                        child: TabBar(
-                                                          indicatorSize:
-                                                              TabBarIndicatorSize
-                                                                  .tab,
-                                                          tabAlignment:
-                                                              TabAlignment
-                                                                  .start,
-                                                          isScrollable: true,
-                                                          dividerColor:
-                                                              Theme.of(context)
-                                                                  .hintColor,
-                                                          controller:
-                                                              _tabController,
-                                                          indicatorColor:
-                                                              Theme.of(context)
-                                                                  .primaryColor,
-                                                          indicatorWeight: 12,
-                                                          labelColor:
-                                                              Theme.of(context)
-                                                                  .primaryColor,
-                                                          indicator:
-                                                              UnderlineTabIndicator(
-                                                            borderSide: BorderSide(
-                                                                width: 2.0,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .primaryColor),
-                                                            insets: EdgeInsets
-                                                                .zero, // no inset — covers full tab
-                                                          ),
-                                                          indicatorPadding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      0),
-                                                          unselectedLabelStyle:
-                                                              robotoRegular
-                                                                  .copyWith(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .hintColor,
-                                                          ),
-                                                          labelStyle: robotoBold
-                                                              .copyWith(
-                                                            fontSize: Dimensions
-                                                                .fontSizeLarge,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .disabledColor,
-                                                          ),
-                                                          tabs:
-                                                              _generateTabChildren(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                      height: 235,
-                                                      child: AnimatedBuilder(
-                                                        animation:
-                                                            _tabController!,
-                                                        builder: (BuildContext
-                                                                context,
-                                                            Widget? child) {
-                                                          return TabBarView(
-                                                              controller:
-                                                                  _tabController,
-                                                              children: _generateTabPage(
-                                                                  resProvider,
-                                                                  _tabController));
-                                                        },
-                                                      )),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height: Dimensions
-                                                    .paddingSizeLarge),
                                             Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -767,1686 +663,508 @@ class AddProductScreenState extends State<AddProductScreen>
                                                 ],
                                               ),
                                             ),
-                                          ],
-                                        );
-                                      }),
-                                      const SizedBox(
-                                          height:
-                                              Dimensions.paddingSizeDefault),
-                                      Consumer<AiController>(builder:
-                                          (context, aiController, child) {
-                                        return AddProductSectionWidget(
-                                          title: getTranslated(
-                                              'general_setup', context)!,
-                                          subTitle: getTranslated(
-                                              'here_you_can_set_up_the_foundational_details',
-                                              context)!,
-                                          isAiGenerating: (aiController
-                                              .generalSetupLoading),
-                                          aiWidget: Consumer<AiController>(
-                                              builder: (context, aiController,
-                                                  child) {
-                                            return Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    if (resProvider
-                                                        .titleControllerList[
-                                                            _tabController
-                                                                    ?.index ??
-                                                                0]
-                                                        .text
-                                                        .isEmpty) {
-                                                      showCustomSnackBarWidget(
-                                                          '${getTranslated('product_name_required', context)}',
-                                                          context);
-                                                    } else if (resProvider
-                                                        .descriptionControllerList[
-                                                            _tabController
-                                                                    ?.index ??
-                                                                0]
-                                                        .text
-                                                        .isEmpty) {
-                                                      showCustomSnackBarWidget(
-                                                          '${getTranslated('product_description_required', context)}',
-                                                          context);
-                                                    } else {
-                                                      resProvider
-                                                          .generateAndSetOtherData(
-                                                        title: resProvider
-                                                            .titleControllerList[
-                                                                _tabController
-                                                                        ?.index ??
-                                                                    0]
-                                                            .text
-                                                            .trim(),
-                                                        description: resProvider
-                                                            .descriptionControllerList[
-                                                                _tabController
-                                                                        ?.index ??
-                                                                    0]
-                                                            .text
-                                                            .trim(),
-                                                        langCode: Provider.of<
-                                                                        SplashController>(
-                                                                    context,
-                                                                    listen:
-                                                                        false)
-                                                                .configModel
-                                                                ?.languageList?[
-                                                                    _tabController
-                                                                            ?.index ??
-                                                                        0]
-                                                                .code ??
-                                                            'en',
-                                                      );
-                                                    }
-                                                  },
-                                                  child: !aiController
-                                                          .generalSetupLoading
-                                                      ? Icon(Icons.auto_awesome,
-                                                          color: Colors.blue)
-                                                      : Shimmer.fromColors(
-                                                          baseColor:
-                                                              Theme.of(context)
-                                                                  .hintColor
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.18),
-                                                          highlightColor:
-                                                              Theme.of(context)
-                                                                  .hintColor
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.06),
-                                                          child: Row(children: [
-                                                            Icon(
-                                                                Icons
-                                                                    .auto_awesome,
-                                                                color: Colors
-                                                                    .blue),
-                                                            const SizedBox(
-                                                                width: Dimensions
-                                                                    .paddingSizeExtraSmall),
-                                                            Text(
-                                                                getTranslated(
-                                                                        'generating',
-                                                                        context) ??
-                                                                    '',
-                                                                style: robotoBold
-                                                                    .copyWith(
-                                                                        color: Colors
-                                                                            .blue)),
-                                                          ]),
+                                            SizedBox(
+                                                height: Dimensions
+                                                    .paddingSizeLarge),
+                                            AddProductSectionWidget(
+                                              title: getTranslated(
+                                                  'additional_product_images',
+                                                  context)!,
+                                              subTitle: getTranslated(
+                                                  'upload_any_additional_images_for',
+                                                  context)!,
+                                              childrens: <Widget>[
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: Dimensions
+                                                          .paddingSizeDefault,
+                                                      vertical: Dimensions
+                                                          .paddingSizeSmall),
+                                                  child: Consumer<
+                                                          AddProductImageController>(
+                                                      builder: (context,
+                                                          imageController, _) {
+                                                    final existingCount = _update
+                                                        ? (widget.product
+                                                                ?.imagesFullUrl
+                                                                ?.where((image) =>
+                                                                    image.path
+                                                                        ?.isNotEmpty ??
+                                                                    false)
+                                                                .length ??
+                                                            0)
+                                                        : 0;
+                                                    final colorCount =
+                                                        imageController
+                                                            .imagesWithColor
+                                                            .where((image) =>
+                                                                image.image !=
+                                                                null)
+                                                            .length;
+                                                    final count =
+                                                        existingCount +
+                                                            imageController
+                                                                .withoutColor
+                                                                .length +
+                                                            colorCount;
+                                                    final isComplete =
+                                                        count >= 5;
+                                                    return Row(children: [
+                                                      Icon(
+                                                          isComplete
+                                                              ? Icons
+                                                                  .check_circle_outline
+                                                              : Icons
+                                                                  .photo_library_outlined,
+                                                          color: isComplete
+                                                              ? Colors.green
+                                                              : Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .error),
+                                                      const SizedBox(
+                                                          width: Dimensions
+                                                              .paddingSizeSmall),
+                                                      Text(
+                                                          '${getTranslated('seller_product_images_count', context)}: $count/5',
+                                                          style: robotoMedium.copyWith(
+                                                              color: isComplete
+                                                                  ? Colors.green
+                                                                  : Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .error)),
+                                                    ]);
+                                                  }),
+                                                ),
+                                                if (_update)
+                                                  Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                        horizontal: Dimensions
+                                                            .paddingSizeDefault,
+                                                        vertical: Dimensions
+                                                            .paddingSizeSmall),
+                                                    child: Consumer<
+                                                            VariationController>(
+                                                        builder: (context,
+                                                            variationController,
+                                                            _) {
+                                                      return Consumer<
+                                                              AddProductImageController>(
+                                                          builder: (context,
+                                                              addProductImageController,
+                                                              _) {
+                                                        return GridView.builder(
+                                                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                                                childAspectRatio:
+                                                                    1,
+                                                                crossAxisCount:
+                                                                    2,
+                                                                crossAxisSpacing:
+                                                                    10,
+                                                                mainAxisSpacing:
+                                                                    10),
+                                                            shrinkWrap: true,
+                                                            physics:
+                                                                const NeverScrollableScrollPhysics(),
+                                                            itemCount:
+                                                                addProductImageController
+                                                                    .imagesWithoutColor
+                                                                    .length,
+                                                            itemBuilder:
+                                                                (BuildContext
+                                                                        context,
+                                                                    index) {
+                                                              return Stack(
+                                                                  children: [
+                                                                    DottedBorder(
+                                                                      options:
+                                                                          RoundedRectDottedBorderOptions(
+                                                                        dashPattern: const [
+                                                                          4,
+                                                                          5
+                                                                        ],
+                                                                        color: Theme.of(context)
+                                                                            .hintColor,
+                                                                        radius: const Radius
+                                                                            .circular(
+                                                                            15),
+                                                                      ),
+                                                                      child:
+                                                                          Container(
+                                                                        decoration: const BoxDecoration(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            borderRadius: BorderRadius.all(Radius.circular(20))),
+                                                                        child:
+                                                                            ClipRRect(
+                                                                          borderRadius: const BorderRadius
+                                                                              .all(
+                                                                              Radius.circular(Dimensions.paddingSizeSmall)),
+                                                                          child:
+                                                                              CustomImageWidget(
+                                                                            image:
+                                                                                addProductImageController.imagesWithoutColor[index],
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width / 2.3,
+                                                                            height:
+                                                                                MediaQuery.of(context).size.width / 2.3,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Positioned(
+                                                                        top: 5,
+                                                                        right:
+                                                                            5,
+                                                                        child:
+                                                                            InkWell(
+                                                                          splashColor:
+                                                                              Colors.transparent,
+                                                                          onTap: () =>
+                                                                              addProductImageController.deleteProductImage(
+                                                                            '${widget.product?.id}',
+                                                                            _getFilenameFromFullImagePath(addProductImageController.imagesWithoutColor[index]),
+                                                                            null,
+                                                                          ),
+                                                                          child:
+                                                                              Container(
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              color: Colors.white,
+                                                                              boxShadow: [
+                                                                                BoxShadow(
+                                                                                  color: Theme.of(context).hintColor.withValues(alpha: .25),
+                                                                                  blurRadius: 1,
+                                                                                  spreadRadius: 1,
+                                                                                  offset: const Offset(0, 0),
+                                                                                )
+                                                                              ],
+                                                                              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault)),
+                                                                            ),
+                                                                            child:
+                                                                                const Padding(
+                                                                              padding: EdgeInsets.all(4.0),
+                                                                              child: Icon(
+                                                                                Icons.delete_forever_rounded,
+                                                                                color: Colors.red,
+                                                                                size: 25,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        )),
+                                                                  ]);
+                                                            });
+                                                      });
+                                                    }),
+                                                  ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: Dimensions
+                                                          .paddingSizeDefault,
+                                                      vertical: Dimensions
+                                                          .paddingSizeSmall),
+                                                  child: Consumer<
+                                                          AddProductImageController>(
+                                                      builder: (context,
+                                                          addProductImageController,
+                                                          child) {
+                                                    return GridView.builder(
+                                                        gridDelegate:
+                                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                                          childAspectRatio: 1,
+                                                          crossAxisCount: 2,
+                                                          crossAxisSpacing: 10,
+                                                          mainAxisSpacing: 10,
                                                         ),
+                                                        shrinkWrap: true,
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
+                                                        itemCount:
+                                                            addProductImageController
+                                                                    .withoutColor
+                                                                    .length +
+                                                                1,
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                index) {
+                                                          return index ==
+                                                                  addProductImageController
+                                                                      .withoutColor
+                                                                      .length
+                                                              ? GestureDetector(
+                                                                  onTap: () {
+                                                                    final existingCount =
+                                                                        _update
+                                                                            ? (widget.product?.imagesFullUrl?.where((image) => image.path?.isNotEmpty ?? false).length ??
+                                                                                0)
+                                                                            : 0;
+                                                                    final colorImageCount = addProductImageController
+                                                                        .imagesWithColor
+                                                                        .where((image) =>
+                                                                            image.image !=
+                                                                            null)
+                                                                        .length;
+                                                                    addProductImageController
+                                                                        .pickAdditionalImages(
+                                                                      existingCount:
+                                                                          existingCount,
+                                                                      colorImageCount:
+                                                                          colorImageCount,
+                                                                    );
+                                                                  },
+                                                                  child: Stack(
+                                                                    children: [
+                                                                      DottedBorder(
+                                                                        options:
+                                                                            RoundedRectDottedBorderOptions(
+                                                                          dashPattern: const [
+                                                                            4,
+                                                                            5
+                                                                          ],
+                                                                          color:
+                                                                              Theme.of(context).hintColor,
+                                                                          radius: const Radius
+                                                                              .circular(
+                                                                              15),
+                                                                        ),
+                                                                        child:
+                                                                            ClipRRect(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(Dimensions.paddingSizeSmall),
+                                                                          child:
+                                                                              Image.asset(
+                                                                            Images.placeholderImage,
+                                                                            height:
+                                                                                MediaQuery.of(context).size.width / 2.3,
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width / 2.3,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            color:
+                                                                                Theme.of(context).highlightColor,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      Positioned(
+                                                                        bottom:
+                                                                            0,
+                                                                        right:
+                                                                            0,
+                                                                        top: 0,
+                                                                        left: 0,
+                                                                        child:
+                                                                            Align(
+                                                                          alignment:
+                                                                              Alignment.center,
+                                                                          child: Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                CustomAssetImageWidget(Images.addImageIcon, height: 30, width: 30, color: Theme.of(context).hintColor.withValues(alpha: .7)),
+                                                                                const SizedBox(height: Dimensions.paddingSizeSmall),
+                                                                                Text(getTranslated('click_to_add', context)!, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.headlineMedium?.color))
+                                                                              ]),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : Stack(
+                                                                  children: [
+                                                                    DottedBorder(
+                                                                      options:
+                                                                          RoundedRectDottedBorderOptions(
+                                                                        dashPattern: const [
+                                                                          4,
+                                                                          5
+                                                                        ],
+                                                                        color: Theme.of(context)
+                                                                            .hintColor,
+                                                                        radius: const Radius
+                                                                            .circular(
+                                                                            15),
+                                                                      ),
+                                                                      child:
+                                                                          Container(
+                                                                        decoration:
+                                                                            const BoxDecoration(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          borderRadius:
+                                                                              BorderRadius.all(Radius.circular(20)),
+                                                                        ),
+                                                                        child:
+                                                                            ClipRRect(
+                                                                          borderRadius: const BorderRadius
+                                                                              .all(
+                                                                              Radius.circular(Dimensions.paddingSizeSmall)),
+                                                                          child:
+                                                                              Image.file(
+                                                                            File(addProductImageController.withoutColor[index].image!.path),
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width / 2.3,
+                                                                            height:
+                                                                                MediaQuery.of(context).size.width / 2.3,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Positioned(
+                                                                      top: 5,
+                                                                      right: 5,
+                                                                      child:
+                                                                          InkWell(
+                                                                        splashColor:
+                                                                            Colors.transparent,
+                                                                        onTap: () => addProductImageController.removeImage(
+                                                                            index,
+                                                                            false),
+                                                                        child: Container(
+                                                                            decoration: BoxDecoration(
+                                                                                color: Colors.white,
+                                                                                boxShadow: [
+                                                                                  BoxShadow(color: Theme.of(context).hintColor.withValues(alpha: .25), blurRadius: 1, spreadRadius: 1, offset: const Offset(0, 0))
+                                                                                ],
+                                                                                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault))),
+                                                                            child: const Padding(
+                                                                                padding: EdgeInsets.all(4.0),
+                                                                                child: Icon(
+                                                                                  Icons.delete_forever_rounded,
+                                                                                  color: Colors.red,
+                                                                                  size: 25,
+                                                                                ))),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                );
+                                                        });
+                                                  }),
                                                 ),
                                               ],
-                                            );
-                                          }),
-                                          childrens: <Widget>[
-                                            const SizedBox(
-                                                height: Dimensions
-                                                    .paddingSizeSmall),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: Dimensions
-                                                          .paddingSizeMedium),
-                                              child: SelectCategoryWidget(
-                                                  product: widget.product),
                                             ),
-                                            Provider.of<SplashController>(
-                                                                context,
-                                                                listen: false)
-                                                            .configModel
-                                                            ?.brandSetting ==
-                                                        "1" &&
-                                                    resProvider
-                                                            .productTypeIndex !=
-                                                        1
-                                                ? Padding(
+                                            Container(
+                                              margin: const EdgeInsets.all(
+                                                  Dimensions.paddingSizeSmall),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        Dimensions
+                                                            .radiusDefault),
+                                                color: Theme.of(context)
+                                                    .primaryColor
+                                                    .withValues(alpha: 0.05),
+                                              ),
+                                              child: Column(
+                                                children: [
+                                                  Padding(
                                                     padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: Dimensions
-                                                            .paddingSizeMedium),
-                                                    child: Column(
-                                                      children: [
-                                                        Consumer<
-                                                                ProductController>(
-                                                            builder: (context,
-                                                                productController,
-                                                                _) {
-                                                          brandIds = [];
-                                                          brandIds.add(-1);
-                                                          brandIds.add(0);
-                                                          if (productController
-                                                                  .brandList !=
-                                                              null) {
-                                                            for (int index = 0;
-                                                                index <
-                                                                    productController
-                                                                        .brandList!
-                                                                        .length;
-                                                                index++) {
-                                                              brandIds.add(
-                                                                  productController
-                                                                      .brandList![
-                                                                          index]
-                                                                      .id);
-                                                            }
-                                                            if (_update &&
-                                                                widget.product!
-                                                                        .brandId !=
-                                                                    null) {
-                                                              if (brand == 0) {
-                                                                productController.setBrandIndex(
-                                                                    brandIds.indexOf(widget
-                                                                        .product!
-                                                                        .brandId),
-                                                                    false);
-                                                                brand++;
-                                                              }
-                                                            }
-                                                          }
-
-                                                          return DropdownDecoratorWidget(
-                                                            child:
-                                                                DropdownButton<
-                                                                    int>(
-                                                              value:
-                                                                  productController
-                                                                      .brandIndex,
-                                                              icon: const Icon(Icons
-                                                                  .keyboard_arrow_down_outlined),
-                                                              borderRadius: const BorderRadius
-                                                                  .all(
-                                                                  Radius.circular(
-                                                                      Dimensions
-                                                                          .paddingEye)),
-                                                              items: brandIds
-                                                                  .map((int?
-                                                                      value) {
-                                                                return DropdownMenuItem<
-                                                                    int>(
-                                                                  value: brandIds
-                                                                      .indexOf(
-                                                                          value),
-                                                                  child: Text(
-                                                                    value == 0
-                                                                        ? getTranslated(
-                                                                            'no_brand',
-                                                                            context)!
-                                                                        : value ==
-                                                                                -1
-                                                                            ? getTranslated('select_brand',
-                                                                                context)!
-                                                                            : productController.brandList![(brandIds.indexOf(value) - 2)].name!,
-                                                                    style: robotoMedium.copyWith(
-                                                                        color: value ==
-                                                                                -1
-                                                                            ? Theme.of(context).hintColor
-                                                                            : null),
-                                                                  ),
-                                                                );
-                                                              }).toList(),
-                                                              onChanged:
-                                                                  (int? value) {
-                                                                productController
-                                                                    .setBrandIndex(
-                                                                        value,
-                                                                        true);
-                                                                // resProvider.changeBrandSelectedIndex(value);
-                                                              },
-                                                              isExpanded: true,
-                                                              underline:
-                                                                  const SizedBox(),
-                                                            ),
-                                                          );
-                                                        }),
-                                                        const SizedBox(
-                                                            height: Dimensions
-                                                                .paddingSizeSmall),
-                                                        CustomTextFieldWidget(
+                                                        .only(
+                                                        top: Dimensions
+                                                            .paddingSizeSmall),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .only(
+                                                          top: Dimensions
+                                                              .paddingSizeMedium,
+                                                          left: Dimensions
+                                                              .paddingEye,
+                                                          bottom: Dimensions
+                                                              .paddingEye),
+                                                      child: SizedBox(
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        child: TabBar(
+                                                          indicatorSize:
+                                                              TabBarIndicatorSize
+                                                                  .tab,
+                                                          tabAlignment:
+                                                              TabAlignment
+                                                                  .start,
+                                                          isScrollable: true,
+                                                          dividerColor:
+                                                              Theme.of(context)
+                                                                  .hintColor,
                                                           controller:
-                                                              _brandNameController,
-                                                          formProduct: true,
-                                                          border: true,
-                                                          textInputType:
-                                                              TextInputType
-                                                                  .text,
-                                                          hintText: getTranslated(
-                                                              'enter_brand_name_if_not_listed',
-                                                              context),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: Dimensions
-                                                                .paddingSizeExtraSmall),
-                                                        Align(
-                                                          alignment:
-                                                              AlignmentDirectional
-                                                                  .centerStart,
-                                                          child: Text(
-                                                            getTranslated(
-                                                                    'choose_an_existing_brand_or_enter_a_new_name',
-                                                                    context) ??
-                                                                '',
-                                                            style: robotoRegular.copyWith(
+                                                              _tabController,
+                                                          indicatorColor:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          indicatorWeight: 12,
+                                                          labelColor:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          indicator:
+                                                              UnderlineTabIndicator(
+                                                            borderSide: BorderSide(
+                                                                width: 2.0,
                                                                 color: Theme.of(
                                                                         context)
-                                                                    .hintColor,
-                                                                fontSize: Dimensions
-                                                                    .fontSizeSmall),
+                                                                    .primaryColor),
+                                                            insets: EdgeInsets
+                                                                .zero, // no inset — covers full tab
                                                           ),
+                                                          indicatorPadding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      0),
+                                                          unselectedLabelStyle:
+                                                              robotoRegular
+                                                                  .copyWith(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .hintColor,
+                                                          ),
+                                                          labelStyle: robotoBold
+                                                              .copyWith(
+                                                            fontSize: Dimensions
+                                                                .fontSizeLarge,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .disabledColor,
+                                                          ),
+                                                          tabs:
+                                                              _generateTabChildren(),
                                                         ),
-                                                        const SizedBox(
-                                                            height: Dimensions
-                                                                .paddingSizeMedium),
-                                                      ],
+                                                      ),
                                                     ),
-                                                  )
-                                                : const SizedBox(),
-                                            CheckboxListTile(
-                                                value: resProvider
-                                                    .noProductionExpiryDates,
-                                                onChanged: (v) => resProvider
-                                                    .setNoProductionExpiryDates(
-                                                        v ?? false),
-                                                title: Text(getTranslated(
-                                                        'no_production_expiry_dates',
-                                                        context) ??
-                                                    'No production or expiry dates')),
-                                            if (!resProvider
-                                                .noProductionExpiryDates)
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        Dimensions
-                                                            .paddingSizeMedium,
-                                                        Dimensions
-                                                            .paddingSizeMedium,
-                                                        Dimensions
-                                                            .paddingSizeMedium,
-                                                        0),
-                                                child: Row(children: [
-                                                  Expanded(
-                                                      child: InkWell(
-                                                    onTap: () => _selectProductDate(
-                                                        resProvider
-                                                            .productionDateController,
-                                                        false),
-                                                    child: IgnorePointer(
-                                                        child: CustomTextFieldWidget(
-                                                            formProduct: true,
-                                                            required: true,
-                                                            border: true,
-                                                            readOnly: true,
-                                                            controller: resProvider
-                                                                .productionDateController,
-                                                            hintText: getTranslated(
-                                                                'production_date',
-                                                                context)!)),
-                                                  )),
-                                                  const SizedBox(
-                                                      width: Dimensions
-                                                          .paddingSizeSmall),
-                                                  Expanded(
-                                                      child: InkWell(
-                                                    onTap: () => _selectProductDate(
-                                                        resProvider
-                                                            .expiryDateController,
-                                                        true),
-                                                    child: IgnorePointer(
-                                                        child: CustomTextFieldWidget(
-                                                            formProduct: true,
-                                                            required: true,
-                                                            border: true,
-                                                            readOnly: true,
-                                                            controller: resProvider
-                                                                .expiryDateController,
-                                                            hintText:
-                                                                getTranslated(
-                                                                    'expiry_date',
-                                                                    context)!)),
-                                                  )),
-                                                ]),
-                                              ),
-                                            resProvider.productTypeIndex == 0
-                                                ? Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(
-                                                        Dimensions
-                                                            .paddingSizeMedium,
-                                                        Dimensions
-                                                            .paddingSizeMedium,
-                                                        Dimensions
-                                                            .paddingSizeMedium,
-                                                        0),
-                                                    child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                              getTranslated(
-                                                                  'seller_product_sale_unit_and_measurements',
-                                                                  context)!,
-                                                              style: robotoBold.copyWith(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .textTheme
-                                                                      .bodyLarge
-                                                                      ?.color)),
-                                                          const SizedBox(
-                                                              height: Dimensions
-                                                                  .paddingSizeSmall),
-                                                          const SizedBox(
-                                                              height: Dimensions
-                                                                  .paddingSizeSmall),
-                                                          Text(
-                                                              getTranslated(
-                                                                  'seller_product_optional_dimensions',
-                                                                  context)!,
-                                                              style: robotoRegular.copyWith(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .hintColor)),
-                                                          const SizedBox(
-                                                              height: Dimensions
-                                                                  .paddingSizeSmall),
-                                                          Row(children: [
-                                                            Expanded(
-                                                                child: CustomTextFieldWidget(
-                                                                    formProduct:
-                                                                        true,
-                                                                    border:
-                                                                        true,
-                                                                    controller:
-                                                                        resProvider
-                                                                            .lengthController,
-                                                                    textInputType:
-                                                                        TextInputType
-                                                                            .number,
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .next,
-                                                                    hintText: getTranslated(
-                                                                        'seller_product_length',
-                                                                        context)!)),
-                                                            const SizedBox(
-                                                                width: Dimensions
-                                                                    .paddingSizeSmall),
-                                                            Expanded(
-                                                                child: CustomTextFieldWidget(
-                                                                    formProduct:
-                                                                        true,
-                                                                    border:
-                                                                        true,
-                                                                    controller:
-                                                                        resProvider
-                                                                            .widthController,
-                                                                    textInputType:
-                                                                        TextInputType
-                                                                            .number,
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .next,
-                                                                    hintText: getTranslated(
-                                                                        'seller_product_width',
-                                                                        context)!)),
-                                                            const SizedBox(
-                                                                width: Dimensions
-                                                                    .paddingSizeSmall),
-                                                            Expanded(
-                                                                child: CustomTextFieldWidget(
-                                                                    formProduct:
-                                                                        true,
-                                                                    border:
-                                                                        true,
-                                                                    controller:
-                                                                        resProvider
-                                                                            .heightController,
-                                                                    textInputType:
-                                                                        TextInputType
-                                                                            .number,
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .next,
-                                                                    hintText: getTranslated(
-                                                                        'seller_product_height',
-                                                                        context)!)),
-                                                          ]),
-                                                          DropdownDecoratorWidget(
-                                                            title:
-                                                                'seller_product_dimension_unit',
-                                                            child:
-                                                                DropdownButton<
-                                                                    String>(
-                                                              value: resProvider
-                                                                  .dimensionUnit,
-                                                              isExpanded: true,
-                                                              underline:
-                                                                  const SizedBox(),
-                                                              items: const [
-                                                                'cm',
-                                                                'm'
-                                                              ]
-                                                                  .map((value) => DropdownMenuItem<
-                                                                          String>(
-                                                                      value:
-                                                                          value,
-                                                                      child: Text(
-                                                                          value)))
-                                                                  .toList(),
-                                                              onChanged:
-                                                                  (value) {
-                                                                if (value !=
-                                                                    null)
-                                                                  resProvider
-                                                                      .setDimensionUnit(
-                                                                          value);
-                                                              },
-                                                            ),
-                                                          ),
-                                                          Row(children: [
-                                                            Expanded(
-                                                                child: CustomTextFieldWidget(
-                                                                    formProduct:
-                                                                        true,
-                                                                    border:
-                                                                        true,
-                                                                    controller:
-                                                                        resProvider
-                                                                            .weightController,
-                                                                    textInputType:
-                                                                        TextInputType
-                                                                            .number,
-                                                                    textInputAction:
-                                                                        TextInputAction
-                                                                            .done,
-                                                                    hintText: getTranslated(
-                                                                        'seller_product_weight',
-                                                                        context)!)),
-                                                            const SizedBox(
-                                                                width: Dimensions
-                                                                    .paddingSizeSmall),
-                                                            Expanded(
-                                                                child:
-                                                                    DropdownDecoratorWidget(
-                                                              title:
-                                                                  'seller_product_weight_unit',
-                                                              child:
-                                                                  DropdownButton<
-                                                                      String>(
-                                                                value: resProvider
-                                                                    .weightUnit,
-                                                                isExpanded:
-                                                                    true,
-                                                                underline:
-                                                                    const SizedBox(),
-                                                                items: const [
-                                                                  'g',
-                                                                  'kg'
-                                                                ]
-                                                                    .map((value) => DropdownMenuItem<
-                                                                            String>(
-                                                                        value:
-                                                                            value,
-                                                                        child: Text(
-                                                                            value)))
-                                                                    .toList(),
-                                                                onChanged:
-                                                                    (value) {
-                                                                  if (value !=
-                                                                      null)
-                                                                    resProvider
-                                                                        .setWeightUnit(
-                                                                            value);
-                                                                },
-                                                              ),
-                                                            )),
-                                                          ]),
-                                                        ]),
-                                                  )
-                                                : const SizedBox(),
-                                            false &&
-                                                    Provider.of<SplashController>(
+                                                  ),
+                                                  SizedBox(
+                                                      height: 235,
+                                                      child: AnimatedBuilder(
+                                                        animation:
+                                                            _tabController!,
+                                                        builder: (BuildContext
                                                                 context,
-                                                                listen: false)
-                                                            .configModel!
-                                                            .digitalProductSetting ==
-                                                        "1"
-                                                ? DigitalProductWidget(
-                                                    resProvider: resProvider,
-                                                    product: widget.product)
-                                                : const SizedBox(),
-                                            Consumer<DigitalProductController>(
-                                                builder: (context,
-                                                    digitalProductController,
-                                                    child) {
-                                              return Column(
-                                                children: [
-                                                  //Author
-                                                  resProvider.productTypeIndex ==
-                                                          1
-                                                      ? Padding(
-                                                          padding: const EdgeInsets
-                                                              .symmetric(
-                                                              horizontal: Dimensions
-                                                                  .paddingSizeMedium,
-                                                              vertical: Dimensions
-                                                                  .paddingSizeSmall),
-                                                          child: Autocomplete<
-                                                              String>(
-                                                            optionsBuilder:
-                                                                (TextEditingValue
-                                                                    value) {
-                                                              if (value.text
-                                                                  .isEmpty) {
-                                                                return const Iterable<
-                                                                    String>.empty();
-                                                              } else {
-                                                                return authors.where((author) => author
-                                                                    .toLowerCase()
-                                                                    .contains(value
-                                                                        .text
-                                                                        .toLowerCase()));
-                                                              }
-                                                            },
-                                                            fieldViewBuilder:
-                                                                (context,
-                                                                    controller,
-                                                                    node,
-                                                                    onComplete) {
-                                                              _authorFocus =
-                                                                  node;
-                                                              if (!node
-                                                                  .hasFocus) {
-                                                                _authorFocus
-                                                                    .unfocus();
-                                                              } else {
-                                                                _authorFocus
-                                                                    .requestFocus();
-                                                              }
-                                                              return TextField(
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .text,
-                                                                controller:
-                                                                    controller,
-                                                                focusNode: node,
-                                                                onEditingComplete:
-                                                                    onComplete,
-                                                                onSubmitted:
-                                                                    (value) {
-                                                                  if (digitalProductController
-                                                                      .selectedAuthors!
-                                                                      .isEmpty) {
-                                                                    _scrollController.jumpTo(
-                                                                        _scrollController.offset +
-                                                                            20);
-                                                                  }
-                                                                  digitalProductController
-                                                                      .addAuthor(
-                                                                          value);
-                                                                  // controller.text = '';
-                                                                },
-                                                                onChanged: (value) =>
-                                                                    _onChangeOptionHeight(
-                                                                        value,
-                                                                        authors),
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  contentPadding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          Dimensions
-                                                                              .paddingSize,
-                                                                      horizontal:
-                                                                          Dimensions
-                                                                              .paddingSizeMedium),
-                                                                  hintText: getTranslated(
-                                                                      'author_creator_artist',
-                                                                      context),
-                                                                  hintStyle: TextStyle(
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .hintColor),
-                                                                  labelText: getTranslated(
-                                                                      'author_creator_artist',
-                                                                      context),
-                                                                  labelStyle: TextStyle(
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .bodyLarge
-                                                                          ?.color),
-                                                                  border:
-                                                                      InputBorder
-                                                                          .none,
-                                                                  focusedBorder: OutlineInputBorder(
-                                                                      borderSide: BorderSide(
-                                                                          color: Theme.of(context)
-                                                                              .primaryColor),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8)),
-                                                                  enabledBorder: OutlineInputBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8),
-                                                                      borderSide: BorderSide(
-                                                                          color: Theme.of(context)
-                                                                              .primaryColor
-                                                                              .withValues(alpha: .25),
-                                                                          width: .75)),
-                                                                ),
-                                                              );
-                                                            },
-                                                            displayStringForOption:
-                                                                (value) =>
-                                                                    value,
-                                                            onSelected:
-                                                                (String value) {
-                                                              // resProvider.addAuthor(value);
-                                                            },
-                                                            optionsViewBuilder: (BuildContext
-                                                                    context,
-                                                                AutocompleteOnSelected<
-                                                                        String>
-                                                                    onSelected,
-                                                                Iterable<String>
-                                                                    options) {
-                                                              return Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topLeft,
-                                                                child:
-                                                                    Container(
-                                                                  height: (keyboardHeight ==
-                                                                              0 &&
-                                                                          (_authorFocus
-                                                                              .hasFocus))
-                                                                      ? 155
-                                                                      : 250,
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          right:
-                                                                              8.0), // Add padding to the right
-                                                                  width: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
-                                                                      0.9, // Adjust the width if needed
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .cardColor,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            Dimensions.radiusDefault),
-                                                                    boxShadow: [
-                                                                      BoxShadow(
-                                                                          color: Colors.grey[Provider.of<ThemeController>(context).darkTheme
-                                                                              ? 800
-                                                                              : 200]!,
-                                                                          spreadRadius:
-                                                                              0.5,
-                                                                          blurRadius:
-                                                                              0.3)
-                                                                    ],
-                                                                  ),
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    itemCount:
-                                                                        options
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (BuildContext
-                                                                                context,
-                                                                            int index) {
-                                                                      final String
-                                                                          option =
-                                                                          options
-                                                                              .elementAt(index);
-                                                                      return InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          onSelected(
-                                                                              option);
-                                                                        },
-                                                                        child:
-                                                                            Builder(
-                                                                          builder:
-                                                                              (BuildContext context) {
-                                                                            final bool
-                                                                                highlight =
-                                                                                AutocompleteHighlightedOption.of(context) == index;
-                                                                            if (highlight) {
-                                                                              SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-                                                                                Scrollable.ensureVisible(context, alignment: 0.5);
-                                                                              }, debugLabel: 'AutocompleteOptions.ensureVisible');
-                                                                            }
-                                                                            return Container(
-                                                                              color: highlight ? Theme.of(context).focusColor : null,
-                                                                              padding: const EdgeInsets.all(16.0),
-                                                                              child: Text(option),
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        )
-                                                      : const SizedBox(),
-
-                                                  if (resProvider
-                                                              .productTypeIndex ==
-                                                          1 &&
-                                                      digitalProductController
-                                                          .selectedAuthors!
-                                                          .isNotEmpty)
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: Dimensions
-                                                              .paddingSizeMedium),
-                                                      child: SizedBox(
-                                                        height: (resProvider
-                                                                        .productTypeIndex ==
-                                                                    1 &&
-                                                                digitalProductController
-                                                                    .selectedAuthors!
-                                                                    .isNotEmpty)
-                                                            ? 40
-                                                            : 0,
-                                                        child: (digitalProductController
-                                                                .selectedAuthors!
-                                                                .isNotEmpty)
-                                                            ? ListView.builder(
-                                                                itemCount:
-                                                                    digitalProductController
-                                                                        .selectedAuthors!
-                                                                        .length,
-                                                                scrollDirection:
-                                                                    Axis.horizontal,
-                                                                itemBuilder:
-                                                                    (context,
-                                                                        index) {
-                                                                  return Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .all(
-                                                                        Dimensions
-                                                                            .paddingSizeVeryTiny),
-                                                                    child:
-                                                                        Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              Dimensions.paddingSizeMedium),
-                                                                      margin: const EdgeInsets
-                                                                          .only(
-                                                                          right:
-                                                                              Dimensions.paddingSizeSmall),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Theme.of(context)
-                                                                            .primaryColor
-                                                                            .withValues(alpha: .20),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(Dimensions.paddingSizeDefault),
-                                                                      ),
-                                                                      child: Row(
-                                                                          children: [
-                                                                            Consumer<SplashController>(builder: (ctx,
-                                                                                colorP,
-                                                                                child) {
-                                                                              return Text(
-                                                                                digitalProductController.selectedAuthors![index],
-                                                                                style: robotoRegular.copyWith(color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                              );
-                                                                            }),
-                                                                            const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                                            InkWell(
-                                                                              splashColor: Colors.transparent,
-                                                                              onTap: () {
-                                                                                digitalProductController.removeAuthor(index);
-                                                                              },
-                                                                              child: Icon(Icons.close, size: 15, color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                            ),
-                                                                          ]),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                              )
-                                                            : const SizedBox(),
-                                                      ),
-                                                    ),
-
-                                                  const SizedBox(
-                                                      height: Dimensions
-                                                          .paddingSizeSmall),
-
-                                                  ///Publishing
-                                                  resProvider.productTypeIndex ==
-                                                          1
-                                                      ? Padding(
-                                                          padding: const EdgeInsets
-                                                              .symmetric(
-                                                              horizontal: Dimensions
-                                                                  .paddingSizeMedium,
-                                                              vertical: Dimensions
-                                                                  .paddingSizeSmall),
-                                                          child: Autocomplete<
-                                                              String>(
-                                                            optionsBuilder:
-                                                                (TextEditingValue
-                                                                    value) {
-                                                              if (value.text
-                                                                  .isEmpty) {
-                                                                return const Iterable<
-                                                                    String>.empty();
-                                                              } else {
-                                                                return publishingHouses.where((author) => author
-                                                                    .toLowerCase()
-                                                                    .contains(value
-                                                                        .text
-                                                                        .toLowerCase()));
-                                                              }
-                                                            },
-                                                            fieldViewBuilder:
-                                                                (context,
-                                                                    controller,
-                                                                    node,
-                                                                    onComplete) {
-                                                              _publishingFocus =
-                                                                  node;
-                                                              if (!node
-                                                                  .hasFocus) {
-                                                                _publishingFocus
-                                                                    .unfocus();
-                                                              } else {
-                                                                _publishingFocus
-                                                                    .requestFocus();
-                                                              }
-                                                              return TextField(
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .text,
-                                                                controller:
-                                                                    controller,
-                                                                focusNode: node,
-                                                                onEditingComplete:
-                                                                    onComplete,
-                                                                onSubmitted:
-                                                                    (value) {
-                                                                  if (digitalProductController
-                                                                      .selectedPublishingHouse!
-                                                                      .isEmpty) {
-                                                                    _scrollController.jumpTo(
-                                                                        _scrollController.offset +
-                                                                            20);
-                                                                  }
-                                                                  digitalProductController
-                                                                      .addPublishingHouse(
-                                                                          value);
-                                                                },
-                                                                onChanged: (value) =>
-                                                                    _onChangeOptionHeight(
-                                                                        value,
-                                                                        publishingHouses),
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  hintText: getTranslated(
-                                                                      'publishing_house',
-                                                                      context),
-                                                                  contentPadding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          Dimensions
-                                                                              .paddingSize,
-                                                                      horizontal:
-                                                                          Dimensions
-                                                                              .paddingSizeMedium),
-                                                                  hintStyle: TextStyle(
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .hintColor),
-                                                                  labelText: getTranslated(
-                                                                      'publishing_house',
-                                                                      context),
-                                                                  labelStyle: TextStyle(
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .bodyLarge
-                                                                          ?.color),
-                                                                  border:
-                                                                      InputBorder
-                                                                          .none,
-                                                                  focusedBorder:
-                                                                      OutlineInputBorder(
-                                                                          borderSide:
-                                                                              BorderSide(color: Theme.of(context).primaryColor)),
-                                                                  enabledBorder: OutlineInputBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8),
-                                                                      borderSide: BorderSide(
-                                                                          color: Theme.of(context)
-                                                                              .primaryColor
-                                                                              .withValues(alpha: .25),
-                                                                          width: .75)),
-                                                                ),
-                                                              );
-                                                            },
-                                                            displayStringForOption:
-                                                                (value) =>
-                                                                    value,
-                                                            onSelected:
-                                                                (String value) {
-                                                              // resProvider.addAuthor(value);
-                                                            },
-                                                            optionsViewBuilder: (BuildContext
-                                                                    context,
-                                                                AutocompleteOnSelected<
-                                                                        String>
-                                                                    onSelected,
-                                                                Iterable<String>
-                                                                    options) {
-                                                              return Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topLeft,
-                                                                child:
-                                                                    Container(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          right:
-                                                                              8.0), // Add padding to the right
-                                                                  width: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
-                                                                      0.9, //
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .cardColor,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            Dimensions.radiusDefault),
-                                                                    boxShadow: [
-                                                                      BoxShadow(
-                                                                          color: Colors.grey[Provider.of<ThemeController>(context).darkTheme
-                                                                              ? 800
-                                                                              : 200]!,
-                                                                          spreadRadius:
-                                                                              0.5,
-                                                                          blurRadius:
-                                                                              0.3)
-                                                                    ],
-                                                                  ),
-
-                                                                  // Adjust the width if needed
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    itemCount:
-                                                                        options
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (BuildContext
-                                                                                context,
-                                                                            int index) {
-                                                                      final String
-                                                                          option =
-                                                                          options
-                                                                              .elementAt(index);
-                                                                      return InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          onSelected(
-                                                                              option);
-                                                                        },
-                                                                        child:
-                                                                            Builder(
-                                                                          builder:
-                                                                              (BuildContext context) {
-                                                                            final bool
-                                                                                highlight =
-                                                                                AutocompleteHighlightedOption.of(context) == index;
-                                                                            if (highlight) {
-                                                                              SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-                                                                                Scrollable.ensureVisible(context, alignment: 0.5);
-                                                                              }, debugLabel: 'AutocompleteOptions.ensureVisible');
-                                                                            }
-                                                                            return Container(
-                                                                              color: highlight ? Theme.of(context).focusColor : null,
-                                                                              padding: const EdgeInsets.all(16.0),
-                                                                              child: Text(option),
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        )
-                                                      : const SizedBox(),
-
-                                                  if (resProvider
-                                                              .productTypeIndex ==
-                                                          1 &&
-                                                      digitalProductController
-                                                          .selectedPublishingHouse!
-                                                          .isNotEmpty)
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: Dimensions
-                                                              .paddingSizeMedium),
-                                                      child: SizedBox(
-                                                        height: (resProvider
-                                                                        .productTypeIndex ==
-                                                                    1 &&
-                                                                digitalProductController
-                                                                    .selectedPublishingHouse!
-                                                                    .isNotEmpty)
-                                                            ? 40
-                                                            : 0,
-                                                        child: (digitalProductController
-                                                                .selectedPublishingHouse!
-                                                                .isNotEmpty)
-                                                            ? ListView.builder(
-                                                                itemCount:
-                                                                    digitalProductController
-                                                                        .selectedPublishingHouse!
-                                                                        .length,
-                                                                scrollDirection:
-                                                                    Axis.horizontal,
-                                                                itemBuilder:
-                                                                    (context,
-                                                                        index) {
-                                                                  return Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .all(
-                                                                        Dimensions
-                                                                            .paddingSizeVeryTiny),
-                                                                    child:
-                                                                        Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              Dimensions.paddingSizeMedium),
-                                                                      margin: const EdgeInsets
-                                                                          .only(
-                                                                          right:
-                                                                              Dimensions.paddingSizeSmall),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Theme.of(context)
-                                                                            .primaryColor
-                                                                            .withValues(alpha: .20),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(Dimensions.paddingSizeDefault),
-                                                                      ),
-                                                                      child: Row(
-                                                                          children: [
-                                                                            Consumer<SplashController>(builder: (ctx,
-                                                                                colorP,
-                                                                                child) {
-                                                                              return Text(
-                                                                                digitalProductController.selectedPublishingHouse![index],
-                                                                                style: robotoRegular.copyWith(color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                              );
-                                                                            }),
-                                                                            const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                                            InkWell(
-                                                                              splashColor: Colors.transparent,
-                                                                              onTap: () {
-                                                                                digitalProductController.removePublishingHouse(index);
-                                                                              },
-                                                                              child: Icon(Icons.close, size: 15, color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                            ),
-                                                                          ]),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                              )
-                                                            : const SizedBox(),
-                                                      ),
-                                                    ),
-                                                  //End Author Publishing
-
-                                                  const SizedBox(
-                                                      height: Dimensions
-                                                          .paddingSizeSmall),
-
-                                                  resProvider.productTypeIndex ==
-                                                          1
-                                                      ? Padding(
-                                                          padding: const EdgeInsets
-                                                              .symmetric(
-                                                              horizontal: Dimensions
-                                                                  .paddingSizeMedium),
-                                                          child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                DropdownDecoratorWidget(
-                                                                  title:
-                                                                      'delivery_type',
-                                                                  child:
-                                                                      DropdownButton<
-                                                                          String>(
-                                                                    icon: const Icon(
-                                                                        Icons
-                                                                            .keyboard_arrow_down_outlined),
-                                                                    borderRadius:
-                                                                        const BorderRadius
-                                                                            .all(
-                                                                            Radius.circular(Dimensions.paddingEye)),
-                                                                    value: digitalProductController.digitalProductTypeIndex ==
-                                                                            0
-                                                                        ? 'ready_after_sell'
-                                                                        : 'ready_product',
-                                                                    items: deliveryTypeList
-                                                                        .map((String
-                                                                            value) {
-                                                                      return DropdownMenuItem<
-                                                                              String>(
-                                                                          value:
-                                                                              value,
-                                                                          child: Text(
-                                                                              getTranslated(value, context)!,
-                                                                              style: robotoMedium));
-                                                                    }).toList(),
-                                                                    onChanged:
-                                                                        (value) {
-                                                                      digitalProductController.setDigitalProductTypeIndex(
-                                                                          value == 'ready_after_sell'
-                                                                              ? 0
-                                                                              : 1,
-                                                                          true);
-                                                                    },
-                                                                    isExpanded:
-                                                                        true,
-                                                                    underline:
-                                                                        const SizedBox(),
-                                                                  ),
-                                                                ),
-                                                              ]),
-                                                        )
-                                                      : const SizedBox(),
+                                                            Widget? child) {
+                                                          return TabBarView(
+                                                              controller:
+                                                                  _tabController,
+                                                              children: _generateTabPage(
+                                                                  resProvider,
+                                                                  _tabController));
+                                                        },
+                                                      )),
                                                 ],
-                                              );
-                                            }),
-                                            const SizedBox(height: 15),
+                                              ),
+                                            ),
                                           ],
                                         );
                                       }),
                                       const SizedBox(
                                           height:
                                               Dimensions.paddingSizeDefault),
-                                      AddProductSectionWidget(
-                                        title: getTranslated(
-                                            'additional_product_images',
-                                            context)!,
-                                        subTitle: getTranslated(
-                                            'upload_any_additional_images_for',
-                                            context)!,
-                                        childrens: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: Dimensions
-                                                    .paddingSizeDefault,
-                                                vertical: Dimensions
-                                                    .paddingSizeSmall),
-                                            child: Consumer<
-                                                    AddProductImageController>(
-                                                builder: (context,
-                                                    imageController, _) {
-                                              final existingCount = _update
-                                                  ? (widget.product
-                                                          ?.imagesFullUrl
-                                                          ?.where((image) =>
-                                                              image.path
-                                                                  ?.isNotEmpty ??
-                                                              false)
-                                                          .length ??
-                                                      0)
-                                                  : 0;
-                                              final colorCount = imageController
-                                                  .imagesWithColor
-                                                  .where((image) =>
-                                                      image.image != null)
-                                                  .length;
-                                              final count = existingCount +
-                                                  imageController
-                                                      .withoutColor.length +
-                                                  colorCount;
-                                              final isComplete = count >= 5;
-                                              return Row(children: [
-                                                Icon(
-                                                    isComplete
-                                                        ? Icons
-                                                            .check_circle_outline
-                                                        : Icons
-                                                            .photo_library_outlined,
-                                                    color: isComplete
-                                                        ? Colors.green
-                                                        : Theme.of(context)
-                                                            .colorScheme
-                                                            .error),
-                                                const SizedBox(
-                                                    width: Dimensions
-                                                        .paddingSizeSmall),
-                                                Text(
-                                                    '${getTranslated('seller_product_images_count', context)}: $count/5',
-                                                    style:
-                                                        robotoMedium.copyWith(
-                                                            color: isComplete
-                                                                ? Colors.green
-                                                                : Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .error)),
-                                              ]);
-                                            }),
-                                          ),
-                                          if (_update)
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: Dimensions
-                                                      .paddingSizeDefault,
-                                                  vertical: Dimensions
-                                                      .paddingSizeSmall),
-                                              child:
-                                                  Consumer<VariationController>(
-                                                      builder: (context,
-                                                          variationController,
-                                                          _) {
-                                                return Consumer<
-                                                        AddProductImageController>(
-                                                    builder: (context,
-                                                        addProductImageController,
-                                                        _) {
-                                                  return GridView.builder(
-                                                      gridDelegate:
-                                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                                              childAspectRatio:
-                                                                  1,
-                                                              crossAxisCount: 2,
-                                                              crossAxisSpacing:
-                                                                  10,
-                                                              mainAxisSpacing:
-                                                                  10),
-                                                      shrinkWrap: true,
-                                                      physics:
-                                                          const NeverScrollableScrollPhysics(),
-                                                      itemCount:
-                                                          addProductImageController
-                                                              .imagesWithoutColor
-                                                              .length,
-                                                      itemBuilder:
-                                                          (BuildContext context,
-                                                              index) {
-                                                        return Stack(children: [
-                                                          DottedBorder(
-                                                            options:
-                                                                RoundedRectDottedBorderOptions(
-                                                              dashPattern: const [
-                                                                4,
-                                                                5
-                                                              ],
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .hintColor,
-                                                              radius:
-                                                                  const Radius
-                                                                      .circular(
-                                                                      15),
-                                                            ),
-                                                            child: Container(
-                                                              decoration: const BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              20))),
-                                                              child: ClipRRect(
-                                                                borderRadius: const BorderRadius
-                                                                    .all(
-                                                                    Radius.circular(
-                                                                        Dimensions
-                                                                            .paddingSizeSmall)),
-                                                                child:
-                                                                    CustomImageWidget(
-                                                                  image: addProductImageController
-                                                                          .imagesWithoutColor[
-                                                                      index],
-                                                                  width: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width /
-                                                                      2.3,
-                                                                  height: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width /
-                                                                      2.3,
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Positioned(
-                                                              top: 5,
-                                                              right: 5,
-                                                              child: InkWell(
-                                                                splashColor: Colors
-                                                                    .transparent,
-                                                                onTap: () =>
-                                                                    addProductImageController
-                                                                        .deleteProductImage(
-                                                                  '${widget.product?.id}',
-                                                                  _getFilenameFromFullImagePath(
-                                                                      addProductImageController
-                                                                              .imagesWithoutColor[
-                                                                          index]),
-                                                                  null,
-                                                                ),
-                                                                child:
-                                                                    Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    boxShadow: [
-                                                                      BoxShadow(
-                                                                        color: Theme.of(context)
-                                                                            .hintColor
-                                                                            .withValues(alpha: .25),
-                                                                        blurRadius:
-                                                                            1,
-                                                                        spreadRadius:
-                                                                            1,
-                                                                        offset: const Offset(
-                                                                            0,
-                                                                            0),
-                                                                      )
-                                                                    ],
-                                                                    borderRadius:
-                                                                        const BorderRadius
-                                                                            .all(
-                                                                            Radius.circular(Dimensions.paddingSizeDefault)),
-                                                                  ),
-                                                                  child:
-                                                                      const Padding(
-                                                                    padding:
-                                                                        EdgeInsets.all(
-                                                                            4.0),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .delete_forever_rounded,
-                                                                      color: Colors
-                                                                          .red,
-                                                                      size: 25,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              )),
-                                                        ]);
-                                                      });
-                                                });
-                                              }),
-                                            ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: Dimensions
-                                                    .paddingSizeDefault,
-                                                vertical: Dimensions
-                                                    .paddingSizeSmall),
-                                            child: Consumer<
-                                                    AddProductImageController>(
-                                                builder: (context,
-                                                    addProductImageController,
-                                                    child) {
-                                              return GridView.builder(
-                                                  gridDelegate:
-                                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                                    childAspectRatio: 1,
-                                                    crossAxisCount: 2,
-                                                    crossAxisSpacing: 10,
-                                                    mainAxisSpacing: 10,
-                                                  ),
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  itemCount:
-                                                      addProductImageController
-                                                              .withoutColor
-                                                              .length +
-                                                          1,
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          index) {
-                                                    return index ==
-                                                            addProductImageController
-                                                                .withoutColor
-                                                                .length
-                                                        ? GestureDetector(
-                                                            onTap: () {
-                                                              final existingCount = _update
-                                                                  ? (widget
-                                                                          .product
-                                                                          ?.imagesFullUrl
-                                                                          ?.where((image) =>
-                                                                              image.path?.isNotEmpty ??
-                                                                              false)
-                                                                          .length ??
-                                                                      0)
-                                                                  : 0;
-                                                              final colorImageCount =
-                                                                  addProductImageController
-                                                                      .imagesWithColor
-                                                                      .where((image) =>
-                                                                          image
-                                                                              .image !=
-                                                                          null)
-                                                                      .length;
-                                                              addProductImageController
-                                                                  .pickAdditionalImages(
-                                                                existingCount:
-                                                                    existingCount,
-                                                                colorImageCount:
-                                                                    colorImageCount,
-                                                              );
-                                                            },
-                                                            child: Stack(
-                                                              children: [
-                                                                DottedBorder(
-                                                                  options:
-                                                                      RoundedRectDottedBorderOptions(
-                                                                    dashPattern: const [
-                                                                      4,
-                                                                      5
-                                                                    ],
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .hintColor,
-                                                                    radius: const Radius
-                                                                        .circular(
-                                                                        15),
-                                                                  ),
-                                                                  child:
-                                                                      ClipRRect(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            Dimensions.paddingSizeSmall),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      Images
-                                                                          .placeholderImage,
-                                                                      height: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width /
-                                                                          2.3,
-                                                                      width: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width /
-                                                                          2.3,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .highlightColor,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Positioned(
-                                                                  bottom: 0,
-                                                                  right: 0,
-                                                                  top: 0,
-                                                                  left: 0,
-                                                                  child: Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .center,
-                                                                    child: Column(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          CustomAssetImageWidget(
-                                                                              Images.addImageIcon,
-                                                                              height: 30,
-                                                                              width: 30,
-                                                                              color: Theme.of(context).hintColor.withValues(alpha: .7)),
-                                                                          const SizedBox(
-                                                                              height: Dimensions.paddingSizeSmall),
-                                                                          Text(
-                                                                              getTranslated('click_to_add', context)!,
-                                                                              style: robotoRegular.copyWith(color: Theme.of(context).textTheme.headlineMedium?.color))
-                                                                        ]),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          )
-                                                        : Stack(
-                                                            children: [
-                                                              DottedBorder(
-                                                                options:
-                                                                    RoundedRectDottedBorderOptions(
-                                                                  dashPattern: const [
-                                                                    4,
-                                                                    5
-                                                                  ],
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .hintColor,
-                                                                  radius: const Radius
-                                                                      .circular(
-                                                                      15),
-                                                                ),
-                                                                child:
-                                                                    Container(
-                                                                  decoration:
-                                                                      const BoxDecoration(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(20)),
-                                                                  ),
-                                                                  child:
-                                                                      ClipRRect(
-                                                                    borderRadius:
-                                                                        const BorderRadius
-                                                                            .all(
-                                                                            Radius.circular(Dimensions.paddingSizeSmall)),
-                                                                    child: Image
-                                                                        .file(
-                                                                      File(addProductImageController
-                                                                          .withoutColor[
-                                                                              index]
-                                                                          .image!
-                                                                          .path),
-                                                                      width: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width /
-                                                                          2.3,
-                                                                      height: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width /
-                                                                          2.3,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Positioned(
-                                                                top: 5,
-                                                                right: 5,
-                                                                child: InkWell(
-                                                                  splashColor:
-                                                                      Colors
-                                                                          .transparent,
-                                                                  onTap: () => addProductImageController
-                                                                      .removeImage(
-                                                                          index,
-                                                                          false),
-                                                                  child: Container(
-                                                                      decoration: BoxDecoration(
-                                                                          color: Colors.white,
-                                                                          boxShadow: [
-                                                                            BoxShadow(
-                                                                                color: Theme.of(context).hintColor.withValues(alpha: .25),
-                                                                                blurRadius: 1,
-                                                                                spreadRadius: 1,
-                                                                                offset: const Offset(0, 0))
-                                                                          ],
-                                                                          borderRadius: const BorderRadius.all(Radius.circular(Dimensions.paddingSizeDefault))),
-                                                                      child: const Padding(
-                                                                          padding: EdgeInsets.all(4.0),
-                                                                          child: Icon(
-                                                                            Icons.delete_forever_rounded,
-                                                                            color:
-                                                                                Colors.red,
-                                                                            size:
-                                                                                25,
-                                                                          ))),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          );
-                                                  });
-                                            }),
-                                          ),
-                                        ],
-                                      ),
+                                      const SizedBox(
+                                          height:
+                                              Dimensions.paddingSizeDefault),
                                       const SizedBox(
                                           height:
                                               Dimensions.paddingSizeDefault),
@@ -2798,11 +1516,872 @@ class AddProductScreenState extends State<AddProductScreen>
     ];
   }
 
+  Widget buildProductDetails(BuildContext context) {
+    final resProvider = Provider.of<AddProductController>(context);
+    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
+    return Column(children: [
+      Consumer<AiController>(builder: (context, aiController, child) {
+        return AddProductSectionWidget(
+          title: getTranslated('general_setup', context)!,
+          subTitle: getTranslated(
+              'here_you_can_set_up_the_foundational_details', context)!,
+          isAiGenerating: (aiController.generalSetupLoading),
+          aiWidget:
+              Consumer<AiController>(builder: (context, aiController, child) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                InkWell(
+                  onTap: () {
+                    if (resProvider
+                        .titleControllerList[_tabController?.index ?? 0]
+                        .text
+                        .isEmpty) {
+                      showCustomSnackBarWidget(
+                          '${getTranslated('product_name_required', context)}',
+                          context);
+                    } else if (resProvider
+                        .descriptionControllerList[_tabController?.index ?? 0]
+                        .text
+                        .isEmpty) {
+                      showCustomSnackBarWidget(
+                          '${getTranslated('product_description_required', context)}',
+                          context);
+                    } else {
+                      resProvider.generateAndSetOtherData(
+                        title: resProvider
+                            .titleControllerList[_tabController?.index ?? 0]
+                            .text
+                            .trim(),
+                        description: resProvider
+                            .descriptionControllerList[
+                                _tabController?.index ?? 0]
+                            .text
+                            .trim(),
+                        langCode: Provider.of<SplashController>(context,
+                                    listen: false)
+                                .configModel
+                                ?.languageList?[_tabController?.index ?? 0]
+                                .code ??
+                            'en',
+                      );
+                    }
+                  },
+                  child: !aiController.generalSetupLoading
+                      ? Icon(Icons.auto_awesome, color: Colors.blue)
+                      : Shimmer.fromColors(
+                          baseColor: Theme.of(context)
+                              .hintColor
+                              .withValues(alpha: 0.18),
+                          highlightColor: Theme.of(context)
+                              .hintColor
+                              .withValues(alpha: 0.06),
+                          child: Row(children: [
+                            Icon(Icons.auto_awesome, color: Colors.blue),
+                            const SizedBox(
+                                width: Dimensions.paddingSizeExtraSmall),
+                            Text(getTranslated('generating', context) ?? '',
+                                style: robotoBold.copyWith(color: Colors.blue)),
+                          ]),
+                        ),
+                ),
+              ],
+            );
+          }),
+          childrens: <Widget>[
+            const SizedBox(height: Dimensions.paddingSizeSmall),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Dimensions.paddingSizeMedium),
+              child: SelectCategoryWidget(product: widget.product),
+            ),
+            Provider.of<SplashController>(context, listen: false)
+                            .configModel
+                            ?.brandSetting ==
+                        "1" &&
+                    resProvider.productTypeIndex != 1
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: Dimensions.paddingSizeMedium),
+                    child: Column(
+                      children: [
+                        Consumer<ProductController>(
+                            builder: (context, productController, _) {
+                          brandIds = [];
+                          brandIds.add(-1);
+                          brandIds.add(0);
+                          if (productController.brandList != null) {
+                            for (int index = 0;
+                                index < productController.brandList!.length;
+                                index++) {
+                              brandIds
+                                  .add(productController.brandList![index].id);
+                            }
+                            if (_update && widget.product!.brandId != null) {
+                              if (brand == 0) {
+                                productController.setBrandIndex(
+                                    brandIds.indexOf(widget.product!.brandId),
+                                    false);
+                                brand++;
+                              }
+                            }
+                          }
+
+                          brandIds.add(-2);
+                          return DropdownDecoratorWidget(
+                            child: DropdownButton<int>(
+                              value: productController.brandIndex,
+                              icon: const Icon(
+                                  Icons.keyboard_arrow_down_outlined),
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(Dimensions.paddingEye)),
+                              items: brandIds.map((int? value) {
+                                return DropdownMenuItem<int>(
+                                  value: brandIds.indexOf(value),
+                                  child: Text(
+                                    value == -2
+                                        ? (getTranslated('other', context) ??
+                                            'Other')
+                                        : value == 0
+                                            ? getTranslated(
+                                                'no_brand', context)!
+                                            : value == -1
+                                                ? getTranslated(
+                                                    'select_brand', context)!
+                                                : productController
+                                                    .brandList![(brandIds
+                                                            .indexOf(value) -
+                                                        2)]
+                                                    .name!,
+                                    style: robotoMedium.copyWith(
+                                        color: value == -1
+                                            ? Theme.of(context).hintColor
+                                            : null),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (int? value) {
+                                productController.setBrandIndex(value, true);
+                                // resProvider.changeBrandSelectedIndex(value);
+                              },
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+                        CustomTextFieldWidget(
+                          controller: _brandNameController,
+                          formProduct: true,
+                          border: true,
+                          textInputType: TextInputType.text,
+                          hintText: getTranslated(
+                              'enter_brand_name_if_not_listed', context),
+                        ),
+                        const SizedBox(
+                            height: Dimensions.paddingSizeExtraSmall),
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            getTranslated(
+                                    'choose_an_existing_brand_or_enter_a_new_name',
+                                    context) ??
+                                '',
+                            style: robotoRegular.copyWith(
+                                color: Theme.of(context).hintColor,
+                                fontSize: Dimensions.fontSizeSmall),
+                          ),
+                        ),
+                        const SizedBox(height: Dimensions.paddingSizeMedium),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  Dimensions.paddingSizeMedium,
+                  Dimensions.paddingSizeMedium,
+                  Dimensions.paddingSizeMedium,
+                  0),
+              child: Row(children: [
+                Expanded(
+                    child: InkWell(
+                  onTap: () {
+                    if (resProvider.noProductionExpiryDates) {
+                      resProvider.setNoProductionExpiryDates(false);
+                    }
+                    _selectProductDate(resProvider.expiryDateController, true);
+                  },
+                  child: IgnorePointer(
+                      child: CustomTextFieldWidget(
+                    formProduct: true,
+                    required: false,
+                    border: true,
+                    readOnly: true,
+                    controller: resProvider.expiryDateController,
+                    hintText:
+                        '${getTranslated('expiry_date', context) ?? 'Expiry date'} (${getTranslated('optional', context) ?? 'optional'})',
+                  )),
+                )),
+                IconButton(
+                  tooltip: getTranslated('clear', context) ?? 'Clear',
+                  onPressed: () => resProvider.expiryDateController.clear(),
+                  icon: const Icon(Icons.close),
+                )
+              ]),
+            ),
+            resProvider.productTypeIndex == 0
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                        Dimensions.paddingSizeMedium,
+                        Dimensions.paddingSizeMedium,
+                        Dimensions.paddingSizeMedium,
+                        0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              getTranslated(
+                                  'seller_product_sale_unit_and_measurements',
+                                  context)!,
+                              style: robotoBold.copyWith(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color)),
+                          const SizedBox(height: Dimensions.paddingSizeSmall),
+                          const SizedBox(height: Dimensions.paddingSizeSmall),
+                          Text(
+                              getTranslated(
+                                  'seller_product_optional_dimensions',
+                                  context)!,
+                              style: robotoRegular.copyWith(
+                                  color: Theme.of(context).hintColor)),
+                          const SizedBox(height: Dimensions.paddingSizeSmall),
+                          Row(children: [
+                            Expanded(
+                                child: CustomTextFieldWidget(
+                                    formProduct: true,
+                                    border: true,
+                                    controller: resProvider.lengthController,
+                                    textInputType: TextInputType.number,
+                                    textInputAction: TextInputAction.next,
+                                    hintText: getTranslated(
+                                        'seller_product_length', context)!)),
+                            const SizedBox(width: Dimensions.paddingSizeSmall),
+                            Expanded(
+                                child: CustomTextFieldWidget(
+                                    formProduct: true,
+                                    border: true,
+                                    controller: resProvider.widthController,
+                                    textInputType: TextInputType.number,
+                                    textInputAction: TextInputAction.next,
+                                    hintText: getTranslated(
+                                        'seller_product_width', context)!)),
+                            const SizedBox(width: Dimensions.paddingSizeSmall),
+                            Expanded(
+                                child: CustomTextFieldWidget(
+                                    formProduct: true,
+                                    border: true,
+                                    controller: resProvider.heightController,
+                                    textInputType: TextInputType.number,
+                                    textInputAction: TextInputAction.next,
+                                    hintText: getTranslated(
+                                        'seller_product_height', context)!)),
+                          ]),
+                          DropdownDecoratorWidget(
+                            title: 'seller_product_dimension_unit',
+                            child: DropdownButton<String>(
+                              value: resProvider.dimensionUnit,
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              items: const ['cm', 'm']
+                                  .map((value) => DropdownMenuItem<String>(
+                                      value: value, child: Text(value)))
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null)
+                                  resProvider.setDimensionUnit(value);
+                              },
+                            ),
+                          ),
+                          Row(children: [
+                            Expanded(
+                                child: CustomTextFieldWidget(
+                                    formProduct: true,
+                                    border: true,
+                                    controller: resProvider.weightController,
+                                    textInputType: TextInputType.number,
+                                    textInputAction: TextInputAction.done,
+                                    hintText: getTranslated(
+                                        'seller_product_weight', context)!)),
+                            const SizedBox(width: Dimensions.paddingSizeSmall),
+                            Expanded(
+                                child: DropdownDecoratorWidget(
+                              title: 'seller_product_weight_unit',
+                              child: DropdownButton<String>(
+                                value: resProvider.weightUnit,
+                                isExpanded: true,
+                                underline: const SizedBox(),
+                                items: const ['g', 'kg']
+                                    .map((value) => DropdownMenuItem<String>(
+                                        value: value, child: Text(value)))
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value != null)
+                                    resProvider.setWeightUnit(value);
+                                },
+                              ),
+                            )),
+                          ]),
+                        ]),
+                  )
+                : const SizedBox(),
+            false &&
+                    Provider.of<SplashController>(context, listen: false)
+                            .configModel!
+                            .digitalProductSetting ==
+                        "1"
+                ? DigitalProductWidget(
+                    resProvider: resProvider, product: widget.product)
+                : const SizedBox(),
+            Consumer<DigitalProductController>(
+                builder: (context, digitalProductController, child) {
+              return Column(
+                children: [
+                  //Author
+                  resProvider.productTypeIndex == 1
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: Dimensions.paddingSizeMedium,
+                              vertical: Dimensions.paddingSizeSmall),
+                          child: Autocomplete<String>(
+                            optionsBuilder: (TextEditingValue value) {
+                              if (value.text.isEmpty) {
+                                return const Iterable<String>.empty();
+                              } else {
+                                return authors.where((author) => author
+                                    .toLowerCase()
+                                    .contains(value.text.toLowerCase()));
+                              }
+                            },
+                            fieldViewBuilder:
+                                (context, controller, node, onComplete) {
+                              _authorFocus = node;
+                              if (!node.hasFocus) {
+                                _authorFocus.unfocus();
+                              } else {
+                                _authorFocus.requestFocus();
+                              }
+                              return TextField(
+                                keyboardType: TextInputType.text,
+                                controller: controller,
+                                focusNode: node,
+                                onEditingComplete: onComplete,
+                                onSubmitted: (value) {
+                                  if (digitalProductController
+                                      .selectedAuthors!.isEmpty) {
+                                    _scrollController
+                                        .jumpTo(_scrollController.offset + 20);
+                                  }
+                                  digitalProductController.addAuthor(value);
+                                  // controller.text = '';
+                                },
+                                onChanged: (value) =>
+                                    _onChangeOptionHeight(value, authors),
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: Dimensions.paddingSize,
+                                      horizontal: Dimensions.paddingSizeMedium),
+                                  hintText: getTranslated(
+                                      'author_creator_artist', context),
+                                  hintStyle: TextStyle(
+                                      color: Theme.of(context).hintColor),
+                                  labelText: getTranslated(
+                                      'author_creator_artist', context),
+                                  labelStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color),
+                                  border: InputBorder.none,
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .primaryColor
+                                              .withValues(alpha: .25),
+                                          width: .75)),
+                                ),
+                              );
+                            },
+                            displayStringForOption: (value) => value,
+                            onSelected: (String value) {
+                              // resProvider.addAuthor(value);
+                            },
+                            optionsViewBuilder: (BuildContext context,
+                                AutocompleteOnSelected<String> onSelected,
+                                Iterable<String> options) {
+                              return Align(
+                                alignment: Alignment.topLeft,
+                                child: Container(
+                                  height: (keyboardHeight == 0 &&
+                                          (_authorFocus.hasFocus))
+                                      ? 155
+                                      : 250,
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0), // Add padding to the right
+                                  width: MediaQuery.of(context).size.width *
+                                      0.9, // Adjust the width if needed
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(
+                                        Dimensions.radiusDefault),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey[
+                                              Provider.of<ThemeController>(
+                                                          context)
+                                                      .darkTheme
+                                                  ? 800
+                                                  : 200]!,
+                                          spreadRadius: 0.5,
+                                          blurRadius: 0.3)
+                                    ],
+                                  ),
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: options.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final String option =
+                                          options.elementAt(index);
+                                      return InkWell(
+                                        onTap: () {
+                                          onSelected(option);
+                                        },
+                                        child: Builder(
+                                          builder: (BuildContext context) {
+                                            final bool highlight =
+                                                AutocompleteHighlightedOption
+                                                        .of(context) ==
+                                                    index;
+                                            if (highlight) {
+                                              SchedulerBinding.instance
+                                                  .addPostFrameCallback(
+                                                      (Duration timeStamp) {
+                                                Scrollable.ensureVisible(
+                                                    context,
+                                                    alignment: 0.5);
+                                              },
+                                                      debugLabel:
+                                                          'AutocompleteOptions.ensureVisible');
+                                            }
+                                            return Container(
+                                              color: highlight
+                                                  ? Theme.of(context).focusColor
+                                                  : null,
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child: Text(option),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : const SizedBox(),
+
+                  if (resProvider.productTypeIndex == 1 &&
+                      digitalProductController.selectedAuthors!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.paddingSizeMedium),
+                      child: SizedBox(
+                        height: (resProvider.productTypeIndex == 1 &&
+                                digitalProductController
+                                    .selectedAuthors!.isNotEmpty)
+                            ? 40
+                            : 0,
+                        child: (digitalProductController
+                                .selectedAuthors!.isNotEmpty)
+                            ? ListView.builder(
+                                itemCount: digitalProductController
+                                    .selectedAuthors!.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(
+                                        Dimensions.paddingSizeVeryTiny),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal:
+                                              Dimensions.paddingSizeMedium),
+                                      margin: const EdgeInsets.only(
+                                          right: Dimensions.paddingSizeSmall),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withValues(alpha: .20),
+                                        borderRadius: BorderRadius.circular(
+                                            Dimensions.paddingSizeDefault),
+                                      ),
+                                      child: Row(children: [
+                                        Consumer<SplashController>(
+                                            builder: (ctx, colorP, child) {
+                                          return Text(
+                                            digitalProductController
+                                                .selectedAuthors![index],
+                                            style: robotoRegular.copyWith(
+                                                color: ColorHelper.blendColors(
+                                                    Colors.white,
+                                                    Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .color!,
+                                                    0.7)),
+                                          );
+                                        }),
+                                        const SizedBox(
+                                            width: Dimensions.paddingSizeSmall),
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          onTap: () {
+                                            digitalProductController
+                                                .removeAuthor(index);
+                                          },
+                                          child: Icon(Icons.close,
+                                              size: 15,
+                                              color: ColorHelper.blendColors(
+                                                  Colors.white,
+                                                  Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge!
+                                                      .color!,
+                                                  0.7)),
+                                        ),
+                                      ]),
+                                    ),
+                                  );
+                                },
+                              )
+                            : const SizedBox(),
+                      ),
+                    ),
+
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                  ///Publishing
+                  resProvider.productTypeIndex == 1
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: Dimensions.paddingSizeMedium,
+                              vertical: Dimensions.paddingSizeSmall),
+                          child: Autocomplete<String>(
+                            optionsBuilder: (TextEditingValue value) {
+                              if (value.text.isEmpty) {
+                                return const Iterable<String>.empty();
+                              } else {
+                                return publishingHouses.where((author) => author
+                                    .toLowerCase()
+                                    .contains(value.text.toLowerCase()));
+                              }
+                            },
+                            fieldViewBuilder:
+                                (context, controller, node, onComplete) {
+                              _publishingFocus = node;
+                              if (!node.hasFocus) {
+                                _publishingFocus.unfocus();
+                              } else {
+                                _publishingFocus.requestFocus();
+                              }
+                              return TextField(
+                                keyboardType: TextInputType.text,
+                                controller: controller,
+                                focusNode: node,
+                                onEditingComplete: onComplete,
+                                onSubmitted: (value) {
+                                  if (digitalProductController
+                                      .selectedPublishingHouse!.isEmpty) {
+                                    _scrollController
+                                        .jumpTo(_scrollController.offset + 20);
+                                  }
+                                  digitalProductController
+                                      .addPublishingHouse(value);
+                                },
+                                onChanged: (value) => _onChangeOptionHeight(
+                                    value, publishingHouses),
+                                decoration: InputDecoration(
+                                  hintText: getTranslated(
+                                      'publishing_house', context),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: Dimensions.paddingSize,
+                                      horizontal: Dimensions.paddingSizeMedium),
+                                  hintStyle: TextStyle(
+                                      color: Theme.of(context).hintColor),
+                                  labelText: getTranslated(
+                                      'publishing_house', context),
+                                  labelStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color),
+                                  border: InputBorder.none,
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .primaryColor
+                                              .withValues(alpha: .25),
+                                          width: .75)),
+                                ),
+                              );
+                            },
+                            displayStringForOption: (value) => value,
+                            onSelected: (String value) {
+                              // resProvider.addAuthor(value);
+                            },
+                            optionsViewBuilder: (BuildContext context,
+                                AutocompleteOnSelected<String> onSelected,
+                                Iterable<String> options) {
+                              return Align(
+                                alignment: Alignment.topLeft,
+                                child: Container(
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0), // Add padding to the right
+                                  width: MediaQuery.of(context).size.width *
+                                      0.9, //
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(
+                                        Dimensions.radiusDefault),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey[
+                                              Provider.of<ThemeController>(
+                                                          context)
+                                                      .darkTheme
+                                                  ? 800
+                                                  : 200]!,
+                                          spreadRadius: 0.5,
+                                          blurRadius: 0.3)
+                                    ],
+                                  ),
+
+                                  // Adjust the width if needed
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: options.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final String option =
+                                          options.elementAt(index);
+                                      return InkWell(
+                                        onTap: () {
+                                          onSelected(option);
+                                        },
+                                        child: Builder(
+                                          builder: (BuildContext context) {
+                                            final bool highlight =
+                                                AutocompleteHighlightedOption
+                                                        .of(context) ==
+                                                    index;
+                                            if (highlight) {
+                                              SchedulerBinding.instance
+                                                  .addPostFrameCallback(
+                                                      (Duration timeStamp) {
+                                                Scrollable.ensureVisible(
+                                                    context,
+                                                    alignment: 0.5);
+                                              },
+                                                      debugLabel:
+                                                          'AutocompleteOptions.ensureVisible');
+                                            }
+                                            return Container(
+                                              color: highlight
+                                                  ? Theme.of(context).focusColor
+                                                  : null,
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child: Text(option),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : const SizedBox(),
+
+                  if (resProvider.productTypeIndex == 1 &&
+                      digitalProductController
+                          .selectedPublishingHouse!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.paddingSizeMedium),
+                      child: SizedBox(
+                        height: (resProvider.productTypeIndex == 1 &&
+                                digitalProductController
+                                    .selectedPublishingHouse!.isNotEmpty)
+                            ? 40
+                            : 0,
+                        child: (digitalProductController
+                                .selectedPublishingHouse!.isNotEmpty)
+                            ? ListView.builder(
+                                itemCount: digitalProductController
+                                    .selectedPublishingHouse!.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(
+                                        Dimensions.paddingSizeVeryTiny),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal:
+                                              Dimensions.paddingSizeMedium),
+                                      margin: const EdgeInsets.only(
+                                          right: Dimensions.paddingSizeSmall),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withValues(alpha: .20),
+                                        borderRadius: BorderRadius.circular(
+                                            Dimensions.paddingSizeDefault),
+                                      ),
+                                      child: Row(children: [
+                                        Consumer<SplashController>(
+                                            builder: (ctx, colorP, child) {
+                                          return Text(
+                                            digitalProductController
+                                                    .selectedPublishingHouse![
+                                                index],
+                                            style: robotoRegular.copyWith(
+                                                color: ColorHelper.blendColors(
+                                                    Colors.white,
+                                                    Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .color!,
+                                                    0.7)),
+                                          );
+                                        }),
+                                        const SizedBox(
+                                            width: Dimensions.paddingSizeSmall),
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          onTap: () {
+                                            digitalProductController
+                                                .removePublishingHouse(index);
+                                          },
+                                          child: Icon(Icons.close,
+                                              size: 15,
+                                              color: ColorHelper.blendColors(
+                                                  Colors.white,
+                                                  Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge!
+                                                      .color!,
+                                                  0.7)),
+                                        ),
+                                      ]),
+                                    ),
+                                  );
+                                },
+                              )
+                            : const SizedBox(),
+                      ),
+                    ),
+                  //End Author Publishing
+
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                  resProvider.productTypeIndex == 1
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: Dimensions.paddingSizeMedium),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                DropdownDecoratorWidget(
+                                  title: 'delivery_type',
+                                  child: DropdownButton<String>(
+                                    icon: const Icon(
+                                        Icons.keyboard_arrow_down_outlined),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(Dimensions.paddingEye)),
+                                    value: digitalProductController
+                                                .digitalProductTypeIndex ==
+                                            0
+                                        ? 'ready_after_sell'
+                                        : 'ready_product',
+                                    items: deliveryTypeList.map((String value) {
+                                      return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                              getTranslated(value, context)!,
+                                              style: robotoMedium));
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      digitalProductController
+                                          .setDigitalProductTypeIndex(
+                                              value == 'ready_after_sell'
+                                                  ? 0
+                                                  : 1,
+                                              true);
+                                    },
+                                    isExpanded: true,
+                                    underline: const SizedBox(),
+                                  ),
+                                ),
+                              ]),
+                        )
+                      : const SizedBox(),
+                ],
+              );
+            }),
+            const SizedBox(height: 15),
+          ],
+        );
+      }),
+      Padding(
+          padding: const EdgeInsets.all(16),
+          child: TextField(
+            controller: resProvider.descriptionControllerList[0],
+            minLines: 3,
+            maxLines: 6,
+            textInputAction: TextInputAction.newline,
+            decoration: const InputDecoration(
+                labelText: 'الوصف (اختياري)', border: OutlineInputBorder()),
+          )),
+    ]);
+  }
+
   List<Widget> _generateTabPage(
       AddProductController resProvider, TabController? tabIndex) {
     return [
-      TitleAndDescriptionWidget(
-          resProvider: resProvider, index: 0, langCode: 'ar')
+      TextField(
+          controller: resProvider.titleControllerList[0],
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+              labelText: 'اسم المنتج *', border: OutlineInputBorder()))
     ];
   }
 

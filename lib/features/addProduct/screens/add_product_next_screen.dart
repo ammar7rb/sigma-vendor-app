@@ -51,6 +51,8 @@ class AddProductNextScreen extends StatefulWidget {
   final String? title;
   final String? description;
   final Function(int) onTabChanged;
+  final WidgetBuilder detailsBuilder;
+  final ProductGeneralInfoData? Function() generalInfoReader;
 
   const AddProductNextScreen(
       {super.key,
@@ -65,6 +67,8 @@ class AddProductNextScreen extends StatefulWidget {
       this.unit,
       this.title,
       this.description,
+      required this.detailsBuilder,
+      required this.generalInfoReader,
       required this.onTabChanged});
 
   @override
@@ -232,8 +236,6 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
   ProductCombinedData getCurrentFormData() {
     final resProvider =
         Provider.of<AddProductController>(context, listen: false);
-    final categoryController =
-        Provider.of<CategoryController>(context, listen: false);
     final String titleValue = resProvider.titleControllerList[0].text.trim();
     final String descriptionValue =
         resProvider.descriptionControllerList[0].text.trim();
@@ -254,20 +256,13 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
     // Keep legacy form data neutral; server-side checkout calculates the real shipping price.
     String shipping = '0';
 
+    final general = widget.generalInfoReader();
     return ProductCombinedData(
-      categoryId: categoryController.categoryIndex != 0
-          ? categoryController
-              .categoryList![categoryController.categoryIndex! - 1].id
-              .toString()
-          : '-1',
-      subCategoryId: categoryController.subCategoryIndex != 0
-          ? categoryController
-              .subCategoryList![categoryController.subCategoryIndex! - 1].id
-              .toString()
-          : "-1",
+      categoryId: general?.categoryId,
+      subCategoryId: general?.subCategoryId,
       subSubCategoryId: "-1",
-      brandId: widget.brandId,
-      brandName: widget.brandName,
+      brandId: general?.brandId,
+      brandName: general?.brandName,
       unit: (resProvider.unitValue != null && resProvider.unitValue!.isNotEmpty)
           ? resProvider.unitValue
           : widget.unit,
@@ -691,21 +686,25 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                                   valueListenable:
                                                                       variationController
                                                                           .totalQuantityController,
-                                                                  builder: (context, value, child) => Column(
-                                                                          crossAxisAlignment: CrossAxisAlignment
-                                                                              .stretch,
+                                                                  builder: (context,
+                                                                          value,
+                                                                          child) =>
+                                                                      Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.stretch,
                                                                           children: [
-                                                                              const SizedBox(height: 12),
-                                                                              DropdownButtonFormField<String>(
-                                                                                  initialValue: resProvider.saleUnitType,
-                                                                                  decoration: InputDecoration(labelText: getTranslated('seller_product_sale_unit_type', context)),
-                                                                                  items: ['piece', 'package'].map((v) => DropdownMenuItem(value: v, child: Text(getTranslated('seller_product_sale_unit_$v', context) ?? v))).toList(),
-                                                                                  onChanged: (v) {
-                                                                                    if (v != null) resProvider.setSaleUnitType(v);
-                                                                                  }),
-                                                                              if (resProvider.saleUnitType == 'package')
-                                                                                Padding(padding: const EdgeInsets.only(top: 12), child: TextField(controller: resProvider.piecesPerUnitController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: getTranslated('seller_product_pieces_per_unit', context))))
-                                                                            ])),
+                                                                            const SizedBox(height: 12),
+                                                                            DropdownButtonFormField<String>(
+                                                                                initialValue: resProvider.saleUnitType,
+                                                                                decoration: InputDecoration(labelText: getTranslated('seller_product_sale_unit_type', context)),
+                                                                                items: ['piece', 'package'].map((v) => DropdownMenuItem(value: v, child: Text(getTranslated('seller_product_sale_unit_$v', context) ?? v))).toList(),
+                                                                                onChanged: (v) {
+                                                                                  if (v != null) resProvider.setSaleUnitType(v);
+                                                                                }),
+                                                                            if (resProvider.saleUnitType ==
+                                                                                'package')
+                                                                              Padding(padding: const EdgeInsets.only(top: 12), child: TextField(controller: resProvider.piecesPerUnitController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: getTranslated('seller_product_pieces_per_unit', context))))
+                                                                          ])),
                                                               resProvider.productTypeIndex ==
                                                                       0
                                                                   ? const SizedBox(
@@ -747,6 +746,7 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                             SizedBox(
                                                 height: Dimensions
                                                     .paddingSizeDefault),
+                                            widget.detailsBuilder(context),
                                             Consumer<AiController>(builder:
                                                 (context, aiController, child) {
                                               return AddProductSectionWidget(
@@ -2126,7 +2126,26 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                     //   showCustomSnackBarWidget(getTranslated('upload_product_color_image',context),context, sanckBarType: SnackBarType.warning);
                                                     // }
 
-                                                    if (isValid) {
+                                                    if (isValid &&
+                                                        resProvider.validateGeneralInfo(
+                                                            context,
+                                                            categoryController:
+                                                                Provider.of<
+                                                                        CategoryController>(
+                                                                    context,
+                                                                    listen:
+                                                                        false),
+                                                            imageController:
+                                                                Provider.of<
+                                                                        AddProductImageController>(
+                                                                    context,
+                                                                    listen:
+                                                                        false),
+                                                            existingProduct:
+                                                                widget.product,
+                                                            youtubeLink: resProvider
+                                                                .youtubeLinkController
+                                                                .text)) {
                                                       if (resProvider
                                                                   .productTypeIndex ==
                                                               1 &&

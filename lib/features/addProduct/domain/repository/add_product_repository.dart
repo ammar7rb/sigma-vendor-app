@@ -372,6 +372,10 @@ class AddProductRepository implements AddProductRepositoryInterface {
     );
 
     if (isAdd) {
+      if (requestData['category_id'] == null ||
+          requestData['category_id'] == '-1') {
+        requestData.remove('category_id');
+      }
       requestData['slot_id'] = addProduct.slotId;
       requestData['slot_reservation_token'] = addProduct.slotReservationToken;
       if (addProduct.extraAdRequestKey != null) {

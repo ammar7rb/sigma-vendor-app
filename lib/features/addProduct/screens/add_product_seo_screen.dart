@@ -406,6 +406,38 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                       context) ??
                                                   '',
                                             ),
+                                            _ReviewRow(
+                                                icon: Icons.view_in_ar_outlined,
+                                                label: 'نوع البيع',
+                                                value: resProvider
+                                                            .saleUnitType ==
+                                                        'package'
+                                                    ? 'عبوة — ${resProvider.piecesPerUnitController.text} قطعة'
+                                                    : 'قطعة واحدة'),
+                                            _ReviewRow(
+                                                icon: Icons.event_outlined,
+                                                label: 'تاريخ الانتهاء',
+                                                value: resProvider
+                                                        .expiryDateController
+                                                        .text
+                                                        .isEmpty
+                                                    ? 'غير محدد'
+                                                    : resProvider
+                                                        .expiryDateController
+                                                        .text),
+                                            _ReviewRow(
+                                                icon: Icons.notes_outlined,
+                                                label: 'الوصف',
+                                                value: resProvider
+                                                        .descriptionControllerList[
+                                                            0]
+                                                        .text
+                                                        .isEmpty
+                                                    ? 'غير مضاف'
+                                                    : resProvider
+                                                        .descriptionControllerList[
+                                                            0]
+                                                        .text),
                                             const SizedBox(
                                                 height: Dimensions
                                                     .paddingSizeMedium),
@@ -1414,9 +1446,15 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                       AddProductModel();
                                                   _addProduct!.slotId =
                                                       widget.slotId;
-                                                  _addProduct!.extraAdSubscriptionId = widget.extraAdSubscriptionId;
-                                                  _addProduct!.extraAdPrice = widget.extraAdPrice;
-                                                  _addProduct!.extraAdRequestKey = widget.extraAdRequestKey;
+                                                  _addProduct!
+                                                          .extraAdSubscriptionId =
+                                                      widget
+                                                          .extraAdSubscriptionId;
+                                                  _addProduct!.extraAdPrice =
+                                                      widget.extraAdPrice;
+                                                  _addProduct!
+                                                          .extraAdRequestKey =
+                                                      widget.extraAdRequestKey;
                                                   _addProduct!
                                                           .slotReservationToken =
                                                       widget
@@ -1659,9 +1697,18 @@ class AddProductSeoScreenState extends State<AddProductSeoScreen>
                                                                   .imagesWithColor
                                                                   .length;
                                                           i++) {
-                                                        if (addProductImageController.imagesWithColor[i].image != null &&
-                                                            !await addProductImageController.addProductImage(
-                                                                Get.context!, addProductImageController.imagesWithColor[i], route)) {
+                                                        if (addProductImageController
+                                                                    .imagesWithColor[
+                                                                        i]
+                                                                    .image !=
+                                                                null &&
+                                                            !await addProductImageController
+                                                                .addProductImage(
+                                                                    Get
+                                                                        .context!,
+                                                                    addProductImageController
+                                                                        .imagesWithColor[i],
+                                                                    route)) {
                                                           return;
                                                         }
                                                       }
