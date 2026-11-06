@@ -141,6 +141,9 @@ class OrderController extends ChangeNotifier {
     } else if (_orderTypeIndex == 11) {
       _orderType = 'disputed';
       getOrderList(context, 1, 'disputed', null);
+    } else if (_orderTypeIndex == 12) {
+      _orderType = 'pending_vendor';
+      getOrderList(context, 1, 'pending_vendor', null);
     }
     if (notify) {
       notifyListeners();

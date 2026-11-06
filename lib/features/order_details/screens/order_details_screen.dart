@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/features/order_details/widgets/vendor_eligibility_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_dialog_widget.dart';
 import 'package:sixvalley_vendor_app/features/dashboard/screens/dashboard_screen.dart';
@@ -144,6 +145,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               builder: (context, orderController, child) {
             return Consumer<OrderDetailsController>(
                 builder: (context, orderDetailsController, child) {
+              if (orderDetailsController.restrictedFulfillment != null) {
+                return VendorEligibilityView(
+                    order: orderDetailsController.restrictedFulfillment!,
+                    onRefresh: () => _loadData(context));
+              }
               if (orderDetailsController.loadError != null) {
                 return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),

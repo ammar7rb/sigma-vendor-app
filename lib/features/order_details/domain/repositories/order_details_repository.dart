@@ -46,6 +46,14 @@ class OrderDetailsRepository implements OrderDetailsRepositoryInterface {
   @override
   Future<ApiResponse> getOrderDetails(String orderID) async {
     try {
+      final eligibility = await dioClient!
+          .get('/api/v3/seller/fulfillment-requests/order/$orderID');
+      if (eligibility.data is Map &&
+          eligibility.data['fulfillment_request']?['fulfillment_eligibility']
+                  ?['has_restrictions'] ==
+              true) {
+        return ApiResponse.withSuccess(eligibility);
+      }
       final response =
           await dioClient!.get('${AppConstants.orderDetails}$orderID');
       return ApiResponse.withSuccess(response);

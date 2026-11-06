@@ -84,6 +84,7 @@ class Order {
   String? shippingFulfillmentMode;
   Map<String, dynamic>? shippingPriceSnapshot;
   bool detailsLocked = false;
+  Map<String, dynamic>? fulfillmentEligibility;
   String? restrictedAccessToken;
   String? maskedOrderReference;
   String? commerceFlowStatus;
@@ -241,6 +242,9 @@ class Order {
   Order.fromJson(Map<String, dynamic> json) {
     id = int.tryParse('${json['id'] ?? ''}');
     detailsLocked = json['details_locked'] == true;
+    fulfillmentEligibility = json['fulfillment_eligibility'] is Map
+        ? Map<String, dynamic>.from(json['fulfillment_eligibility'])
+        : null;
     restrictedAccessToken = json['restricted_access_token']?.toString();
     maskedOrderReference = json['order_reference']?.toString();
     commerceFlowStatus = json['flow_status']?.toString() ??

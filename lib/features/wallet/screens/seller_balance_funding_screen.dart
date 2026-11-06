@@ -3,6 +3,7 @@ import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspa
 import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
 import 'package:sixvalley_vendor_app/features/profile/widgets/vendor_navigation_actions.dart';
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_debt_panel.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
@@ -169,6 +170,8 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                               value, balance.fundingSettings);
                           return key == null ? null : tr(key);
                         }),
+                    if (widget.walletTarget == 'operating') ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: amount, builder: (_, value, __) => VendorDebtDepositPreview(debt: balance.vendorDebt['outstanding_debt'], grossInput: value.text)),
                     const SizedBox(height: 16),
                     Text(tr('payment_method'),
                         style: Theme.of(context)

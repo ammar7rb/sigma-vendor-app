@@ -37,6 +37,9 @@ class OrderRepository implements OrderRepositoryInterface {
           'order_current_status': jsonEncode(
               ['pending', 'confirmed', 'processing', 'out_for_delivery'])
         });
+      } else if (status == 'pending_vendor') {
+        queryParameters.remove('order_status');
+        queryParameters.remove('order_current_status');
       } else if (status == 'disputed') {
         queryParameters.remove('order_status');
         queryParameters.remove('order_current_status');

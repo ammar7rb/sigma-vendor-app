@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_tab_view_screen.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_app_bar_widget.dart';
 import 'package:sixvalley_vendor_app/features/dashboard/screens/dashboard_screen.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_slots_screen.dart';
@@ -32,6 +33,17 @@ class ProductListMenuScreen extends StatelessWidget {
           if (!didPop && fromNotification) back();
         },
         child: Scaffold(
+            floatingActionButton: FloatingActionButton.extended(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => const AddProductTabView(fromHome: false))),
+                icon: const Icon(Icons.add),
+                label: Text(Localizations.localeOf(context).languageCode == 'ar'
+                    ? 'إضافة منتج دون مساحة'
+                    : 'Submit product without a slot')),
             appBar: CustomAppBarWidget(
                 title: getTranslated('phase5_spaces', context),
                 isBackButtonExist: !fromDashboard,

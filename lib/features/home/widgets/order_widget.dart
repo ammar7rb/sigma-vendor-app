@@ -1,5 +1,6 @@
 import 'package:sixvalley_vendor_app/features/order/controllers/order_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/features/order_details/widgets/vendor_eligibility_view.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_asset_image_widget.dart';
@@ -27,6 +28,19 @@ class _OrderWidgetState extends State<OrderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.orderModel.fulfillmentEligibility?['has_restrictions'] == true) {
+      return Column(children: [
+        VendorEligibilityLockCard(
+            summary: widget.orderModel.fulfillmentEligibility!),
+        TextButton(
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        OrderDetailsScreen(orderId: widget.orderModel.id))),
+            child: const Text('فتح طلب التنفيذ'))
+      ]);
+    }
     if (widget.orderModel.detailsLocked) {
       return _lockedOrderCard(context);
     }

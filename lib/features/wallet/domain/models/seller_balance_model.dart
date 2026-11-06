@@ -1,6 +1,7 @@
 import 'package:sixvalley_vendor_app/features/seller_package/domain/models/seller_package_overview_model.dart';
 
 class SellerBalanceModel {
+  final Map<String, dynamic> vendorDebt;
   final Map<String, double> summary;
   final List<SellerFinancialRecord> records;
   final List<SellerBalanceDepositRecord> deposits;
@@ -13,6 +14,7 @@ class SellerBalanceModel {
   final Map<String, dynamic> fundingSettings;
 
   const SellerBalanceModel({
+    this.vendorDebt = const {},
     required this.summary,
     required this.records,
     required this.financialTabs,
@@ -48,6 +50,7 @@ class SellerBalanceModel {
     rawTabs
         .removeWhere((key, _) => !const ['balance', 'shipping'].contains(key));
     return SellerBalanceModel(
+      vendorDebt: Map<String, dynamic>.from(json['vendor_debt'] as Map? ?? {}),
       summary: rawSummary
           .map((key, value) => MapEntry(key.toString(), _number(value))),
       records: rawRecords

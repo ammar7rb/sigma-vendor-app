@@ -1,5 +1,6 @@
 import 'package:sixvalley_vendor_app/helper/price_converter.dart';
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_debt_panel.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_withdrawal_methods_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_balance_funding_screen.dart';
@@ -176,6 +177,7 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                                 .colorScheme
                                                 .error))),
                               if (data != null) ...[
+                                VendorDebtPanel(debt: data?['vendor_debt'] as Map? ?? {}, deposits: deposits['data'] as List? ?? []),
                                 if (isOverview) ...[
                                   FinancePanel(
                                       title: tr('available_balance'),

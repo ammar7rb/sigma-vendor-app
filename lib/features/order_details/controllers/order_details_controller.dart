@@ -63,6 +63,7 @@ class OrderDetailsController extends ChangeNotifier {
   bool get shippingProofLoading => _shippingProofLoading;
 
   String? loadError;
+  Map<String, dynamic>? restrictedFulfillment;
   String? proofError;
   List<Map<String, dynamic>> shippingProofs = [];
   int _detailsGeneration = 0;
@@ -78,6 +79,7 @@ class OrderDetailsController extends ChangeNotifier {
       shippingProofs = [];
     }
     loadError = null;
+    restrictedFulfillment = null;
     proofError = null;
     _detailsLoading = true;
     notifyListeners();
@@ -85,6 +87,17 @@ class OrderDetailsController extends ChangeNotifier {
       final apiResponse =
           await orderDetailsServiceInterface.getOrderDetails(orderID);
       if (generation != _detailsGeneration) return;
+      if (apiResponse.response?.statusCode == 200 &&
+          apiResponse.response?.data is Map &&
+          apiResponse.response?.data['fulfillment_request']
+                  ?['fulfillment_eligibility']?['has_restrictions'] ==
+              true) {
+        restrictedFulfillment = Map<String, dynamic>.from(
+            apiResponse.response!.data['fulfillment_request']);
+        _orderDetails = [];
+        shippingProofs = [];
+        return;
+      }
       if (apiResponse.response?.statusCode != 200 ||
           apiResponse.response?.data is! List) {
         throw StateError('order_load_failed');
@@ -420,6 +433,7 @@ class OrderDetailsController extends ChangeNotifier {
   }
 
   void emptyOrderDetails() {
+    restrictedFulfillment = null;
     _detailsGeneration++;
     _currentReference = null;
     shippingProofs = [];

@@ -1,4 +1,3 @@
-import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
@@ -116,9 +115,6 @@ class _AddProductTabViewState extends State<AddProductTabView>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.product == null && widget.slotId == null) {
-      return const ProductListMenuScreen(showAdvertisingSlots: true);
-    }
     final productTabs = _productTabs(context);
     if (widget.product == null && !_eligibilityChecked) {
       return Scaffold(
@@ -155,6 +151,13 @@ class _AddProductTabViewState extends State<AddProductTabView>
         ),
         body: Column(
           children: [
+            if (widget.product == null && widget.slotId == null)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(Localizations.localeOf(context).languageCode == 'ar'
+                    ? 'يمكنك إرسال المنتج دون باقة مدفوعة. ستراجعه الإدارة قبل نشره، ولن يشغل مساحة إعلانية.'
+                    : 'No paid package is needed. Administration reviews your product before publication; no advertising slot is assigned.'),
+              ),
             Container(
               padding: EdgeInsets.symmetric(
                   horizontal: Dimensions.paddingSizeDefault,

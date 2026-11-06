@@ -80,6 +80,9 @@ class _OrderScreenState extends State<OrderScreen> {
                         text: getTranslated('disputed_orders', context) ??
                             'Disputes',
                         index: 11),
+                    const SizedBox(width: 8),
+                    const OrderTypeButton(
+                        text: 'طلبات معلقة من جهة التاجر', index: 12),
                   ]),
                 ),
               ),
