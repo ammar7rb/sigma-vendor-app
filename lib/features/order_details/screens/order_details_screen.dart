@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/order_details/widgets/vendor_fulfillment_view.dart';
 import 'package:flutter/material.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/vendor_eligibility_view.dart';
 import 'package:provider/provider.dart';
@@ -146,6 +147,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             return Consumer<OrderDetailsController>(
                 builder: (context, orderDetailsController, child) {
               if (orderDetailsController.restrictedFulfillment != null) {
+                if (orderDetailsController.restrictedFulfillment!['fulfillment_eligibility']?['portion_actions_enabled'] == true) {
+                  return VendorFulfillmentView(order: orderDetailsController.restrictedFulfillment!, onRefresh: () => _loadData(context));
+                }
                 return VendorEligibilityView(
                     order: orderDetailsController.restrictedFulfillment!,
                     onRefresh: () => _loadData(context));

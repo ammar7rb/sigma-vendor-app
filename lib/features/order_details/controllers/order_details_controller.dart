@@ -89,9 +89,8 @@ class OrderDetailsController extends ChangeNotifier {
       if (generation != _detailsGeneration) return;
       if (apiResponse.response?.statusCode == 200 &&
           apiResponse.response?.data is Map &&
-          apiResponse.response?.data['fulfillment_request']
-                  ?['fulfillment_eligibility']?['has_restrictions'] ==
-              true) {
+          (apiResponse.response?.data['fulfillment_request']?['fulfillment_eligibility']?['has_restrictions'] == true ||
+              apiResponse.response?.data['fulfillment_request']?['fulfillment_eligibility']?['portion_actions_enabled'] == true)) {
         restrictedFulfillment = Map<String, dynamic>.from(
             apiResponse.response!.data['fulfillment_request']);
         _orderDetails = [];

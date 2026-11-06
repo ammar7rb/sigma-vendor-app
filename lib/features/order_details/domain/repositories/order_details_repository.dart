@@ -49,9 +49,8 @@ class OrderDetailsRepository implements OrderDetailsRepositoryInterface {
       final eligibility = await dioClient!
           .get('/api/v3/seller/fulfillment-requests/order/$orderID');
       if (eligibility.data is Map &&
-          eligibility.data['fulfillment_request']?['fulfillment_eligibility']
-                  ?['has_restrictions'] ==
-              true) {
+          (eligibility.data['fulfillment_request']?['fulfillment_eligibility']?['has_restrictions'] == true ||
+              eligibility.data['fulfillment_request']?['fulfillment_eligibility']?['portion_actions_enabled'] == true)) {
         return ApiResponse.withSuccess(eligibility);
       }
       final response =
