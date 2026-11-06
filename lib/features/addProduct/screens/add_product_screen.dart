@@ -116,8 +116,7 @@ class AddProductScreenState extends State<AddProductScreen>
     brandIds = [
       -1,
       0,
-      ...?productController.brandList?.map((brand) => brand.id),
-      -2
+      ...?productController.brandList?.map((brand) => brand.id)
     ];
     final selectedBrandIndex = productController.brandIndex;
     final selectedBrandId = selectedBrandIndex != null &&
@@ -1138,7 +1137,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                                     ),
                                                   ),
                                                   SizedBox(
-                                                      height: 235,
+                                                      height: 76,
                                                       child: AnimatedBuilder(
                                                         animation:
                                                             _tabController!,
@@ -1627,7 +1626,6 @@ class AddProductScreenState extends State<AddProductScreen>
                             }
                           }
 
-                          brandIds.add(-2);
                           return DropdownDecoratorWidget(
                             child: DropdownButton<int>(
                               value: productController.brandIndex,

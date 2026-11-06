@@ -44,15 +44,14 @@ class SelectCategoryWidgetState extends State<SelectCategoryWidget> {
                                     value: categoryController
                                             .categoryIds.isEmpty
                                         ? 0
-                                        : categoryController.categoryIndex == -1
+                                        : (categoryController.categoryIndex ==
+                                                    -1 ||
+                                                categoryController
+                                                        .categoryIndex ==
+                                                    -2)
                                             ? 0
                                             : categoryController.categoryIndex,
                                     items: [
-                                      DropdownMenuItem<int>(
-                                          value: -2,
-                                          child: Text(getTranslated(
-                                                  'other_category', context) ??
-                                              'Other')),
                                       ...categoryController.categoryIds
                                           .map((int? value) {
                                         return DropdownMenuItem<int>(

@@ -83,30 +83,10 @@ class AddProductSectionWidget extends StatelessWidget {
                 ],
               ),
             ),
-          if (subTitle != null)
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 0,
-                          horizontal: Dimensions.fontSizeExtraLarge),
-                      child: Text(
-                        subTitle ?? '',
-                        style: titleStyle ??
-                            robotoRegular.copyWith(
-                                fontSize: Dimensions.fontSizeSmall,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .headlineLarge
-                                    ?.color),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      )),
-                ),
-                button ?? SizedBox(),
-              ],
-            ),
+          if (button != null)
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: button!),
           ShimmerOverlayWrapper(
             isActive: (isAiGenerating ?? false),
             opacity: 0.3,
