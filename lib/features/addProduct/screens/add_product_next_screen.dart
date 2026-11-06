@@ -352,6 +352,7 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                             Consumer<AiController>(builder:
                                                 (context, aiController, child) {
                                               return AddProductSectionWidget(
+                                                showTitle: false,
                                                 isAiGenerating:
                                                     aiController.pricingLoading,
                                                 title: getTranslated(
@@ -747,807 +748,775 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                 height: Dimensions
                                                     .paddingSizeDefault),
                                             widget.detailsBuilder(context),
-                                            Consumer<AiController>(builder:
-                                                (context, aiController, child) {
-                                              return AddProductSectionWidget(
-                                                isAiGenerating: aiController
-                                                    .variationLoading,
-                                                title: getTranslated(
-                                                    'variations', context)!,
-                                                subTitle: getTranslated(
-                                                    'enable_and_manage_different_variations',
-                                                    context)!,
-                                                aiWidget: InkWell(
-                                                  onTap: () {
-                                                    if (widget.title == null) {
-                                                      showCustomSnackBarWidget(
-                                                          '${getTranslated('product_name_required', context)}',
-                                                          context);
-                                                    } else if (widget
-                                                            .description ==
-                                                        null) {
-                                                      showCustomSnackBarWidget(
-                                                          '${getTranslated('product_description_required', context)}',
-                                                          context);
-                                                    } else {
-                                                      aiController
-                                                          .generateVariationSetup(
-                                                              title: widget
-                                                                      .title ??
-                                                                  '',
-                                                              description: widget
-                                                                      .description ??
-                                                                  '',
-                                                              product: widget
-                                                                  .product);
-                                                    }
-                                                  },
-                                                  child: !aiController
-                                                          .variationLoading
-                                                      ? Icon(Icons.auto_awesome,
-                                                          color: Colors.blue)
-                                                      : Shimmer.fromColors(
-                                                          baseColor:
-                                                              Theme.of(context)
-                                                                  .hintColor
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.18),
-                                                          highlightColor:
-                                                              Theme.of(context)
-                                                                  .hintColor
-                                                                  .withValues(
-                                                                      alpha:
-                                                                          0.06),
-                                                          child: Row(children: [
-                                                            Icon(
-                                                                Icons
-                                                                    .auto_awesome,
-                                                                color: Colors
-                                                                    .blue),
-                                                            const SizedBox(
-                                                                width: Dimensions
-                                                                    .paddingSizeExtraSmall),
-                                                            Text(
-                                                                getTranslated(
-                                                                        'generating',
-                                                                        context) ??
+                                            if (widget.product != null)
+                                              Consumer<AiController>(builder:
+                                                  (context, aiController,
+                                                      child) {
+                                                return AddProductSectionWidget(
+                                                  showTitle: false,
+                                                  isAiGenerating: aiController
+                                                      .variationLoading,
+                                                  title: getTranslated(
+                                                      'variations', context)!,
+                                                  subTitle: getTranslated(
+                                                      'enable_and_manage_different_variations',
+                                                      context)!,
+                                                  aiWidget: InkWell(
+                                                    onTap: () {
+                                                      if (widget.title ==
+                                                          null) {
+                                                        showCustomSnackBarWidget(
+                                                            '${getTranslated('product_name_required', context)}',
+                                                            context);
+                                                      } else if (widget
+                                                              .description ==
+                                                          null) {
+                                                        showCustomSnackBarWidget(
+                                                            '${getTranslated('product_description_required', context)}',
+                                                            context);
+                                                      } else {
+                                                        aiController
+                                                            .generateVariationSetup(
+                                                                title: widget
+                                                                        .title ??
                                                                     '',
-                                                                style: robotoBold
-                                                                    .copyWith(
-                                                                        color: Colors
-                                                                            .blue)),
-                                                          ]),
-                                                        ),
-                                                ),
-                                                button: Padding(
-                                                  padding: EdgeInsets.only(
-                                                      right: Dimensions
-                                                          .paddingSizeDefault),
-                                                  child: FlutterSwitch(
-                                                    width: 40.0,
-                                                    height: 20.0,
-                                                    toggleSize: 20.0,
-                                                    value: resProvider
-                                                        .isAttributeActive,
-                                                    borderRadius: 20.0,
-                                                    activeColor:
-                                                        Theme.of(context)
-                                                            .primaryColor,
-                                                    padding: 1.0,
-                                                    onToggle: (bool isActive) =>
-                                                        resProvider
-                                                            .setIsAttributeActive(
-                                                                isActive,
-                                                                notify: true),
+                                                                description:
+                                                                    widget.description ??
+                                                                        '',
+                                                                product: widget
+                                                                    .product);
+                                                      }
+                                                    },
+                                                    child: !aiController
+                                                            .variationLoading
+                                                        ? Icon(
+                                                            Icons.auto_awesome,
+                                                            color: Colors.blue)
+                                                        : Shimmer.fromColors(
+                                                            baseColor: Theme.of(
+                                                                    context)
+                                                                .hintColor
+                                                                .withValues(
+                                                                    alpha:
+                                                                        0.18),
+                                                            highlightColor: Theme
+                                                                    .of(context)
+                                                                .hintColor
+                                                                .withValues(
+                                                                    alpha:
+                                                                        0.06),
+                                                            child: Row(
+                                                                children: [
+                                                                  Icon(
+                                                                      Icons
+                                                                          .auto_awesome,
+                                                                      color: Colors
+                                                                          .blue),
+                                                                  const SizedBox(
+                                                                      width: Dimensions
+                                                                          .paddingSizeExtraSmall),
+                                                                  Text(
+                                                                      getTranslated(
+                                                                              'generating',
+                                                                              context) ??
+                                                                          '',
+                                                                      style: robotoBold.copyWith(
+                                                                          color:
+                                                                              Colors.blue)),
+                                                                ]),
+                                                          ),
                                                   ),
-                                                ),
-                                                childrens: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                      left: Dimensions
-                                                          .paddingSizeMedium,
-                                                      right: Dimensions
-                                                          .paddingSizeMedium,
-                                                      top: Dimensions
-                                                          .paddingSizeSmall,
+                                                  button: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        right: Dimensions
+                                                            .paddingSizeDefault),
+                                                    child: FlutterSwitch(
+                                                      width: 40.0,
+                                                      height: 20.0,
+                                                      toggleSize: 20.0,
+                                                      value: resProvider
+                                                          .isAttributeActive,
+                                                      borderRadius: 20.0,
+                                                      activeColor:
+                                                          Theme.of(context)
+                                                              .primaryColor,
+                                                      padding: 1.0,
+                                                      onToggle: (bool
+                                                              isActive) =>
+                                                          resProvider
+                                                              .setIsAttributeActive(
+                                                                  isActive,
+                                                                  notify: true),
                                                     ),
-                                                    child: Align(
-                                                      alignment:
-                                                          AlignmentDirectional
-                                                              .centerStart,
-                                                      child: Text(
-                                                        getTranslated(
-                                                                'seller_product_variation_help',
-                                                                context) ??
-                                                            '',
-                                                        style: robotoRegular
-                                                            .copyWith(
-                                                          fontSize: Dimensions
-                                                              .fontSizeSmall,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .hintColor,
+                                                  ),
+                                                  childrens: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        left: Dimensions
+                                                            .paddingSizeMedium,
+                                                        right: Dimensions
+                                                            .paddingSizeMedium,
+                                                        top: Dimensions
+                                                            .paddingSizeSmall,
+                                                      ),
+                                                      child: Align(
+                                                        alignment:
+                                                            AlignmentDirectional
+                                                                .centerStart,
+                                                        child: Text(
+                                                          getTranslated(
+                                                                  'seller_product_variation_help',
+                                                                  context) ??
+                                                              '',
+                                                          style: robotoRegular
+                                                              .copyWith(
+                                                            fontSize: Dimensions
+                                                                .fontSizeSmall,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .hintColor,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  if (!resProvider
-                                                      .isAttributeActive)
+                                                    if (!resProvider
+                                                        .isAttributeActive)
+                                                      SizedBox(
+                                                          height: Dimensions
+                                                              .paddingSizeSmall),
+                                                    resProvider.productTypeIndex ==
+                                                                0 &&
+                                                            resProvider
+                                                                .isAttributeActive
+                                                        ? Column(children: [
+                                                            const SizedBox(
+                                                                height: Dimensions
+                                                                    .paddingSizeDefault),
+                                                            Padding(
+                                                              padding: const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      Dimensions
+                                                                          .paddingSizeMedium),
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(Dimensions
+                                                                            .radiusDefault),
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .primaryColor
+                                                                        .withValues(
+                                                                            alpha:
+                                                                                0.05)),
+                                                                padding: EdgeInsets
+                                                                    .all(Dimensions
+                                                                        .paddingSizeSmall),
+                                                                child: Column(
+                                                                  children: [
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        Expanded(
+                                                                            child:
+                                                                                Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text(
+                                                                              getTranslated('color', context)!,
+                                                                              style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            ),
+                                                                            // const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+                                                                            Text(
+                                                                              getTranslated('here_you_setup_color_wise_variations', context)!,
+                                                                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.headlineLarge?.color),
+                                                                              maxLines: 2,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            )
+                                                                          ],
+                                                                        )),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                Dimensions.paddingSizeSmall),
+                                                                        FlutterSwitch(
+                                                                          width:
+                                                                              40.0,
+                                                                          height:
+                                                                              20.0,
+                                                                          toggleSize:
+                                                                              20.0,
+                                                                          value: variationController
+                                                                              .attributeList![0]
+                                                                              .active,
+                                                                          borderRadius:
+                                                                              20.0,
+                                                                          activeColor:
+                                                                              Theme.of(context).primaryColor,
+                                                                          padding:
+                                                                              1.0,
+                                                                          onToggle: (bool isActive) => variationController.toggleAttribute(
+                                                                              context,
+                                                                              0,
+                                                                              widget.product),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    Consumer<AiController>(builder:
+                                                                        (context,
+                                                                            aiController,
+                                                                            child) {
+                                                                      TextEditingController?
+                                                                          _autoController;
+                                                                      FocusNode?
+                                                                          _autoFocusNode;
+
+                                                                      return Column(
+                                                                        children: [
+                                                                          const SizedBox(
+                                                                              height: Dimensions.paddingSizeSmall),
+                                                                          variationController.attributeList![0].active
+                                                                              ? Consumer<SplashController>(builder: (ctx, colorProvider, child) {
+                                                                                  if (colorProvider.colorList != null) {
+                                                                                    for (int index = 0; index < colorProvider.colorList!.length; index++) {
+                                                                                      colors.add(index);
+                                                                                    }
+                                                                                  }
+                                                                                  return Autocomplete<int>(
+                                                                                    optionsBuilder: (TextEditingValue value) {
+                                                                                      if (value.text.isEmpty) {
+                                                                                        return _getColorSuggestionsIndexList(
+                                                                                          colors: colors,
+                                                                                          colorList: colorProvider.colorList,
+                                                                                          savedColorVariationList: variationController.attributeList?.first.variants ?? [],
+                                                                                          pattern: '',
+                                                                                        );
+                                                                                      } else {
+                                                                                        return _getColorSuggestionsIndexList(
+                                                                                          colors: colors,
+                                                                                          colorList: colorProvider.colorList,
+                                                                                          savedColorVariationList: variationController.attributeList?.first.variants ?? [],
+                                                                                          pattern: value.text,
+                                                                                        );
+                                                                                      }
+                                                                                    },
+                                                                                    optionsViewBuilder: (context, Function(int) onSelected, Iterable<int> options) {
+                                                                                      return Align(
+                                                                                        alignment: Alignment.topLeft,
+                                                                                        child: Material(
+                                                                                          elevation: 4.0,
+                                                                                          color: Theme.of(context).cardColor,
+                                                                                          shape: RoundedRectangleBorder(
+                                                                                            borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+                                                                                          ),
+                                                                                          child: SizedBox(
+                                                                                            width: MediaQuery.of(context).size.width - (Dimensions.paddingSizeDefault * 2),
+                                                                                            height: 250,
+                                                                                            child: ListView.builder(
+                                                                                              padding: EdgeInsets.zero,
+                                                                                              itemCount: options.length,
+                                                                                              itemBuilder: (BuildContext context, int index) {
+                                                                                                final int optionIndex = options.elementAt(index);
+                                                                                                final colorItem = colorProvider.colorList![optionIndex];
+
+                                                                                                String hexString = colorItem.code!.replaceAll('#', '');
+                                                                                                Color itemColor = Color(int.parse("0xFF$hexString"));
+
+                                                                                                return InkWell(
+                                                                                                  onTap: () {
+                                                                                                    onSelected(optionIndex);
+                                                                                                  },
+                                                                                                  child: Padding(
+                                                                                                    padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeDefault),
+                                                                                                    child: Row(
+                                                                                                      children: [
+                                                                                                        Container(
+                                                                                                          width: 20,
+                                                                                                          height: 20,
+                                                                                                          decoration: BoxDecoration(color: itemColor, shape: BoxShape.circle, border: Border.all(color: Theme.of(context).hintColor.withValues(alpha: 0.2))),
+                                                                                                        ),
+                                                                                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                                                                                                        Expanded(
+                                                                                                          child: Text(
+                                                                                                            colorItem.name!,
+                                                                                                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ],
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                );
+                                                                                              },
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      );
+                                                                                    },
+                                                                                    fieldViewBuilder: (context, controller, node, onComplete) {
+                                                                                      _autoController ??= controller;
+                                                                                      _autoFocusNode ??= node;
+                                                                                      return Container(
+                                                                                        height: 50,
+                                                                                        decoration: BoxDecoration(
+                                                                                          color: Theme.of(context).cardColor,
+                                                                                          border: Border.all(width: 1, color: Theme.of(context).hintColor.withValues(alpha: .50)),
+                                                                                          borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+                                                                                        ),
+                                                                                        child: TextField(
+                                                                                          controller: controller,
+                                                                                          focusNode: node,
+                                                                                          onEditingComplete: onComplete,
+                                                                                          onTap: () {
+                                                                                            if (controller.text.isEmpty) {
+                                                                                              controller.text = controller.text;
+                                                                                            }
+                                                                                          },
+                                                                                          decoration: InputDecoration(
+                                                                                            hintText: getTranslated('type_color_name', context),
+                                                                                            hintStyle: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
+                                                                                            border: OutlineInputBorder(
+                                                                                              borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+                                                                                              borderSide: BorderSide.none,
+                                                                                            ),
+                                                                                            suffixIcon: Icon(Icons.arrow_drop_down, color: Theme.of(context).hintColor),
+                                                                                          ),
+                                                                                        ),
+                                                                                      );
+                                                                                    },
+                                                                                    displayStringForOption: (value) => colorProvider.colorList![value].name!,
+                                                                                    onSelected: (int value) {
+                                                                                      variationController.addVariant(context, 0, colorProvider.colorList![value].name, widget.product, true);
+                                                                                      variationController.addColorCode(colorProvider.colorList![value].code);
+
+                                                                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                                                        _autoFocusNode?.unfocus();
+                                                                                      });
+                                                                                    },
+                                                                                  );
+                                                                                })
+                                                                              : const SizedBox(),
+                                                                          SizedBox(
+                                                                              height: (variationController.attributeList![0].variants.isNotEmpty) ? Dimensions.paddingSizeSmall : 0),
+                                                                          if (variationController.attributeList?[0].active ??
+                                                                              false)
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 0),
+                                                                              child: variationController.attributeList![0].variants.isNotEmpty
+                                                                                  ? Wrap(
+                                                                                      spacing: Dimensions.paddingSizeSmall,
+                                                                                      runSpacing: Dimensions.paddingSizeSmall,
+                                                                                      children: List.generate(
+                                                                                        variationController.attributeList![0].variants.length,
+                                                                                        (index) {
+                                                                                          String hexString = '';
+                                                                                          if (variationController.colorCodeList.isNotEmpty && variationController.colorCodeList.length > index) {
+                                                                                            hexString = variationController.colorCodeList[index]!.replaceAll('#', '');
+                                                                                          }
+                                                                                          Color itemColor = Color(int.parse("0xFF$hexString"));
+                                                                                          return Container(
+                                                                                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: Theme.of(context).primaryColor.withValues(alpha: 0.10),
+                                                                                              borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
+                                                                                            ),
+                                                                                            child: Row(
+                                                                                              mainAxisSize: MainAxisSize.min,
+                                                                                              children: [
+                                                                                                Container(
+                                                                                                  width: 15,
+                                                                                                  height: 15,
+                                                                                                  decoration: BoxDecoration(
+                                                                                                    color: itemColor,
+                                                                                                    shape: BoxShape.circle,
+                                                                                                    border: Border.all(color: Theme.of(context).hintColor.withValues(alpha: 0.2)),
+                                                                                                  ),
+                                                                                                ),
+                                                                                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                                                                                Consumer<SplashController>(builder: (ctx, colorP, child) {
+                                                                                                  return Text(
+                                                                                                    variationController.attributeList![0].variants[index]!,
+                                                                                                    style: robotoRegular.copyWith(
+                                                                                                      fontSize: Dimensions.fontSizeDefault,
+                                                                                                      color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7),
+                                                                                                    ),
+                                                                                                  );
+                                                                                                }),
+                                                                                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                                                                                InkWell(
+                                                                                                  splashColor: Colors.transparent,
+                                                                                                  onTap: () {
+                                                                                                    variationController.removeVariant(context, 0, index, widget.product);
+                                                                                                    variationController.removeColorCode(index);
+                                                                                                  },
+                                                                                                  child: Icon(
+                                                                                                    Icons.close,
+                                                                                                    size: 15,
+                                                                                                    color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        },
+                                                                                      ),
+                                                                                    )
+                                                                                  : const SizedBox(),
+                                                                            ),
+                                                                          const SizedBox(
+                                                                              height: Dimensions.paddingSizeSmall),
+                                                                        ],
+                                                                      );
+                                                                    }),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: Dimensions
+                                                                    .paddingSizeDefault),
+                                                            Padding(
+                                                              padding: const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      Dimensions
+                                                                          .paddingSizeMedium),
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(Dimensions
+                                                                            .radiusDefault),
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .primaryColor
+                                                                        .withValues(
+                                                                            alpha:
+                                                                                0.05)),
+                                                                padding: EdgeInsets
+                                                                    .all(Dimensions
+                                                                        .paddingSizeSmall),
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        Expanded(
+                                                                            child:
+                                                                                Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text(
+                                                                              getTranslated('other_attributes', context)!,
+                                                                              style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            ),
+                                                                            Text(
+                                                                              getTranslated('here_you_can_setup_the_product_attribute', context)!,
+                                                                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.headlineLarge?.color),
+                                                                              maxLines: 2,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            )
+                                                                          ],
+                                                                        )),
+                                                                      ],
+                                                                    ),
+                                                                    AttributeViewWidget(
+                                                                        product:
+                                                                            widget
+                                                                                .product,
+                                                                        colorOn: variationController
+                                                                            .attributeList![0]
+                                                                            .active),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            Dimensions.paddingSizeSmall),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: Dimensions
+                                                                    .paddingSizeDefault),
+                                                          ])
+                                                        : const SizedBox(),
                                                     SizedBox(
-                                                        height: Dimensions
-                                                            .paddingSizeSmall),
-                                                  resProvider.productTypeIndex ==
-                                                              0 &&
-                                                          resProvider
-                                                              .isAttributeActive
-                                                      ? Column(children: [
-                                                          const SizedBox(
-                                                              height: Dimensions
-                                                                  .paddingSizeDefault),
-                                                          Padding(
-                                                            padding: const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal:
-                                                                    Dimensions
-                                                                        .paddingSizeMedium),
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          Dimensions
-                                                                              .radiusDefault),
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .primaryColor
-                                                                      .withValues(
-                                                                          alpha:
-                                                                              0.05)),
+                                                        height: resProvider
+                                                                    .productTypeIndex ==
+                                                                0
+                                                            ? 0
+                                                            : Dimensions
+                                                                .paddingSizeDefault),
+                                                    resProvider.productTypeIndex ==
+                                                                1 &&
+                                                            resProvider
+                                                                .isAttributeActive
+                                                        ? Consumer<
+                                                                DigitalProductController>(
+                                                            builder: (context,
+                                                                digitalProductController,
+                                                                _) {
+                                                            return Padding(
                                                               padding: EdgeInsets
                                                                   .all(Dimensions
                                                                       .paddingSizeSmall),
-                                                              child: Column(
-                                                                children: [
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Expanded(
-                                                                          child:
-                                                                              Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Text(
-                                                                            getTranslated('color',
-                                                                                context)!,
-                                                                            style:
-                                                                                robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                          ),
-                                                                          // const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-                                                                          Text(
-                                                                            getTranslated('here_you_setup_color_wise_variations',
-                                                                                context)!,
-                                                                            style:
-                                                                                robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.headlineLarge?.color),
-                                                                            maxLines:
-                                                                                2,
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                          )
-                                                                        ],
-                                                                      )),
-                                                                      const SizedBox(
-                                                                          width:
-                                                                              Dimensions.paddingSizeSmall),
-                                                                      FlutterSwitch(
-                                                                        width:
-                                                                            40.0,
-                                                                        height:
-                                                                            20.0,
-                                                                        toggleSize:
-                                                                            20.0,
-                                                                        value: variationController
-                                                                            .attributeList![0]
-                                                                            .active,
-                                                                        borderRadius:
-                                                                            20.0,
-                                                                        activeColor:
-                                                                            Theme.of(context).primaryColor,
-                                                                        padding:
-                                                                            1.0,
-                                                                        onToggle: (bool isActive) => variationController.toggleAttribute(
-                                                                            context,
-                                                                            0,
-                                                                            widget.product),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                  Consumer<
-                                                                          AiController>(
-                                                                      builder: (context,
-                                                                          aiController,
-                                                                          child) {
-                                                                    TextEditingController?
-                                                                        _autoController;
-                                                                    FocusNode?
-                                                                        _autoFocusNode;
-
-                                                                    return Column(
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(Dimensions
+                                                                            .radiusDefault),
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .primaryColor
+                                                                        .withValues(
+                                                                            alpha:
+                                                                                0.05)),
+                                                                padding: EdgeInsets
+                                                                    .all(Dimensions
+                                                                        .paddingSizeSmall),
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          0),
+                                                                  child: Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
                                                                       children: [
+                                                                        Text(
+                                                                          getTranslated(
+                                                                              'select_file_type',
+                                                                              context)!,
+                                                                          style: robotoBold.copyWith(
+                                                                              fontSize: Dimensions.fontSizeLarge,
+                                                                              color: Theme.of(context).textTheme.bodyLarge?.color),
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
+
+                                                                        Text(
+                                                                          getTranslated(
+                                                                              'select_at_least_one_file_type_to_work',
+                                                                              context)!,
+                                                                          style: robotoRegular.copyWith(
+                                                                              fontSize: Dimensions.fontSizeSmall,
+                                                                              color: Theme.of(context).textTheme.headlineLarge?.color),
+                                                                          maxLines:
+                                                                              2,
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
                                                                         const SizedBox(
                                                                             height:
                                                                                 Dimensions.paddingSizeSmall),
-                                                                        variationController.attributeList![0].active
-                                                                            ? Consumer<SplashController>(builder: (ctx, colorProvider, child) {
-                                                                                if (colorProvider.colorList != null) {
-                                                                                  for (int index = 0; index < colorProvider.colorList!.length; index++) {
-                                                                                    colors.add(index);
-                                                                                  }
-                                                                                }
-                                                                                return Autocomplete<int>(
-                                                                                  optionsBuilder: (TextEditingValue value) {
-                                                                                    if (value.text.isEmpty) {
-                                                                                      return _getColorSuggestionsIndexList(
-                                                                                        colors: colors,
-                                                                                        colorList: colorProvider.colorList,
-                                                                                        savedColorVariationList: variationController.attributeList?.first.variants ?? [],
-                                                                                        pattern: '',
-                                                                                      );
-                                                                                    } else {
-                                                                                      return _getColorSuggestionsIndexList(
-                                                                                        colors: colors,
-                                                                                        colorList: colorProvider.colorList,
-                                                                                        savedColorVariationList: variationController.attributeList?.first.variants ?? [],
-                                                                                        pattern: value.text,
-                                                                                      );
-                                                                                    }
-                                                                                  },
-                                                                                  optionsViewBuilder: (context, Function(int) onSelected, Iterable<int> options) {
-                                                                                    return Align(
-                                                                                      alignment: Alignment.topLeft,
-                                                                                      child: Material(
-                                                                                        elevation: 4.0,
-                                                                                        color: Theme.of(context).cardColor,
-                                                                                        shape: RoundedRectangleBorder(
-                                                                                          borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+
+                                                                        DropdownDecoratorWidget(
+                                                                          child:
+                                                                              DropdownButton<String>(
+                                                                            icon:
+                                                                                const Icon(Icons.keyboard_arrow_down_outlined),
+                                                                            borderRadius:
+                                                                                const BorderRadius.all(Radius.circular(Dimensions.paddingEye)),
+                                                                            hint:
+                                                                                Text(getTranslated('select_file_type', context)!, style: robotoRegular.copyWith(color: themeProvider.darkTheme ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).hintColor, fontSize: Dimensions.fontSizeExtraLarge)),
+                                                                            items:
+                                                                                digitalVariation.map((String? value) {
+                                                                              return DropdownMenuItem<String>(
+                                                                                value: value,
+                                                                                child: Text(value!),
+                                                                              );
+                                                                            }).toList(),
+                                                                            onChanged:
+                                                                                (String? value) {
+                                                                              if (digitalProductController.selectedDigitalVariation.contains(value)) {
+                                                                                showCustomSnackBarWidget(getTranslated('filetype_already_exists', context), context, sanckBarType: SnackBarType.warning);
+                                                                              } else {
+                                                                                digitalProductController.addDigitalProductVariation(value!);
+                                                                              }
+                                                                            },
+                                                                            isExpanded:
+                                                                                true,
+                                                                            underline:
+                                                                                const SizedBox(),
+                                                                          ),
+                                                                        ),
+
+                                                                        !digitalProductController.selectedDigitalVariation.isNotEmpty
+                                                                            ? const SizedBox(height: Dimensions.paddingSizeSmall)
+                                                                            : const SizedBox.shrink(),
+
+                                                                        digitalProductController.selectedDigitalVariation.isNotEmpty
+                                                                            ? SizedBox(
+                                                                                height: digitalProductController.selectedDigitalVariation.isNotEmpty ? 30 : 0,
+                                                                                child: ListView.builder(
+                                                                                  itemCount: digitalProductController.selectedDigitalVariation.length,
+                                                                                  scrollDirection: Axis.horizontal,
+                                                                                  itemBuilder: (context, index) {
+                                                                                    return Container(
+                                                                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
+                                                                                      margin: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Theme.of(context).hintColor.withValues(alpha: .20),
+                                                                                        borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
+                                                                                      ),
+                                                                                      child: Row(children: [
+                                                                                        Consumer<SplashController>(builder: (ctx, colorP, child) {
+                                                                                          return Text(
+                                                                                            digitalProductController.selectedDigitalVariation[index],
+                                                                                            style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color!),
+                                                                                          );
+                                                                                        }),
+                                                                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                                                                                        InkWell(
+                                                                                          splashColor: Colors.transparent,
+                                                                                          onTap: () {
+                                                                                            digitalProductController.removeDigitalVariant(context, index);
+                                                                                          },
+                                                                                          child: Icon(Icons.close, size: 15, color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
                                                                                         ),
-                                                                                        child: SizedBox(
-                                                                                          width: MediaQuery.of(context).size.width - (Dimensions.paddingSizeDefault * 2),
-                                                                                          height: 250,
+                                                                                      ]),
+                                                                                    );
+                                                                                  },
+                                                                                ),
+                                                                              )
+                                                                            : const SizedBox(),
+                                                                        digitalProductController.selectedDigitalVariation.isNotEmpty
+                                                                            ? const SizedBox(height: Dimensions.paddingSizeSmall)
+                                                                            : const SizedBox(),
+
+                                                                        ///Digital variation
+                                                                        Consumer<DigitalProductController>(builder: (context,
+                                                                            digitalProductController,
+                                                                            _) {
+                                                                          return ListView
+                                                                              .builder(
+                                                                            itemCount:
+                                                                                digitalProductController.selectedDigitalVariation.length,
+                                                                            shrinkWrap:
+                                                                                true,
+                                                                            physics:
+                                                                                const NeverScrollableScrollPhysics(),
+                                                                            itemBuilder:
+                                                                                (context, index) {
+                                                                              return Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                                  Text(
+                                                                                    digitalProductController.selectedDigitalVariation[index],
+                                                                                    style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                  ),
+                                                                                  const SizedBox(height: Dimensions.paddingSizeSmall),
+                                                                                  Row(
+                                                                                    children: [
+                                                                                      Expanded(
+                                                                                        child: CustomTextFieldWidget(
+                                                                                          formProduct: true,
+                                                                                          required: true,
+                                                                                          border: true,
+                                                                                          controller: digitalProductController.extentionControllerList[index],
+                                                                                          textInputAction: TextInputAction.done,
+                                                                                          textInputType: TextInputType.text,
+                                                                                          isAmount: false,
+                                                                                          hintText: '${digitalProductController.selectedDigitalVariation[index]} ${getTranslated('extension', context)!}',
+                                                                                          onFieldSubmit: (String value) {
+                                                                                            if (digitalProductController.digitalVariationExtantion[index].contains(value)) {
+                                                                                              showCustomSnackBarWidget(getTranslated('extension_already_exists', context), context, sanckBarType: SnackBarType.warning);
+                                                                                            } else if (value.trim() != '') {
+                                                                                              digitalProductController.addExtension(index, value);
+                                                                                            }
+                                                                                          },
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                                                                                      InkWell(
+                                                                                        onTap: () {
+                                                                                          if (digitalProductController.digitalVariationExtantion[index].contains(digitalProductController.extentionControllerList[index].text)) {
+                                                                                            showCustomSnackBarWidget(getTranslated('extension_already_exists', context), context, sanckBarType: SnackBarType.warning);
+                                                                                          } else if (digitalProductController.extentionControllerList[index].text.trim() != '') {
+                                                                                            digitalProductController.addExtension(index, digitalProductController.extentionControllerList[index].text);
+                                                                                          }
+                                                                                        },
+                                                                                        child: Container(
+                                                                                          height: 50,
+                                                                                          width: 50,
+                                                                                          padding: EdgeInsets.all(Dimensions.paddingSizeMedium),
+                                                                                          decoration: BoxDecoration(
+                                                                                            color: Theme.of(context).primaryColor,
+                                                                                            borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
+                                                                                          ),
+                                                                                          child: SizedBox(height: 20, width: 20, child: CustomAssetImageWidget(Images.addAttribuiteIcon)),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                  digitalProductController.digitalVariationExtantion[index].isNotEmpty ? const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
+                                                                                  digitalProductController.digitalVariationExtantion[index].isNotEmpty
+                                                                                      ? SizedBox(
+                                                                                          height: digitalProductController.digitalVariationExtantion[index].isNotEmpty ? 30 : 0,
                                                                                           child: ListView.builder(
-                                                                                            padding: EdgeInsets.zero,
-                                                                                            itemCount: options.length,
-                                                                                            itemBuilder: (BuildContext context, int index) {
-                                                                                              final int optionIndex = options.elementAt(index);
-                                                                                              final colorItem = colorProvider.colorList![optionIndex];
-
-                                                                                              String hexString = colorItem.code!.replaceAll('#', '');
-                                                                                              Color itemColor = Color(int.parse("0xFF$hexString"));
-
-                                                                                              return InkWell(
-                                                                                                onTap: () {
-                                                                                                  onSelected(optionIndex);
-                                                                                                },
-                                                                                                child: Padding(
-                                                                                                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeDefault),
-                                                                                                  child: Row(
-                                                                                                    children: [
-                                                                                                      Container(
-                                                                                                        width: 20,
-                                                                                                        height: 20,
-                                                                                                        decoration: BoxDecoration(color: itemColor, shape: BoxShape.circle, border: Border.all(color: Theme.of(context).hintColor.withValues(alpha: 0.2))),
-                                                                                                      ),
-                                                                                                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                                                                      Expanded(
-                                                                                                        child: Text(
-                                                                                                          colorItem.name!,
-                                                                                                          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color),
-                                                                                                        ),
-                                                                                                      ),
-                                                                                                    ],
+                                                                                            itemCount: digitalProductController.digitalVariationExtantion[index].length,
+                                                                                            scrollDirection: Axis.horizontal,
+                                                                                            itemBuilder: (context, i) {
+                                                                                              return Padding(
+                                                                                                padding: const EdgeInsets.all(Dimensions.paddingSizeVeryTiny),
+                                                                                                child: Container(
+                                                                                                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
+                                                                                                  margin: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
+                                                                                                  decoration: BoxDecoration(
+                                                                                                    color: Theme.of(context).hintColor.withValues(alpha: .20),
+                                                                                                    borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
                                                                                                   ),
+                                                                                                  child: Row(children: [
+                                                                                                    Consumer<SplashController>(builder: (ctx, colorP, child) {
+                                                                                                      return Text(
+                                                                                                        digitalProductController.digitalVariationExtantion[index][i],
+                                                                                                        style: robotoRegular.copyWith(color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
+                                                                                                      );
+                                                                                                    }),
+                                                                                                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                                                                                                    InkWell(
+                                                                                                      splashColor: Colors.transparent,
+                                                                                                      onTap: () {
+                                                                                                        digitalProductController.removeExtension(index, i);
+                                                                                                      },
+                                                                                                      child: Icon(Icons.close, size: 15, color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
+                                                                                                    ),
+                                                                                                  ]),
                                                                                                 ),
                                                                                               );
                                                                                             },
                                                                                           ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    );
-                                                                                  },
-                                                                                  fieldViewBuilder: (context, controller, node, onComplete) {
-                                                                                    _autoController ??= controller;
-                                                                                    _autoFocusNode ??= node;
-                                                                                    return Container(
-                                                                                      height: 50,
-                                                                                      decoration: BoxDecoration(
-                                                                                        color: Theme.of(context).cardColor,
-                                                                                        border: Border.all(width: 1, color: Theme.of(context).hintColor.withValues(alpha: .50)),
-                                                                                        borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                                                                      ),
-                                                                                      child: TextField(
-                                                                                        controller: controller,
-                                                                                        focusNode: node,
-                                                                                        onEditingComplete: onComplete,
-                                                                                        onTap: () {
-                                                                                          if (controller.text.isEmpty) {
-                                                                                            controller.text = controller.text;
-                                                                                          }
-                                                                                        },
-                                                                                        decoration: InputDecoration(
-                                                                                          hintText: getTranslated('type_color_name', context),
-                                                                                          hintStyle: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
-                                                                                          border: OutlineInputBorder(
-                                                                                            borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                                                                            borderSide: BorderSide.none,
-                                                                                          ),
-                                                                                          suffixIcon: Icon(Icons.arrow_drop_down, color: Theme.of(context).hintColor),
-                                                                                        ),
-                                                                                      ),
-                                                                                    );
-                                                                                  },
-                                                                                  displayStringForOption: (value) => colorProvider.colorList![value].name!,
-                                                                                  onSelected: (int value) {
-                                                                                    variationController.addVariant(context, 0, colorProvider.colorList![value].name, widget.product, true);
-                                                                                    variationController.addColorCode(colorProvider.colorList![value].code);
-
-                                                                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                                                      _autoFocusNode?.unfocus();
-                                                                                    });
-                                                                                  },
-                                                                                );
-                                                                              })
-                                                                            : const SizedBox(),
-                                                                        SizedBox(
-                                                                            height: (variationController.attributeList![0].variants.isNotEmpty)
-                                                                                ? Dimensions.paddingSizeSmall
-                                                                                : 0),
-                                                                        if (variationController.attributeList?[0].active ??
-                                                                            false)
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.symmetric(horizontal: 0),
-                                                                            child: variationController.attributeList![0].variants.isNotEmpty
-                                                                                ? Wrap(
-                                                                                    spacing: Dimensions.paddingSizeSmall,
-                                                                                    runSpacing: Dimensions.paddingSizeSmall,
-                                                                                    children: List.generate(
-                                                                                      variationController.attributeList![0].variants.length,
-                                                                                      (index) {
-                                                                                        String hexString = '';
-                                                                                        if (variationController.colorCodeList.isNotEmpty && variationController.colorCodeList.length > index) {
-                                                                                          hexString = variationController.colorCodeList[index]!.replaceAll('#', '');
-                                                                                        }
-                                                                                        Color itemColor = Color(int.parse("0xFF$hexString"));
-                                                                                        return Container(
-                                                                                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
-                                                                                          decoration: BoxDecoration(
-                                                                                            color: Theme.of(context).primaryColor.withValues(alpha: 0.10),
-                                                                                            borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
-                                                                                          ),
-                                                                                          child: Row(
-                                                                                            mainAxisSize: MainAxisSize.min,
-                                                                                            children: [
-                                                                                              Container(
-                                                                                                width: 15,
-                                                                                                height: 15,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  color: itemColor,
-                                                                                                  shape: BoxShape.circle,
-                                                                                                  border: Border.all(color: Theme.of(context).hintColor.withValues(alpha: 0.2)),
-                                                                                                ),
-                                                                                              ),
-                                                                                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                                                                              Consumer<SplashController>(builder: (ctx, colorP, child) {
-                                                                                                return Text(
-                                                                                                  variationController.attributeList![0].variants[index]!,
-                                                                                                  style: robotoRegular.copyWith(
-                                                                                                    fontSize: Dimensions.fontSizeDefault,
-                                                                                                    color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7),
-                                                                                                  ),
-                                                                                                );
-                                                                                              }),
-                                                                                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                                                                              InkWell(
-                                                                                                splashColor: Colors.transparent,
-                                                                                                onTap: () {
-                                                                                                  variationController.removeVariant(context, 0, index, widget.product);
-                                                                                                  variationController.removeColorCode(index);
-                                                                                                },
-                                                                                                child: Icon(
-                                                                                                  Icons.close,
-                                                                                                  size: 15,
-                                                                                                  color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ],
-                                                                                          ),
-                                                                                        );
-                                                                                      },
-                                                                                    ),
-                                                                                  )
-                                                                                : const SizedBox(),
-                                                                          ),
-                                                                        const SizedBox(
-                                                                            height:
-                                                                                Dimensions.paddingSizeSmall),
-                                                                      ],
-                                                                    );
-                                                                  }),
-                                                                ],
+                                                                                        )
+                                                                                      : const SizedBox(),
+                                                                                  const SizedBox(height: Dimensions.paddingSizeSmall)
+                                                                                ],
+                                                                              );
+                                                                            },
+                                                                          );
+                                                                        }),
+                                                                      ]),
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: Dimensions
-                                                                  .paddingSizeDefault),
-                                                          Padding(
-                                                            padding: const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal:
-                                                                    Dimensions
-                                                                        .paddingSizeMedium),
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          Dimensions
-                                                                              .radiusDefault),
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .primaryColor
-                                                                      .withValues(
-                                                                          alpha:
-                                                                              0.05)),
-                                                              padding: EdgeInsets
-                                                                  .all(Dimensions
-                                                                      .paddingSizeSmall),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Expanded(
-                                                                          child:
-                                                                              Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Text(
-                                                                            getTranslated('other_attributes',
-                                                                                context)!,
-                                                                            style:
-                                                                                robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                          ),
-                                                                          Text(
-                                                                            getTranslated('here_you_can_setup_the_product_attribute',
-                                                                                context)!,
-                                                                            style:
-                                                                                robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.headlineLarge?.color),
-                                                                            maxLines:
-                                                                                2,
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                          )
-                                                                        ],
-                                                                      )),
-                                                                    ],
-                                                                  ),
-                                                                  AttributeViewWidget(
-                                                                      product:
-                                                                          widget
-                                                                              .product,
-                                                                      colorOn: variationController
-                                                                          .attributeList![
-                                                                              0]
-                                                                          .active),
-                                                                  SizedBox(
-                                                                      height: Dimensions
-                                                                          .paddingSizeSmall),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: Dimensions
-                                                                  .paddingSizeDefault),
-                                                        ])
-                                                      : const SizedBox(),
-                                                  SizedBox(
-                                                      height: resProvider
-                                                                  .productTypeIndex ==
-                                                              0
-                                                          ? 0
-                                                          : Dimensions
-                                                              .paddingSizeDefault),
-                                                  resProvider.productTypeIndex ==
-                                                              1 &&
-                                                          resProvider
-                                                              .isAttributeActive
-                                                      ? Consumer<
-                                                              DigitalProductController>(
-                                                          builder: (context,
-                                                              digitalProductController,
-                                                              _) {
-                                                          return Padding(
-                                                            padding: EdgeInsets
-                                                                .all(Dimensions
-                                                                    .paddingSizeSmall),
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          Dimensions
-                                                                              .radiusDefault),
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .primaryColor
-                                                                      .withValues(
-                                                                          alpha:
-                                                                              0.05)),
-                                                              padding: EdgeInsets
-                                                                  .all(Dimensions
-                                                                      .paddingSizeSmall),
-                                                              child: Padding(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        0),
-                                                                child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        getTranslated(
-                                                                            'select_file_type',
-                                                                            context)!,
-                                                                        style: robotoBold.copyWith(
-                                                                            fontSize:
-                                                                                Dimensions.fontSizeLarge,
-                                                                            color: Theme.of(context).textTheme.bodyLarge?.color),
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                      ),
-
-                                                                      Text(
-                                                                        getTranslated(
-                                                                            'select_at_least_one_file_type_to_work',
-                                                                            context)!,
-                                                                        style: robotoRegular.copyWith(
-                                                                            fontSize:
-                                                                                Dimensions.fontSizeSmall,
-                                                                            color: Theme.of(context).textTheme.headlineLarge?.color),
-                                                                        maxLines:
-                                                                            2,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                      ),
-                                                                      const SizedBox(
-                                                                          height:
-                                                                              Dimensions.paddingSizeSmall),
-
-                                                                      DropdownDecoratorWidget(
-                                                                        child: DropdownButton<
-                                                                            String>(
-                                                                          icon:
-                                                                              const Icon(Icons.keyboard_arrow_down_outlined),
-                                                                          borderRadius: const BorderRadius
-                                                                              .all(
-                                                                              Radius.circular(Dimensions.paddingEye)),
-                                                                          hint: Text(
-                                                                              getTranslated('select_file_type', context)!,
-                                                                              style: robotoRegular.copyWith(color: themeProvider.darkTheme ? Theme.of(context).textTheme.bodyLarge?.color : Theme.of(context).hintColor, fontSize: Dimensions.fontSizeExtraLarge)),
-                                                                          items:
-                                                                              digitalVariation.map((String? value) {
-                                                                            return DropdownMenuItem<String>(
-                                                                              value: value,
-                                                                              child: Text(value!),
-                                                                            );
-                                                                          }).toList(),
-                                                                          onChanged:
-                                                                              (String? value) {
-                                                                            if (digitalProductController.selectedDigitalVariation.contains(value)) {
-                                                                              showCustomSnackBarWidget(getTranslated('filetype_already_exists', context), context, sanckBarType: SnackBarType.warning);
-                                                                            } else {
-                                                                              digitalProductController.addDigitalProductVariation(value!);
-                                                                            }
-                                                                          },
-                                                                          isExpanded:
-                                                                              true,
-                                                                          underline:
-                                                                              const SizedBox(),
-                                                                        ),
-                                                                      ),
-
-                                                                      !digitalProductController
-                                                                              .selectedDigitalVariation
-                                                                              .isNotEmpty
-                                                                          ? const SizedBox(
-                                                                              height: Dimensions.paddingSizeSmall)
-                                                                          : const SizedBox.shrink(),
-
-                                                                      digitalProductController
-                                                                              .selectedDigitalVariation
-                                                                              .isNotEmpty
-                                                                          ? SizedBox(
-                                                                              height: digitalProductController.selectedDigitalVariation.isNotEmpty ? 30 : 0,
-                                                                              child: ListView.builder(
-                                                                                itemCount: digitalProductController.selectedDigitalVariation.length,
-                                                                                scrollDirection: Axis.horizontal,
-                                                                                itemBuilder: (context, index) {
-                                                                                  return Container(
-                                                                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
-                                                                                    margin: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
-                                                                                    decoration: BoxDecoration(
-                                                                                      color: Theme.of(context).hintColor.withValues(alpha: .20),
-                                                                                      borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
-                                                                                    ),
-                                                                                    child: Row(children: [
-                                                                                      Consumer<SplashController>(builder: (ctx, colorP, child) {
-                                                                                        return Text(
-                                                                                          digitalProductController.selectedDigitalVariation[index],
-                                                                                          style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color!),
-                                                                                        );
-                                                                                      }),
-                                                                                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                                                      InkWell(
-                                                                                        splashColor: Colors.transparent,
-                                                                                        onTap: () {
-                                                                                          digitalProductController.removeDigitalVariant(context, index);
-                                                                                        },
-                                                                                        child: Icon(Icons.close, size: 15, color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                                      ),
-                                                                                    ]),
-                                                                                  );
-                                                                                },
-                                                                              ),
-                                                                            )
-                                                                          : const SizedBox(),
-                                                                      digitalProductController
-                                                                              .selectedDigitalVariation
-                                                                              .isNotEmpty
-                                                                          ? const SizedBox(
-                                                                              height: Dimensions.paddingSizeSmall)
-                                                                          : const SizedBox(),
-
-                                                                      ///Digital variation
-                                                                      Consumer<DigitalProductController>(builder:
-                                                                          (context,
-                                                                              digitalProductController,
-                                                                              _) {
-                                                                        return ListView
-                                                                            .builder(
-                                                                          itemCount: digitalProductController
-                                                                              .selectedDigitalVariation
-                                                                              .length,
-                                                                          shrinkWrap:
-                                                                              true,
-                                                                          physics:
-                                                                              const NeverScrollableScrollPhysics(),
-                                                                          itemBuilder:
-                                                                              (context, index) {
-                                                                            return Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                Text(
-                                                                                  digitalProductController.selectedDigitalVariation[index],
-                                                                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                ),
-                                                                                const SizedBox(height: Dimensions.paddingSizeSmall),
-                                                                                Row(
-                                                                                  children: [
-                                                                                    Expanded(
-                                                                                      child: CustomTextFieldWidget(
-                                                                                        formProduct: true,
-                                                                                        required: true,
-                                                                                        border: true,
-                                                                                        controller: digitalProductController.extentionControllerList[index],
-                                                                                        textInputAction: TextInputAction.done,
-                                                                                        textInputType: TextInputType.text,
-                                                                                        isAmount: false,
-                                                                                        hintText: '${digitalProductController.selectedDigitalVariation[index]} ${getTranslated('extension', context)!}',
-                                                                                        onFieldSubmit: (String value) {
-                                                                                          if (digitalProductController.digitalVariationExtantion[index].contains(value)) {
-                                                                                            showCustomSnackBarWidget(getTranslated('extension_already_exists', context), context, sanckBarType: SnackBarType.warning);
-                                                                                          } else if (value.trim() != '') {
-                                                                                            digitalProductController.addExtension(index, value);
-                                                                                          }
-                                                                                        },
-                                                                                      ),
-                                                                                    ),
-                                                                                    const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                                                    InkWell(
-                                                                                      onTap: () {
-                                                                                        if (digitalProductController.digitalVariationExtantion[index].contains(digitalProductController.extentionControllerList[index].text)) {
-                                                                                          showCustomSnackBarWidget(getTranslated('extension_already_exists', context), context, sanckBarType: SnackBarType.warning);
-                                                                                        } else if (digitalProductController.extentionControllerList[index].text.trim() != '') {
-                                                                                          digitalProductController.addExtension(index, digitalProductController.extentionControllerList[index].text);
-                                                                                        }
-                                                                                      },
-                                                                                      child: Container(
-                                                                                        height: 50,
-                                                                                        width: 50,
-                                                                                        padding: EdgeInsets.all(Dimensions.paddingSizeMedium),
-                                                                                        decoration: BoxDecoration(
-                                                                                          color: Theme.of(context).primaryColor,
-                                                                                          borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
-                                                                                        ),
-                                                                                        child: SizedBox(height: 20, width: 20, child: CustomAssetImageWidget(Images.addAttribuiteIcon)),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                                digitalProductController.digitalVariationExtantion[index].isNotEmpty ? const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
-                                                                                digitalProductController.digitalVariationExtantion[index].isNotEmpty
-                                                                                    ? SizedBox(
-                                                                                        height: digitalProductController.digitalVariationExtantion[index].isNotEmpty ? 30 : 0,
-                                                                                        child: ListView.builder(
-                                                                                          itemCount: digitalProductController.digitalVariationExtantion[index].length,
-                                                                                          scrollDirection: Axis.horizontal,
-                                                                                          itemBuilder: (context, i) {
-                                                                                            return Padding(
-                                                                                              padding: const EdgeInsets.all(Dimensions.paddingSizeVeryTiny),
-                                                                                              child: Container(
-                                                                                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
-                                                                                                margin: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
-                                                                                                decoration: BoxDecoration(
-                                                                                                  color: Theme.of(context).hintColor.withValues(alpha: .20),
-                                                                                                  borderRadius: BorderRadius.circular(Dimensions.paddingSizeDefault),
-                                                                                                ),
-                                                                                                child: Row(children: [
-                                                                                                  Consumer<SplashController>(builder: (ctx, colorP, child) {
-                                                                                                    return Text(
-                                                                                                      digitalProductController.digitalVariationExtantion[index][i],
-                                                                                                      style: robotoRegular.copyWith(color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                                                    );
-                                                                                                  }),
-                                                                                                  const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                                                                  InkWell(
-                                                                                                    splashColor: Colors.transparent,
-                                                                                                    onTap: () {
-                                                                                                      digitalProductController.removeExtension(index, i);
-                                                                                                    },
-                                                                                                    child: Icon(Icons.close, size: 15, color: ColorHelper.blendColors(Colors.white, Theme.of(context).textTheme.bodyLarge!.color!, 0.7)),
-                                                                                                  ),
-                                                                                                ]),
-                                                                                              ),
-                                                                                            );
-                                                                                          },
-                                                                                        ),
-                                                                                      )
-                                                                                    : const SizedBox(),
-                                                                                const SizedBox(height: Dimensions.paddingSizeSmall)
-                                                                              ],
-                                                                            );
-                                                                          },
-                                                                        );
-                                                                      }),
-                                                                    ]),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        })
-                                                      : SizedBox(),
-                                                ],
-                                              );
-                                            }),
+                                                            );
+                                                          })
+                                                        : SizedBox(),
+                                                  ],
+                                                );
+                                              }),
                                             variationController
                                                     .variantTypeList.isNotEmpty
                                                 ? SizedBox(
@@ -1607,6 +1576,8 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                         digitalProductController
                                                                 .shouldShowUploadFile()
                                                             ? AddProductSectionWidget(
+                                                                showTitle:
+                                                                    false,
                                                                 title: getTranslated(
                                                                     'variation_wise_file_upload',
                                                                     context)!,

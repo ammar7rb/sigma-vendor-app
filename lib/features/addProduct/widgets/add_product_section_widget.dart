@@ -8,6 +8,7 @@ import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class AddProductSectionWidget extends StatelessWidget {
   final String? title;
+  final bool showTitle;
   final String? subTitle;
   final List<Widget> childrens;
   final TextStyle? titleStyle;
@@ -20,6 +21,7 @@ class AddProductSectionWidget extends StatelessWidget {
   const AddProductSectionWidget(
       {super.key,
       this.title,
+      this.showTitle = true,
       required this.childrens,
       this.titleStyle,
       this.isDecoration = true,
@@ -47,7 +49,7 @@ class AddProductSectionWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null)
+          if (showTitle && title != null)
             Padding(
               padding: const EdgeInsets.symmetric(
                   vertical: Dimensions.paddingSizeSmall,

@@ -400,6 +400,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                       Consumer<AiController>(
                                           builder: (context, aiController, _) {
                                         return AddProductSectionWidget(
+                                          showTitle: false,
                                           title: getTranslated(
                                               'basic_info', context)!,
                                           subTitle: getTranslated(
@@ -666,6 +667,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                                 height: Dimensions
                                                     .paddingSizeLarge),
                                             AddProductSectionWidget(
+                                              showTitle: false,
                                               title: getTranslated(
                                                   'additional_product_images',
                                                   context)!,
@@ -1169,6 +1171,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                               Dimensions.paddingSizeDefault),
                                       if (false)
                                         AddProductSectionWidget(
+                                          showTitle: false,
                                           title: getTranslated(
                                               'product_video_link', context)!,
                                           subTitle: getTranslated(
@@ -1521,6 +1524,7 @@ class AddProductScreenState extends State<AddProductScreen>
     return Column(children: [
       Consumer<AiController>(builder: (context, aiController, child) {
         return AddProductSectionWidget(
+          showTitle: false,
           title: getTranslated('general_setup', context)!,
           subTitle: getTranslated(
               'here_you_can_set_up_the_foundational_details', context)!,
