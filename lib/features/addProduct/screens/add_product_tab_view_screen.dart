@@ -59,7 +59,7 @@ class _AddProductTabViewState extends State<AddProductTabView>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
 
-    if (widget.product == null && widget.slotId != null) {
+    if (widget.product == null) {
       // Every new-product entry point reaches this screen, so the check cannot be bypassed from another menu.
       Future.microtask(_checkNewProductEligibility);
     } else {
@@ -227,11 +227,11 @@ class _AddProductTabViewState extends State<AddProductTabView>
       if (!mounted) return;
       if (response.data['product_creation_allowed'] != true) {
         setState(() {
-          _eligibilityReason =
-              Localizations.localeOf(context).languageCode == 'ar'
-                  ? 'يلزم اشتراك سارٍ لإنشاء منتجات جديدة.'
-                  : 'An active subscription is required to create products.';
-          _eligibilityAction = 'packages';
+          _eligibilityReason = Localizations.localeOf(context).languageCode ==
+                  'ar'
+              ? 'يلزم تفعيل حساب التاجر قبل إرسال المنتجات. لا يلزم شراء باقة للإضافة العادية.'
+              : 'Activate your vendor account before submitting products. A paid package is not required for ordinary submissions.';
+          _eligibilityAction = 'back';
           _canAddNewProduct = false;
           _eligibilityChecked = true;
         });

@@ -1,9 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/seller_package/screens/seller_package_screen.dart';
 import 'package:sixvalley_vendor_app/features/order_details/widgets/vendor_eligibility_view.dart';
+
+class _ProofInputException implements Exception {
+  final String message;
+  const _ProofInputException(this.message);
+}
 
 class VendorFulfillmentView extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -33,9 +38,11 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
   void message(Object error) {
     if (!mounted) return;
     final data = error is DioException ? error.response?.data : null;
-    final text = data is Map
-        ? '${data['message'] ?? 'تعذر تنفيذ الإجراء؛ حدّث التفاصيل وحاول مجددًا.'}'
-        : 'تعذر تنفيذ الإجراء؛ حدّث التفاصيل وحاول مجددًا.';
+    final text = error is _ProofInputException
+        ? error.message
+        : data is Map
+            ? '${data['message'] ?? 'تعذر تنفيذ الإجراء؛ حدّث التفاصيل وحاول مجددًا.'}'
+            : 'تعذر تنفيذ الإجراء؛ حدّث التفاصيل وحاول مجددًا.';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(text, textDirection: TextDirection.rtl)),
     );
@@ -127,7 +134,7 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
                           if (action == 'cancel')
                             Text(
                               'الغرامة الحالية: ${money(penalty['assessed_amount'])}.\n'
-                              'أساس النسبة: مستحق بضائع هذا الجزء فقط دون الشحن والضرائب وهامش الشركة. '
+                              '${penalty['mode'] == 'percentage' ? 'النسبة ${penalty['percentage']}٪ من مستحق بضائع هذا الجزء دون الشحن والضرائب وهامش الشركة.' : 'مبلغ ثابت بالجنيه لهذا الجزء.'} '
                               'تخصم من رصيد المدفوعات ويسجل العجز دينًا يسدد من الإيداع المؤكد التالي.',
                             ),
                           if (!needsReason && action != 'accept')
@@ -177,13 +184,32 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
       });
 
   Future<void> proof(Map portion) => run(() async {
-        final file = await ImagePicker().pickImage(source: ImageSource.gallery);
-        if (file == null) return;
+        final result = await FilePicker.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'mp4'],
+          allowMultiple: false,
+          withReadStream: true,
+        );
+        if (result == null || result.files.isEmpty) return;
+        final file = result.files.single;
+        if (file.size > 10 * 1024 * 1024) {
+          throw const _ProofInputException(
+              'حجم إثبات التسليم يجب ألا يتجاوز 10 ميجابايت.');
+        }
+        final upload = file.readStream != null
+            ? MultipartFile.fromStream(() => file.readStream!, file.size,
+                filename: file.name)
+            : file.bytes != null
+                ? MultipartFile.fromBytes(file.bytes!, filename: file.name)
+                : file.path != null
+                    ? await MultipartFile.fromFile(file.path!,
+                        filename: file.name)
+                    : throw const _ProofInputException(
+                        'تعذر قراءة الملف؛ اختره مرة أخرى.');
         await VendorWorkspace.instance.client.post(
           '/api/v3/seller/fulfillment-requests/${portion['id']}/delivery-proof',
           data: FormData.fromMap({
-            'proof':
-                await MultipartFile.fromFile(file.path, filename: file.name),
+            'proof': upload,
           }),
         );
         await widget.onRefresh();
