@@ -80,6 +80,7 @@ class SavedAdvertisementTile extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(height: 8),
                           Text(financeMoney(context, data['unit_price'])),
+                          VendorProductViews(data: data),
                           if (workspace['legacy_exempt'] == true)
                             Padding(
                                 padding: const EdgeInsets.only(top: 8),
@@ -114,5 +115,22 @@ class SavedAdvertisementTile extends StatelessWidget {
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.error))),
                 ])));
+  }
+}
+
+class VendorProductViews extends StatelessWidget {
+  final Map<String, dynamic> data;
+  const VendorProductViews({super.key, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final ar = Localizations.localeOf(context).languageCode == 'ar';
+    final additions = int.tryParse('${data['administrative_view_additions']}') ?? 0;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('${ar ? 'عدد المشاهدات' : 'View count'}: ${data['product_view_count'] ?? 0}'),
+      if (additions > 0)
+        Text('${ar ? 'منها إضافات إدارية' : 'Including administrative additions'}: $additions',
+            style: Theme.of(context).textTheme.bodySmall),
+    ]);
   }
 }

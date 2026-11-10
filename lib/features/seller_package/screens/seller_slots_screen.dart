@@ -319,6 +319,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                     const SizedBox(height: 16),
                     Text('${product['name']}',
                         style: Theme.of(context).textTheme.titleMedium),
+                    VendorProductViews(data: Map<String, dynamic>.from(product)),
                     const SizedBox(height: 12),
                     Wrap(spacing: 24, runSpacing: 12, children: [
                       Column(
