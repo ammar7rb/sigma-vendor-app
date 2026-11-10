@@ -2011,5 +2011,6 @@
 "vendor_fulfillment_cta": "Update fulfillment to track your dues",
 "vendor_procurement_total": "Your merchandise procurement total",
 "vendor_returns_managed": "Administration manages returns and adjustments to your dues",
-  "product_views": "Product views"
+  "product_views": "View count",
+  "administrative_view_additions": "Including administrative additions"
 }

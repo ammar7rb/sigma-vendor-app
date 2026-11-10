@@ -157,6 +157,7 @@ class ProductModel {
 
 class Product {
   int? productViewCount;
+  int administrativeViewAdditions = 0;
   int? id;
   String? addedBy;
   int? userId;
@@ -349,6 +350,8 @@ class Product {
 
   Product.fromJson(Map<String, dynamic> json, {bool fromGetProducts = false}) {
     productViewCount = int.tryParse(json['product_view_count']?.toString() ?? '');
+    administrativeViewAdditions =
+        int.tryParse(json['administrative_view_additions']?.toString() ?? '') ?? 0;
     id = json['id'];
     addedBy = json['added_by'];
     userId = json['user_id'];

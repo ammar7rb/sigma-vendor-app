@@ -391,6 +391,15 @@ class _SellerProductCard extends StatelessWidget {
               ]),
               Text('P${product.id}',
                   style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                '${getTranslated('product_views', context) ?? 'View count'}: ${product.productViewCount ?? 0}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              if (product.administrativeViewAdditions > 0)
+                Text(
+                  '${getTranslated('administrative_view_additions', context) ?? 'Administrative additions'}: ${product.administrativeViewAdditions}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               const SizedBox(height: 6),
               Text(getTranslated('product_price', context) ?? '',
                   style: Theme.of(context).textTheme.bodySmall),

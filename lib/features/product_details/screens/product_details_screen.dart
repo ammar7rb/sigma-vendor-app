@@ -224,9 +224,15 @@ class _ProductHeader extends StatelessWidget {
               children: [
                 Text(product.name ?? '',
                     style: robotoBold.copyWith(fontSize: 18)),
-                if (product.productViewCount != null)
-                  Text('${getTranslated('product_views', context) ?? 'Views'}: ${product.productViewCount}',
-                      style: robotoRegular.copyWith(fontSize: 14)),
+                Text(
+                  '${getTranslated('product_views', context) ?? 'View count'}: ${product.productViewCount ?? 0}',
+                  style: robotoRegular.copyWith(fontSize: 14),
+                ),
+                if (product.administrativeViewAdditions > 0)
+                  Text(
+                    '${getTranslated('administrative_view_additions', context) ?? 'Administrative additions'}: ${product.administrativeViewAdditions}',
+                    style: robotoRegular.copyWith(fontSize: 12),
+                  ),
                 Text(
                   PriceConverter.convertPrice(context, product.unitPrice),
                   style: robotoBold.copyWith(
