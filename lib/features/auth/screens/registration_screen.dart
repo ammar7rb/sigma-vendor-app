@@ -42,9 +42,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       _warning('email_is_ot_valid', 'أدخل بريدًا إلكترونيًا صحيحًا');
     } else if (!EgyptPhoneHelper.isValidLocal(phone)) {
       _warning('phone_number_is_not_valid', 'أدخل رقم هاتف مصري صحيحًا');
-    } else if (auth.passwordController.text.length < 8) {
+    } else if (auth.passwordController.text.length < 6) {
       _warning(
-          'password_minimum_length_is_6', 'كلمة المرور يجب ألا تقل عن 8 أحرف');
+          'password_minimum_length_is_6', 'كلمة المرور 6 أحرف على الأقل.');
     } else if (auth.passwordController.text !=
         auth.confirmPasswordController.text) {
       _warning('password_is_mismatch', 'كلمتا المرور غير متطابقتين');
