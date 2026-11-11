@@ -188,10 +188,11 @@ class AuthRepository implements AuthRepositoryInterface{
     }
     final fields = <String, String>{
       'phone': registerModel.phone!,
-      'email': registerModel.email!,
       'password': registerModel.password!,
       'confirm_password': registerModel.confirmPassword!,
     };
+    final email = registerModel.email?.trim() ?? '';
+    if (email.isNotEmpty) fields['email'] = email;
     for (var index = 0; index < registerModel.policyVersionIds.length; index++) {
       fields['policy_version_ids[$index]'] = registerModel.policyVersionIds[index].toString();
     }

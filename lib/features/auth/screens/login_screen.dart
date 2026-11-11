@@ -4,6 +4,7 @@ import 'package:sixvalley_vendor_app/common/basewidgets/custom_button_widget.dar
 import 'package:sixvalley_vendor_app/common/basewidgets/textfeild/custom_text_feild_widget.dart';
 import 'package:sixvalley_vendor_app/features/more/screens/html_view_screen.dart';
 import 'package:sixvalley_vendor_app/features/splash/domain/models/business_pages_model.dart';
+import 'package:sixvalley_vendor_app/helper/egypt_phone_helper.dart';
 import 'package:sixvalley_vendor_app/helper/email_checker.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
 import 'package:sixvalley_vendor_app/features/auth/controllers/auth_controller.dart';
@@ -185,7 +186,8 @@ class LoginScreenState extends State<LoginScreen> {
                                   getTranslated('enter_email_address', context),
                                   context,
                                   sanckBarType: SnackBarType.warning);
-                            } else if (EmailChecker.isNotValid(email)) {
+                            } else if (EmailChecker.isNotValid(email) &&
+                                !EgyptPhoneHelper.isValidLocal(email)) {
                               showCustomSnackBarWidget(
                                   getTranslated('enter_valid_email', context),
                                   context,
@@ -201,9 +203,12 @@ class LoginScreenState extends State<LoginScreen> {
                                   context,
                                   sanckBarType: SnackBarType.warning);
                             } else {
+                              final identity = EgyptPhoneHelper.isValidLocal(email)
+                                  ? EgyptPhoneHelper.normalizeLocal(email)
+                                  : email;
                               authProvider
                                   .login(context,
-                                      emailAddress: email, password: password)
+                                      emailAddress: identity, password: password)
                                   .then((status) async {
                                 if (status.response?.statusCode == 200) {
                                   if (authProvider.isActiveRememberMe) {

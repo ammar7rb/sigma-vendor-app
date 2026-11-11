@@ -456,8 +456,8 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
             if (extras?['enabled'] == true && active != null)
               DropdownMenuItem(
                   value: 'extra',
-                  child: Text(label('مساحات إضافية للدورة الحالية',
-                      'Extra slots for the current cycle')))
+                  child: Text(                    label('إعلانات إضافية للدورة الحالية',
+                      'Extra ads for the current cycle')))
           ],
           onChanged: disabled
               ? null
@@ -483,9 +483,8 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
                       packageId = value;
                       requestKey = withdrawalRequestKey();
                     })),
-        Text(label(
-            'السعر والشروط محفوظة وقت الطلب. يبدأ التجديد بعد الدورات المدفوعة الحالية.',
-            'Price and terms are fixed at submission. Renewal starts after all paid cycles.')),
+        Text(label('السعر والشروط محفوظة وقت الطلب.',
+            'Price and terms are fixed at submission.')),
       ],
       if (purchaseKind == 'extra') ...[
         TextFormField(
@@ -494,13 +493,13 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 labelText:
-                    label('عدد المساحات الإضافية', 'Extra slot quantity')),
+                    label('عدد الإعلانات الإضافية', 'Extra ad quantity')),
             validator: (value) => (int.tryParse(value ?? '') ?? 0) < 1
                 ? label(
                     'أدخل عددًا صحيحًا موجبًا.', 'Enter a positive quantity.')
                 : null),
         Text(
-            '${label('سعر المساحة', 'Unit price')}: ${extras?['unit_price']} EGP — ${label('تنتهي', 'Expires')}: ${active?['expires_at']}'),
+            '${label('سعر الإعلان', 'Ad price')}: ${extras?['unit_price']} EGP — ${label('تنتهي', 'Expires')}: ${active?['expires_at']}'),
         Text(label(
             'إذا انتهى الاشتراك قبل اعتماد التحويل، يبقى المبلغ معلقًا لتسوية يدوية دون رصيد أو مساحات.',
             'If the subscription expires before approval, the transfer stays pending for manual settlement without balance credit or slots.')),

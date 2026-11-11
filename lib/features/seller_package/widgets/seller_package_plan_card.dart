@@ -6,12 +6,14 @@ class SellerPackagePlanCard extends StatelessWidget {
   final SellerPackagePlan plan;
   final bool current;
   final bool selected;
+  final String? actionLabel;
   final VoidCallback? onSubscribe;
   const SellerPackagePlanCard(
       {super.key,
       required this.plan,
       this.current = false,
       this.selected = false,
+      this.actionLabel,
       this.onSubscribe});
 
   @override
@@ -60,16 +62,17 @@ class SellerPackagePlanCard extends StatelessWidget {
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
-                '${label('عدد الإعلانات', 'Advertisements')}: ${plan.productLimit} ${label('إعلانات', 'ads')}')),
+                '${label('عدد الإعلانات', 'Advertisements')}: ${plan.productLimit > 0 ? plan.productLimit : label('حسب الباقة', 'As listed')} ${plan.productLimit > 0 ? label('إعلانات', 'ads') : ''}')),
         Text('${label('مدة الاشتراك', 'Subscription duration')}: $duration'),
         const SizedBox(height: 16),
         const Divider(),
         const SizedBox(height: 16),
         FilledButton(
             onPressed: onSubscribe,
-            child: Text(current
-                ? label('تجديد الآن', 'Renew now')
-                : label('اشترك الآن', 'Subscribe now'))),
+            child: Text(actionLabel ??
+                (current
+                    ? label('تجديد الآن', 'Renew now')
+                    : label('اشترك الآن', 'Subscribe now')))),
       ]),
     );
   }

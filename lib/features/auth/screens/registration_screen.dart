@@ -11,8 +11,6 @@ import 'package:sixvalley_vendor_app/features/auth/domain/models/register_model.
 import 'package:sixvalley_vendor_app/features/auth/screens/seller_registration_verification_screen.dart';
 import 'package:sixvalley_vendor_app/features/dashboard/screens/dashboard_screen.dart';
 import 'package:sixvalley_vendor_app/features/auth/widgets/seller_auth_header.dart';
-import 'package:sixvalley_vendor_app/features/auth/widgets/required_registration_policy_links.dart';
-import 'package:sixvalley_vendor_app/features/splash/controllers/splash_controller.dart';
 import 'package:sixvalley_vendor_app/helper/email_checker.dart';
 import 'package:sixvalley_vendor_app/helper/egypt_phone_helper.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
@@ -39,22 +37,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   void _submit(AuthController auth) {
     final phone = EgyptPhoneHelper.normalizeLocal(auth.phoneController.text);
-    if (!auth.registrationPoliciesLoaded) {
-      _warning('registration_policies_loading', 'جاري تحميل السياسات');
-    } else if (EmailChecker.isNotValid(auth.emailController.text.trim())) {
+    final email = auth.emailController.text.trim();
+    if (email.isNotEmpty && EmailChecker.isNotValid(email)) {
       _warning('email_is_ot_valid', 'أدخل بريدًا إلكترونيًا صحيحًا');
     } else if (!EgyptPhoneHelper.isValidLocal(phone)) {
       _warning('phone_number_is_not_valid', 'أدخل رقم هاتف مصري صحيحًا');
-    } else if (auth.passwordController.text.length < 8) {
+    } else if (auth.passwordController.text.length < 6) {
       _warning(
-          'password_minimum_length_is_6', 'كلمة المرور يجب ألا تقل عن 8 أحرف');
+          'password_minimum_length_is_6', 'كلمة المرور 6 أحرف على الأقل.');
     } else if (auth.passwordController.text !=
         auth.confirmPasswordController.text) {
       _warning('password_is_mismatch', 'كلمتا المرور غير متطابقتين');
     } else {
       final model = RegisterModel(
-        phone: EgyptPhoneHelper.toInternational(phone),
-        email: auth.emailController.text.trim(),
+        phone: phone,
+        email: email,
         password: auth.passwordController.text,
         confirmPassword: auth.confirmPasswordController.text,
         policyVersionIds: auth.requiredRegistrationPolicies
@@ -90,7 +87,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               MaterialPageRoute(
                   builder: (_) => SellerRegistrationVerificationScreen(
                         registrationReference: reference,
-                        mobileNumber: EgyptPhoneHelper.toInternational(phone),
+                        mobileNumber: phone,
                         otpRequired: otpRequired,
                         resendAfter: data['otp']?['resend_after'] as int? ?? 0,
                         supportTicketRequired: data['eligibility']
@@ -110,24 +107,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void _warning(String key, String fallback) =>
       showCustomSnackBarWidget(tr(key, fallback), context,
           sanckBarType: SnackBarType.warning);
-
-  List<Map<String, dynamic>> _displayPolicies(AuthController auth) {
-    const policySlugs = {'terms-and-conditions'};
-    final pages = context.read<SplashController>().defaultBusinessPages ?? [];
-    final combined = pages
-        .where((page) => policySlugs.contains(page.slug))
-        .map((page) => <String, dynamic>{
-              'title': page.title,
-              'content': page.description,
-              'version': '',
-            })
-        .toList();
-    return [
-      ...combined,
-      ...auth.requiredRegistrationPolicies.where((policy) =>
-          !combined.any((page) => page['title'] == policy['title'])),
-    ];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +134,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label(tr('email', 'البريد الإلكتروني')),
+                      _label(tr('email', 'البريد الإلكتروني (اختياري)')),
                       CustomTextFieldWidget(
                           border: true,
                           prefixIconImage: 'assets/images/email_icon.png',
@@ -216,12 +195,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           controller: auth.confirmPasswordController,
                           focusNode: auth.confirmPasswordNode,
                           textInputAction: TextInputAction.done),
-                      const SizedBox(height: 10),
-                      RequiredRegistrationPolicyLinks(
-                        policies: _displayPolicies(auth),
-                      ),
                       const SizedBox(height: 14),
-                      auth.isLoading || !auth.registrationPoliciesLoaded
+                      auth.isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : CustomButtonWidget(
                               borderRadius: 18,

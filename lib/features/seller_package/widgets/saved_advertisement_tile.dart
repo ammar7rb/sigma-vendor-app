@@ -110,7 +110,7 @@ class SavedAdvertisementTile extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 12),
                         child: Text(
                             ar
-                                ? 'الإعلان غير متاح للعملاء. اختر مساحة سارية أو جدّد الاشتراك.'
+                                ? 'الإعلان غير متاح للعملاء. جدّد الاشتراك.'
                                 : 'Advertisement hidden. Assign a valid space or renew your subscription.',
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.error))),

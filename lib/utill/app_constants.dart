@@ -382,7 +382,7 @@ class AppConstants {
   static const String setCurrentLanguageUri = '/api/v3/seller/language-change';
 
   static const String deleteProductImage =
-      '/api/v3/seller/products/delete-images';
+      '/api/v3/seller/products/delete-image';
   static const String getProductImage =
       '/api/v3/seller/products/get-product-images/';
   static const String deleteProductPreview =

@@ -1,6 +1,5 @@
 import 'package:sixvalley_vendor_app/features/order_details/domain/models/order_setup_model.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/order/domain/models/order_model.dart';
@@ -23,10 +22,7 @@ class SellerShippingAssignmentWidget extends StatefulWidget {
 
 class _SellerShippingAssignmentWidgetState
     extends State<SellerShippingAssignmentWidget> {
-  PlatformFile? proof;
-  final note = TextEditingController();
   bool opening = false;
-  final GlobalKey deliveryProofKey = GlobalKey();
   String tr(String key) => getTranslated(key, context) ?? key;
   String date(dynamic value) {
     final parsed = DateTime.tryParse('$value');
@@ -34,12 +30,6 @@ class _SellerShippingAssignmentWidgetState
         ? tr('finance_not_set')
         : DateFormat.yMMMd(Localizations.localeOf(context).languageCode)
             .format(parsed.toLocal());
-  }
-
-  @override
-  void dispose() {
-    note.dispose();
-    super.dispose();
   }
 
   @override
@@ -120,18 +110,55 @@ class _SellerShippingAssignmentWidgetState
                   for (final status in ['confirmed', 'processing', 'out_for_delivery', 'delivered'])
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: OutlinedButton.icon(
-                        onPressed: controller.actionInProgress || controller.isLoading || (needsResponse && status != 'confirmed') || (!needsResponse && !nextStatuses.contains(status))
-                            ? null
-                            : needsResponse && status == 'confirmed'
-                                ? () => respond(controller, 'accept')
-                            : status == 'delivered'
-                                ? () { final target = deliveryProofKey.currentContext; if (target != null) Scrollable.ensureVisible(target, duration: const Duration(milliseconds: 250)); }
-                                : () => controller.setUpOrder(orderSetupModel: OrderSetupModel(orderId: widget.order.id, orderStatus: status, paymentStatus: widget.order.paymentStatus)),
-                        icon: Icon(widget.order.orderStatus == status ? Icons.check_circle : Icons.circle_outlined,
-                          color: completed && status == 'delivered' ? Colors.green.shade700 : null),
-                        label: Text(tr(status)),
-                      ),
+                      child: status == 'delivered'
+                          ? FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.green.shade700,
+                                  foregroundColor: Colors.white,
+                                  disabledBackgroundColor:
+                                      Colors.green.shade700.withValues(alpha: .45),
+                                  disabledForegroundColor: Colors.white),
+                              onPressed: controller.actionInProgress ||
+                                      controller.isLoading ||
+                                      completed ||
+                                      company ||
+                                      (needsResponse && status != 'confirmed') ||
+                                      (!needsResponse &&
+                                          nextStatuses.isNotEmpty &&
+                                          !nextStatuses.contains(status))
+                                  ? null
+                                  : () => controller.setUpOrder(
+                                      orderSetupModel: OrderSetupModel(
+                                          orderId: widget.order.id,
+                                          orderStatus: status,
+                                          paymentStatus:
+                                              widget.order.paymentStatus)),
+                              icon: Icon(completed
+                                  ? Icons.check_circle
+                                  : Icons.circle_outlined),
+                              label: Text(tr(status)),
+                            )
+                          : OutlinedButton.icon(
+                              onPressed: controller.actionInProgress ||
+                                      controller.isLoading ||
+                                      (needsResponse && status != 'confirmed') ||
+                                      (!needsResponse &&
+                                          nextStatuses.isNotEmpty &&
+                                          !nextStatuses.contains(status))
+                                  ? null
+                                  : needsResponse && status == 'confirmed'
+                                      ? () => respond(controller, 'accept')
+                                      : () => controller.setUpOrder(
+                                          orderSetupModel: OrderSetupModel(
+                                              orderId: widget.order.id,
+                                              orderStatus: status,
+                                              paymentStatus:
+                                                  widget.order.paymentStatus)),
+                              icon: Icon(widget.order.orderStatus == status
+                                  ? Icons.check_circle
+                                  : Icons.circle_outlined),
+                              label: Text(tr(status)),
+                            ),
                     ),
                 ]),
               ),
@@ -154,43 +181,6 @@ class _SellerShippingAssignmentWidgetState
                         style: TextStyle(
                             color: Colors.green.shade700,
                             fontWeight: FontWeight.bold))),
-              if (!company && !terminal && !needsResponse && nextStatuses.contains('delivered')) ...[
-                const Divider(),
-                Text(tr('seller_journey_delivery_proof'), key: deliveryProofKey,
-                    style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                Text(tr('seller_journey_proof_notice')),
-                const SizedBox(height: 12),
-                TextField(
-                    controller: note,
-                    maxLines: 2,
-                    maxLength: 1000,
-                    enabled: !controller.actionInProgress,
-                    decoration: InputDecoration(
-                        labelText: tr('note'),
-                        border: const OutlineInputBorder())),
-                OutlinedButton.icon(
-                    onPressed: controller.actionInProgress ? null : pick,
-                    icon: const Icon(Icons.attach_file),
-                    label: Text(
-                        proof?.name ?? tr('seller_journey_select_document'))),
-                const SizedBox(height: 8),
-                SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                        onPressed:
-                            proof?.path == null || controller.actionInProgress
-                                ? null
-                                : () => submit(controller),
-                        icon: controller.actionInProgress
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.task_alt),
-                        label: Text(tr('delivered')))),
-              ],
               if (company)
                 Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -261,36 +251,6 @@ class _SellerShippingAssignmentWidgetState
         const SizedBox(width: 8),
         Flexible(child: Text(value, textAlign: TextAlign.end))
       ]));
-  Future<void> pick() async {
-    try {
-      final selection = await FilePicker.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: [
-            'jpg',
-            'jpeg',
-            'png',
-            'webp',
-            'pdf',
-            'mp4',
-            'mov',
-            'avi',
-            'mkv',
-            'webm'
-          ]);
-      final file = selection?.files.firstOrNull;
-      if (file == null || !mounted) return;
-      if (file.size > 100 * 1024 * 1024 || file.path == null) {
-        showCustomSnackBarWidget(tr('seller_journey_proof_limit'), context);
-        return;
-      }
-      setState(() => proof = file);
-    } catch (_) {
-      if (mounted) {
-        showCustomSnackBarWidget(tr('finance_proof_failed'), context);
-      }
-    }
-  }
-
   Future<void> refreshLists() async {
     if (!mounted) return;
     final orders = context.read<OrderController>();
@@ -298,26 +258,6 @@ class _SellerShippingAssignmentWidgetState
     await orders.getOrderList(context, 1, orders.orderType, orders.filterModel);
     await wallet.getSellerDashboardOverview();
     await wallet.getSellerBalance();
-  }
-
-  Future<void> submit(OrderDetailsController controller) async {
-    try {
-      final ok = await controller.submitShippingProof(
-          '${widget.order.id}', 'delivered', proof!.path!, note.text.trim());
-      if (ok && mounted) {
-        setState(() {
-          proof = null;
-          note.clear();
-        });
-        showCustomSnackBarWidget(tr('seller_journey_completed'), context,
-            isError: false);
-        await refreshLists();
-      }
-    } catch (_) {
-      if (mounted) {
-        showCustomSnackBarWidget(tr('seller_journey_action_failed'), context);
-      }
-    }
   }
 
   Future<void> respond(OrderDetailsController controller, String decision,

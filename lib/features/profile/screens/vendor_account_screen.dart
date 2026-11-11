@@ -123,8 +123,10 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
             k: fields[k]!.text.trim(),
           'phone_numbers':
               jsonEncode(phones.map((c) => c.text.trim()).toList()),
-          'store_addresses':
-              jsonEncode(addresses.map((c) => c.text.trim()).toList()),
+          'store_addresses': jsonEncode(addresses
+              .map((c) => c.text.trim())
+              .where((value) => value.isNotEmpty)
+              .toList()),
         };
         for (final entry in uploads.entries) {
           payload[entry.key] = MultipartFile.fromBytes(
@@ -194,7 +196,8 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                           v != fields['password']!.text
                       ? text('password_mismatch')
                       : null));
-  Widget repeated(List<TextEditingController> list, String label) =>
+  Widget repeated(List<TextEditingController> list, String label,
+          {bool allowEmpty = false}) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(text(label), style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
@@ -212,7 +215,7 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                             : TextInputType.streetAddress,
                         decoration: InputDecoration(
                             labelText: '${text(label)} ${i + 1}'),
-                        validator: (v) => v?.trim().isNotEmpty == true
+                        validator: (v) => allowEmpty || v?.trim().isNotEmpty == true
                             ? null
                             : text('required_field'))),
                 IconButton(
@@ -290,9 +293,9 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                         ]),
                         const SizedBox(height: 16),
                         input('f_name', 'first_name'),
-                        input('l_name', 'last_name'),
-                        input('store_name', 'store_name'),
-                        input('email', 'email'),
+                        input('l_name', 'last_name', required: false),
+                        input('store_name', 'store_name', required: false),
+                        input('email', 'email', required: false),
                         LayoutBuilder(
                             builder: (context, constraints) =>
                                 Wrap(spacing: 16, runSpacing: 16, children: [
@@ -313,7 +316,8 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                                           child: Padding(
                                               padding: const EdgeInsets.all(16),
                                               child: repeated(addresses,
-                                                  'vendor_store_addresses'))))
+                                                  'vendor_store_addresses',
+                                                  allowEmpty: true))))
                                 ])),
                         for (final entry in {
                           'commercial': 'commercial_registration',

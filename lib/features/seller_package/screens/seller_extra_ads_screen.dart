@@ -160,7 +160,13 @@ class _ExtraAdsState extends State<SellerExtraAdsScreen> {
               'Your request was recorded. Follow its status below.'))));
       await load();
     } catch (e) {
-      if (mounted) setState(() => error = financeError(context, e));
+      if (mounted) {
+        final message = financeError(context, e);
+        setState(() => error = message.contains('غير كاف')
+            ? t('رصيدكم الحالي لا يسمح. برجاء شحن الرصيد.',
+                'Your current balance is not enough. Please top up.')
+            : message);
+      }
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -186,7 +192,7 @@ class _ExtraAdsState extends State<SellerExtraAdsScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: VendorFinanceAppBar(
-          title: t('المساحات الإضافية', 'Extra advertising slots')),
+          title: t('الإعلانات الإضافية', 'Extra ads')),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -199,7 +205,7 @@ class _ExtraAdsState extends State<SellerExtraAdsScreen> {
                         style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 12),
                     Text(t(
-                        'سعر ثابت ونهائي للمساحة مهما كانت المدة المتبقية. تنتهي الإضافات مع الاشتراك ولا تتجدد تلقائيًا. لا تضمن موضعًا مميزًا في الرئيسية أو البحث.',
+                        'سعر ثابت ونهائي للإعلان مهما كانت المدة المتبقية. تنتهي الإضافات مع الاشتراك ولا تتجدد تلقائيًا. لا تضمن موضعًا مميزًا في الرئيسية أو البحث.',
                         'A fixed final price per slot for the remaining subscription time. Extras expire with your subscription and do not renew automatically. Featured placement is not guaranteed.')),
                     if (error != null) ...[
                       const SizedBox(height: 12),
@@ -213,7 +219,7 @@ class _ExtraAdsState extends State<SellerExtraAdsScreen> {
                     if (canBuy) ...[
                       const SizedBox(height: 20),
                       Text(
-                          '${t('سعر المساحة', 'Unit price')}: ${financeMoney(context, price)}'),
+                          '${t('سعر الإعلان', 'Ad price')}: ${financeMoney(context, price)}'),
                       Text(
                           '${t('النهاية', 'Expires')}: ${widget.subscription?['expires_at']}'),
                       const SizedBox(height: 16),

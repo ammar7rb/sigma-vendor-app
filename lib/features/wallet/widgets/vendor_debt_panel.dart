@@ -17,7 +17,7 @@ class VendorDebtPanel extends StatelessWidget {
       const Text('الإيداع المؤكد يسدد الدين الأقدم أولًا، ويضاف الباقي إلى رصيد المدفوعات. لا يخصم من مستحقات مبيعاتك.'),
       for (final charge in debt['charges'] as List? ?? []) ListTile(contentPadding: EdgeInsets.zero,
         leading: const Icon(Icons.receipt_long_outlined),
-        title: Text('${charge['reference']} — ${charge['kind'] == 'cancellation_penalty' ? 'غرامة إلغاء' : 'رسوم مساحة إضافية'}'),
+        title: Text('${charge['reference']} — ${charge['kind'] == 'cancellation_penalty' ? 'غرامة إلغاء' : 'رسوم إعلان إضافي'}'),
         subtitle: Text('قيمة الرسم: ${debtMoney(charge['amount'])}\nالمتبقي: ${debtMoney(charge['outstanding'])}')),
       for (final deposit in deposits.where((row) => row is Map && row['debt_allocation'] is Map)) ExpansionTile(
         tilePadding: EdgeInsets.zero, title: Text('توزيع الإيداع DEP-${deposit['id']}'), children: [
