@@ -79,7 +79,7 @@ void main() {
                   key: boundary, child: const ProductListMenuScreen()))));
       await tester.pumpAndSettle();
       expect(find.text('لا اشتراك مدفوع'), findsOneWidget);
-      expect(find.text('إضافة منتج دون مساحة'), findsOneWidget);
+      expect(find.text('إضافة إعلان'), findsOneWidget);
       expect(
           tester
               .widget<FloatingActionButton>(find.byType(FloatingActionButton))

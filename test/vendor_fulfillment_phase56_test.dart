@@ -102,8 +102,8 @@ void main() {
                     refreshes++;
                   }))));
       expect(find.text('منتج التاجر الأصلي'), findsNothing);
-      await tester.ensureVisible(find.text('تخصيص المساحة وعرض التفاصيل'));
-      await tester.tap(find.text('تخصيص المساحة وعرض التفاصيل'));
+      await tester.ensureVisible(find.text('فتح الإعلان وعرض التفاصيل'));
+      await tester.tap(find.text('فتح الإعلان وعرض التفاصيل'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.textContaining('يسجل دينًا: 70.00 ج.م'), findsOneWidget);

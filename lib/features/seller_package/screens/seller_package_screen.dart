@@ -16,6 +16,9 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
   SellerPackageOverviewModel? overview;
   Map<String, dynamic>? summary;
   bool loading = true;
+  bool renewing = false;
+  bool autoRenewalAvailable = false;
+  bool autoRenewalEnabled = false;
   String? error;
   String? transitionEndsAt;
   bool get arabic => Localizations.localeOf(context).languageCode == 'ar';
@@ -36,6 +39,8 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
       setState(() {
         overview = SellerPackageOverviewModel.fromJson(data);
         summary = Map<String, dynamic>.from(data['subscription'] as Map);
+        autoRenewalAvailable = data['auto_renewal_available'] == true;
+        autoRenewalEnabled = data['auto_renewal_enabled'] == true;
         transitionEndsAt = data['transition_ends_at']?.toString();
         error = null;
       });
@@ -51,11 +56,30 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
     final active = summary?['active'] as Map?;
     final pending = summary?['pending'] as Map?;
     final scheduled = summary?['scheduled'] as List? ?? [];
-    final totalAds = num.tryParse('${active?['product_limit'] ?? ''}');
-    final baseAds = num.tryParse('${active?['base_product_limit'] ?? ''}');
-    final extras = totalAds == null || baseAds == null
-        ? null
-        : (totalAds > baseAds ? totalAds - baseAds : 0);
+    final plans = overview?.packages ?? <SellerPackagePlan>[];
+    SellerPackagePlan? activePlan;
+    for (final plan in plans) {
+      if (plan.id == active?['package_id']) activePlan = plan;
+    }
+    final highestPrice = plans.fold<double>(
+        0, (highest, plan) => plan.packagePrice > highest ? plan.packagePrice : highest);
+    final onHighest = activePlan != null &&
+        activePlan.packagePrice >= highestPrice &&
+        highestPrice > 0;
+    String actionFor(SellerPackagePlan plan) {
+      if (active?['package_id'] == plan.id) {
+        return label('تجديد الآن', 'Renew now');
+      }
+      if (active == null) return label('اشترك الآن', 'Subscribe now');
+      if (onHighest) return label('اشترك', 'Subscribe');
+      final activeLimit = activePlan?.productLimit ?? 0;
+      final higher = activeLimit > 0 && plan.productLimit > 0
+          ? plan.productLimit > activeLimit
+          : plan.packagePrice > (activePlan?.packagePrice ?? 0);
+      return higher
+          ? label('ترقية', 'Upgrade')
+          : label('تغيير الباقة', 'Change package');
+    }
     return Scaffold(
         appBar:
             VendorFinanceAppBar(title: label('الاشتراكات', 'Subscriptions')),
@@ -72,10 +96,23 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
                         onPressed: load,
                         child: Text(label('إعادة المحاولة', 'Retry')))
                   ],
+                  if (active == null)
+                    _panel(label('الباقة المجانية', 'Free package'),
+                        label('أنت على الباقة المجانية', 'You are on the free package')),
                   if (active != null)
                     _panel(
                         '${active['package_name']}',
-                        '${label('الإعلانات المتبقية', 'Remaining ads')}: ${active['remaining_product_limit'] ?? (active['product_publishing_unlimited'] == true ? label('غير محدودة', 'Unlimited') : '—')} • ${label('الإضافات', 'Extras')}: ${extras ?? '—'} • ${label('موعد انتهاء الاشتراك', 'Subscription expires')}: ${active['expires_at'] ?? '—'}'),
+                        '${label('موعد انتهاء الاشتراك', 'Subscription expires')}: ${active['expires_at'] ?? '—'}'),
+                  if (active != null && autoRenewalEnabled)
+                    _panel(label('التجديد التلقائي', 'Automatic renewal'),
+                        label('التجديد التلقائي مفعّل. لإلغائه تواصل مع الإدارة.',
+                            'Automatic renewal is on. Contact administration to cancel it.')),
+                  if (active != null && autoRenewalAvailable && !autoRenewalEnabled)
+                    FilledButton(
+                        onPressed: renewing ? null : () => enableAutoRenewal(active),
+                        child: Text(renewing
+                            ? label('جارٍ التفعيل', 'Enabling')
+                            : label('تفعيل التجديد التلقائي', 'Enable automatic renewal'))),
                   if (pending != null)
                     _panel(
                         summary?['pending_review'] == true ||
@@ -94,6 +131,7 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
                       in overview?.packages ?? <SellerPackagePlan>[])
                     SellerPackagePlanCard(
                       plan: plan,
+                      actionLabel: actionFor(plan),
                       current: active?['package_id'] == plan.id,
                       selected: pending?['package_id'] == plan.id,
                       onSubscribe: summary?['pending_review'] == true
@@ -105,6 +143,34 @@ class _SellerPackageScreenState extends State<SellerPackageScreen> {
                             },
                     ),
                 ])));
+  }
+
+  Future<void> enableAutoRenewal(Map active) async {
+    SellerPackagePlan? plan;
+    for (final item in overview?.packages ?? <SellerPackagePlan>[]) {
+      if (item.id == active['package_id']) plan = item;
+    }
+    final price = plan?.packagePrice ??
+        double.tryParse('${active['paid_package_price']}') ??
+        0;
+    if (price <= 0) {
+      setState(() => error = label('تعذر قراءة سعر الباقة الحالية',
+          'The current package price is unavailable'));
+      return;
+    }
+    setState(() => renewing = true);
+    try {
+      await VendorWorkspace.instance.client
+          .post('/api/v3/seller/packages/auto-renewal', data: {
+        'subscription_id': active['id'],
+        'expected_price': price,
+      });
+      if (mounted) await load();
+    } catch (e) {
+      if (mounted) setState(() => error = financeError(context, e));
+    } finally {
+      if (mounted) setState(() => renewing = false);
+    }
   }
 
   Widget _panel(String title, String detail) => Card(

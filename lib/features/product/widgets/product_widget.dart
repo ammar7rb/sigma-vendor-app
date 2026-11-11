@@ -304,9 +304,22 @@ class _SellerProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Approval remains an internal administration workflow. The seller only
-    // manages whether the product itself is active or paused.
-    final isActive = product.status == 1 || product.requestStatus != 1;
+    // request_status 1 is the only approved state. Anything else must not
+    // look active, even when the publication flag is still on.
+    final approved = product.requestStatus == null || product.requestStatus == 1;
+    final isActive = approved && product.status == 1;
+    final statusLabel = product.requestStatus == 2
+        ? (getTranslated('rejected', context) ?? 'مرفوض')
+        : !approved
+            ? (getTranslated('pending', context) ?? 'قيد المراجعة')
+            : (getTranslated(isActive ? 'active' : 'inactive', context) ?? '');
+    final statusColor = product.requestStatus == 2
+        ? AppDesign.danger
+        : !approved
+            ? AppDesign.warning
+            : isActive
+                ? AppDesign.success
+                : AppDesign.warning;
     final imageUrl = product.thumbnailFullUrl?.path ?? '';
     final expiry = DateTime.tryParse(product.expiryDate ?? '');
     final daysToExpiry = expiry?.difference(DateTime.now()).inDays;
@@ -395,11 +408,6 @@ class _SellerProductCard extends StatelessWidget {
                 '${getTranslated('product_views', context) ?? 'View count'}: ${product.productViewCount ?? 0}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              if (product.administrativeViewAdditions > 0)
-                Text(
-                  '${getTranslated('administrative_view_additions', context) ?? 'Administrative additions'}: ${product.administrativeViewAdditions}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
               const SizedBox(height: 6),
               Text(getTranslated('product_price', context) ?? '',
                   style: Theme.of(context).textTheme.bodySmall),
@@ -413,10 +421,8 @@ class _SellerProductCard extends StatelessWidget {
               const SizedBox(height: 7),
               Wrap(spacing: 8, runSpacing: 6, children: [
                 _StatusChip(
-                  label: getTranslated(
-                          isActive ? 'active' : 'inactive', context) ??
-                      '',
-                  color: isActive ? AppDesign.success : AppDesign.warning,
+                  label: statusLabel,
+                  color: statusColor,
                 ),
                 _StatusChip(
                   label:

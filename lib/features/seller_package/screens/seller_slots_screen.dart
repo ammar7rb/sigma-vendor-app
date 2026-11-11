@@ -109,7 +109,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                         onTap: () =>
                             Navigator.pop(context, (p['id'] as num).toInt())),
                   if (products.isEmpty)
-                    Text(tr('لا توجد منتجات أخرى.', 'No other products.'))
+                    Text(tr('لا توجد إعلانات أخرى.', 'No other ads.'))
                 ]))));
     if (selected != null) await perform(() => assign(slot, selected));
   }
@@ -118,9 +118,9 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
     final yes = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-                title: Text(tr('إزالة من المساحة؟', 'Remove from slot?')),
+                title: Text(tr('إيقاف الإعلان؟', 'Stop this ad?')),
                 content: Text(tr(
-                    'يتوقف الإعلان وتبقى بيانات المنتج محفوظة. لا تتغير نهاية المساحة.',
+                    'يتوقف الإعلان وتبقى بياناته محفوظة. لا يتغير موعد نهاية الاشتراك.',
                     'The advertisement stops. The product is kept and slot expiry stays unchanged.')),
                 actions: [
                   TextButton(
@@ -204,7 +204,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Text(tr('مساحة إضافية', 'Additional slot'),
+                                Text(tr('إعلان إضافي', 'Additional ad'),
                                     style:
                                         Theme.of(context).textTheme.titleLarge),
                                 const SizedBox(height: 8),
@@ -277,7 +277,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                   Row(children: [
                     Expanded(
                         child: Text(
-                            '${tr('المساحة', 'Slot')} ${slot['position']}',
+                            '${tr('الإعلان', 'Ad')} ${slot['position']}',
                             style: Theme.of(context).textTheme.titleMedium)),
                     Chip(
                         label: Text(stateLabel),
@@ -383,7 +383,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                           onPressed: busy ? null : () => remove(slot),
                           icon: const Icon(Icons.delete_outline),
                           label:
-                              Text(tr('حذف من المساحة', 'Remove from slot'))),
+                              Text(tr('إيقاف الإعلان', 'Stop ad'))),
                   ],
                 ])));
   }

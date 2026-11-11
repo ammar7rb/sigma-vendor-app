@@ -1886,6 +1886,7 @@
     "vendor_account_id": "Vendor account ID",
     "vendor_document_limit": "JPG, PNG or WebP image, up to 5 MB",
     "vendor_invoices": "Invoices",
+    "not_yet_due_payouts": "Payouts that are not due yet",
     "vendor_subscriptions": "Subscriptions",
     "ads_manager": "Ads Manager",
     "payments_balance": "Payments balance",

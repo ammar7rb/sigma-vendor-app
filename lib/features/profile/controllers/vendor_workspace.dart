@@ -43,6 +43,16 @@ class VendorWorkspace extends ChangeNotifier {
       inbox = Map<String, dynamic>.from(response.data as Map);
       final values = Map<String, dynamic>.from(inbox!['counts'] as Map);
       counts.updateAll((key, _) => int.tryParse('${values[key]}') ?? 0);
+      // The server order count ignores forwarded orders that are no longer
+      // pending, while those same orders are already in the inbox payload.
+      final unreadOrderAlerts = ((inbox!['notifications'] as List?) ?? [])
+          .whereType<Map>()
+          .where((item) =>
+              item['kind'] == 'order_alert' && item['unread'] == true)
+          .length;
+      if (unreadOrderAlerts > counts['orders']!) {
+        counts['orders'] = unreadOrderAlerts;
+      }
     } catch (_) {
       // Preserve the last server-confirmed counts during connectivity loss.
     } finally {

@@ -479,7 +479,7 @@ class _VendorWorkspaceNotice extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
               ar
-                  ? 'الإعلان غير نشط؛ يلزم اشتراك نشط ومساحة سارية.'
+                  ? 'الإعلان غير نشط؛ يلزم اشتراك نشط.'
                   : 'The advertisement is inactive. An active package and valid slot are required.',
               style: const TextStyle(color: AppDesign.danger)),
           TextButton(

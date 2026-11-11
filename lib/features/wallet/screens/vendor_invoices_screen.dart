@@ -90,6 +90,25 @@ class _VendorInvoicesState extends State<VendorInvoicesScreen> {
                                     hint:
                                         '${tr('due_on_nearest_date')}: ${money(summary['next_due_amount'])}'),
                                 const SizedBox(height: 24),
+                                Text(tr('not_yet_due_payouts')),
+                                const SizedBox(height: 8),
+                                for (final raw in (records['data'] as List? ?? [])
+                                    .where((raw) {
+                                  if (raw is! Map || raw['locked'] == true) {
+                                    return false;
+                                  }
+                                  final due = DateTime.tryParse('${raw['due_at']}');
+                                  return raw['status'] == 'held' &&
+                                      due != null &&
+                                      due.isAfter(DateTime.now());
+                                }))
+                                  ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(
+                                          '${tr('order_id')} ${raw['order_reference']}'),
+                                      subtitle: Text(
+                                          '${money(raw['receivable'])} · ${financeDate(context, raw['due_at'])}')),
+                                const SizedBox(height: 12),
                                 for (final raw
                                     in records['data'] as List? ?? [])
                                   Padding(

@@ -1,5 +1,6 @@
 import 'package:sixvalley_vendor_app/helper/price_converter.dart';
 import 'package:flutter/material.dart';
+import 'package:sixvalley_vendor_app/features/wallet/widgets/sales_cash_transfer_card.dart';
 import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_debt_panel.dart';
 import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspace.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_withdrawal_methods_screen.dart';
@@ -248,7 +249,47 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                                 child: Text(tr(
                                                     'manage_withdrawal_methods'))),
                                             Text(
-                                                '${tr('pending_withdrawal_amount')}: ${money(summary['pending_withdraw'])}')
+                                                '${tr('pending_withdrawal_amount')}: ${money(summary['pending_withdraw'])}'),
+                                            const SizedBox(height: 8),
+                                            TextButton(
+                                                onPressed: () async {
+                                                  final available = double.tryParse(
+                                                          PriceConverter
+                                                              .convertPriceWithoutSymbol(
+                                                                  context,
+                                                                  double.tryParse(
+                                                                          '${summary['available']}') ??
+                                                                      0)) ??
+                                                      0;
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              Scaffold(
+                                                                  appBar:
+                                                                      VendorFinanceAppBar(
+                                                                          title: Localizations.localeOf(context)
+                                                                                      .languageCode ==
+                                                                                  'ar'
+                                                                              ? 'تحويل الحصيلة'
+                                                                              : 'Transfer sales'),
+                                                                  body: ListView(
+                                                                      padding: const EdgeInsets.all(
+                                                                          16),
+                                                                      children: [
+                                                                        SalesCashTransferCard(
+                                                                            availableDisplay:
+                                                                                available,
+                                                                            onDone:
+                                                                                load)
+                                                                      ]))));
+                                                },
+                                                child: Text(Localizations.localeOf(
+                                                                context)
+                                                            .languageCode ==
+                                                        'ar'
+                                                    ? 'تحويل حصيلة المبيعات إلى الكاش'
+                                                    : 'Transfer sales to cash')),
                                           ])),
                                   const SizedBox(height: 16),
                                 ],

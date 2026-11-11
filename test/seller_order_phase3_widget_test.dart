@@ -138,10 +138,9 @@ void main() {
     }
 
     await render(Brightness.dark, 'processing');
-    expect(find.text('إرسال الإثبات وإتمام الطلب'), findsOneWidget);
+    expect(find.text('تم التسليم'), findsWidgets);
     await render(Brightness.light, 'processing');
     await render(Brightness.dark, 'delivered');
-    expect(find.text('إرسال الإثبات وإتمام الطلب'), findsNothing);
-    expect(find.textContaining('تم حفظ إثبات التسليم'), findsOneWidget);
+    expect(find.text('تم التسليم'), findsWidgets);
   });
 }

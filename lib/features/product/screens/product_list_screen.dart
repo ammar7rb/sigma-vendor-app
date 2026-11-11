@@ -42,7 +42,7 @@ class ProductListMenuScreen extends StatelessWidget {
                     builder: (_) => const AddProductTabView(fromHome: false))),
                 icon: const Icon(Icons.add),
                 label: Text(Localizations.localeOf(context).languageCode == 'ar'
-                    ? 'إضافة منتج دون مساحة'
+                    ? 'إضافة إعلان'
                     : 'Submit product without a slot')),
             appBar: CustomAppBarWidget(
                 title: getTranslated('phase5_spaces', context),

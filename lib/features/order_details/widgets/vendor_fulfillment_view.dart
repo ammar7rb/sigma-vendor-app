@@ -75,14 +75,14 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
           builder: (dialogContext) => Directionality(
             textDirection: TextDirection.rtl,
             child: AlertDialog(
-              title: const Text('تخصيص المساحة وعرض التفاصيل'),
+              title: const Text('فتح الإعلان وعرض التفاصيل'),
               content: SingleChildScrollView(
                 child: Text(
-                  '${quote['message']}\n\nالمساحات الإضافية: ${quote['extra_count']}\n'
-                  'سعر المساحة: ${money(quote['unit_price'])}\nإجمالي الرسوم: ${money(quote['total'])}\n'
+                  '${quote['message']}\n\nالإعلانات الإضافية: ${quote['extra_count']}\n'
+                  'سعر الإعلان: ${money(quote['unit_price'])}\nإجمالي الرسوم: ${money(quote['total'])}\n'
                   'خصم من رصيد المدفوعات: ${money(quote['wallet_debit'])}\nيسجل دينًا: ${money(quote['debt'])}\n'
                   'النهاية مع الاشتراك: ${quote['expires_at']}\n\nيسدد الدين من الإيداع المؤكد التالي. '
-                  'التخصيص يتيح التفاصيل للمراجعة ولا يعد قبولًا. يمكنك الرفض قبل القبول دون غرامة.',
+                  'فتح الإعلان يتيح التفاصيل للمراجعة ولا يعد قبولًا. يمكنك الرفض قبل القبول دون غرامة.',
                 ),
               ),
               actions: [
@@ -129,7 +129,7 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
                             ),
                           if (action == 'reject')
                             const Text(
-                              'رفض هذا الجزء قبل القبول دون غرامة إلغاء، حتى بعد شراء الباقة أو تخصيص المساحة.',
+                              'رفض هذا الجزء قبل القبول دون غرامة إلغاء، حتى بعد شراء الباقة أو فتح الإعلان.',
                             ),
                           if (action == 'cancel')
                             Text(
@@ -281,7 +281,7 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
                         FilledButton.icon(
                           onPressed: busy ? null : () => unlock(portion),
                           icon: const Icon(Icons.lock_open),
-                          label: const Text('تخصيص المساحة وعرض التفاصيل'),
+                          label: const Text('فتح الإعلان وعرض التفاصيل'),
                         ),
                         OutlinedButton(
                           onPressed: busy
