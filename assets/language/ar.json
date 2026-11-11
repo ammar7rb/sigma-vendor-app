@@ -1843,7 +1843,7 @@
     "required": "هذا الحقل مطلوب",
     "invalid_email": "أدخل بريدًا إلكترونيًا صحيحًا",
     "enter_valid_egyptian_mobile": "أدخل رقم هاتف مصري صحيحًا",
-    "support_ticket": "تذكرة الدعم",
+    "support_ticket": "طلب الدعم",
     "coupon_package_quota": "المتبقي من قسائم الباقة: {remaining} من {total}",
     "coupon_no_quota": "لا توجد قسائم متبقية في باقتك الحالية.",
     "view_packages": "عرض الباقات",

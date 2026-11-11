@@ -228,7 +228,7 @@ class _ExtraAdsState extends State<SellerExtraAdsScreen> {
                           enabled: !busy,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                              labelText: t('عدد المساحات', 'Quantity'),
+                              labelText: t('عدد الإعلانات', 'Quantity'),
                               border: const OutlineInputBorder()),
                           onChanged: (_) => setState(
                               () => requestKey = withdrawalRequestKey()),
@@ -323,7 +323,7 @@ class _ExtraAdsState extends State<SellerExtraAdsScreen> {
                             label: Text(proof?.name ??
                                 t('إرفاق إثبات التحويل', 'Attach proof'))),
                         Text(t(
-                            'إذا انتهى الاشتراك قبل اعتماد التحويل يبقى المبلغ معلقًا لتسوية يدوية، دون رصيد أو مساحات تلقائية.',
+                            'إذا انتهى الاشتراك قبل اعتماد التحويل يبقى المبلغ معلقًا لتسوية يدوية، دون رصيد أو إعلانات تلقائية.',
                             'If your subscription expires before payment approval, the transfer stays pending for manual settlement. No credit or slots are added automatically.')),
                       ],
                       const SizedBox(height: 16),

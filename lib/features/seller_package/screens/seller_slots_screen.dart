@@ -183,7 +183,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
                       style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 12),
                   Text(
-                      '${tr('صلاحية المساحات', 'Slot validity')}: ${financeDate(context, cycle?['starts_at'])} — ${financeDate(context, cycle?['expires_at'])}'),
+                      '${tr('صلاحية الإعلانات', 'Slot validity')}: ${financeDate(context, cycle?['starts_at'])} — ${financeDate(context, cycle?['expires_at'])}'),
                   Text(
                       '${capacity['used'] ?? 0} ${tr('نشطة', 'active')} · ${capacity['reserved'] ?? 0} ${tr('قيد الإضافة', 'being added')} · ${capacity['available'] ?? 0} ${tr('متاحة', 'available')} / ${capacity['total'] ?? 0}'),
                   TextButton(
@@ -251,7 +251,7 @@ class _SellerSlotsScreenState extends State<SellerSlotsScreen> {
     if (widget.embedded) return body;
     return Scaffold(
       appBar: VendorFinanceAppBar(
-          title: tr('المساحات الإعلانية', 'Advertising slots')),
+          title: tr('الإعلانات', 'Advertising slots')),
       body: body,
     );
   }

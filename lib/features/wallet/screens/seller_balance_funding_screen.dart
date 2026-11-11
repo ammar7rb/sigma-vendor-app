@@ -501,7 +501,7 @@ class _SellerBalanceFundingScreenState extends State<SellerBalanceFundingScreen>
         Text(
             '${label('سعر الإعلان', 'Ad price')}: ${extras?['unit_price']} EGP — ${label('تنتهي', 'Expires')}: ${active?['expires_at']}'),
         Text(label(
-            'إذا انتهى الاشتراك قبل اعتماد التحويل، يبقى المبلغ معلقًا لتسوية يدوية دون رصيد أو مساحات.',
+            'إذا انتهى الاشتراك قبل اعتماد التحويل، يبقى المبلغ معلقًا لتسوية يدوية دون رصيد أو إعلانات.',
             'If the subscription expires before approval, the transfer stays pending for manual settlement without balance credit or slots.')),
       ],
       Padding(
