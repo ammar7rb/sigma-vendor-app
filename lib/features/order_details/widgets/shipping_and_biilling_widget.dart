@@ -475,8 +475,8 @@ class _ShippingAndBillingWidgetState extends State<ShippingAndBillingWidget> {
                                                   padding: const EdgeInsets
                                                       .symmetric(vertical: 1),
                                                   child: Text(
-                                                      '${widget.orderModel?.shippingAddressData != null ? widget.orderModel?.shippingAddressData!.address : ''}',
-                                                      maxLines: 3,
+                                                      widget.orderModel?.shippingAddressData?.fullAddress ?? '',
+                                                      maxLines: 6,
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: titilliumRegular

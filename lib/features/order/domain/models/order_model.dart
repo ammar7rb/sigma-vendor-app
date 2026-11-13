@@ -531,6 +531,40 @@ class BillingAddressData {
   String? country;
   String? latitude;
   String? longitude;
+  String? state;
+  String? district;
+  String? area;
+  String? street;
+  String? buildingNumber;
+  String? floor;
+  String? unitNumber;
+  String? landmark;
+
+  /// العنوان الكامل: المحافظة، المركز، المنطقة، الشارع، المبنى، الدور، الوحدة، العلامة المميزة ثم العنوان.
+  String get fullAddress {
+    String? clean(String? v) {
+      final t = v?.trim();
+      return (t == null || t.isEmpty || t == 'null') ? null : t;
+    }
+
+    final parts = <String>[];
+    void add(String? v, [String prefix = '']) {
+      final t = clean(v);
+      if (t != null && !parts.contains('$prefix$t')) parts.add('$prefix$t');
+    }
+
+    add(state);
+    add(city);
+    add(district);
+    add(area);
+    add(street);
+    add(buildingNumber, 'مبنى ');
+    add(floor, 'دور ');
+    add(unitNumber, 'وحدة ');
+    add(landmark, 'بالقرب من ');
+    add(address);
+    return parts.join('، ');
+  }
 
   BillingAddressData({
     this.id,
@@ -546,6 +580,14 @@ class BillingAddressData {
     this.country,
     this.latitude,
     this.longitude,
+    this.state,
+    this.district,
+    this.area,
+    this.street,
+    this.buildingNumber,
+    this.floor,
+    this.unitNumber,
+    this.landmark,
   });
 
   BillingAddressData.fromJson(Map<String, dynamic> json) {
@@ -562,6 +604,14 @@ class BillingAddressData {
     country = json['country'];
     latitude = json['latitude'];
     longitude = json['longitude'];
+    state = json['state']?.toString();
+    district = json['district']?.toString();
+    area = json['area']?.toString();
+    street = json['street']?.toString();
+    buildingNumber = json['building_number']?.toString();
+    floor = json['floor']?.toString();
+    unitNumber = json['unit_number']?.toString();
+    landmark = json['landmark']?.toString();
   }
 }
 
