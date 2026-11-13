@@ -146,20 +146,7 @@ class VendorEligibilityLockCard extends StatelessWidget {
                         ])),
                   ])),
               const SizedBox(height: 14),
-              for (final perk in const [
-                'تفاصيل الطلب كاملة بمجرد تفعيل الباقة',
-                'الفتح تلقائي — بدون أي خطوة إضافية',
-                'أول 3 إعلانات مجانًا مع باقتك'
-              ])
-                Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Row(children: [
-                      const Icon(Icons.check_circle,
-                          size: 20, color: Color(0xFF16815C)),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(perk)),
-                    ])),
-              const SizedBox(height: 12),
+              const SizedBox(height: 4),
               SizedBox(
                   height: 48,
                   child: FilledButton(
@@ -170,10 +157,6 @@ class VendorEligibilityLockCard extends StatelessWidget {
                       onPressed: packages,
                       child: const Text('اشترك الآن وافتح الطلب',
                           style: TextStyle(fontWeight: FontWeight.w800)))),
-              const SizedBox(height: 8),
-              const Text('طلبك محفوظ ولا يُلغى بسبب القفل.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF5D6E87))),
             ],
           ),
         ));
