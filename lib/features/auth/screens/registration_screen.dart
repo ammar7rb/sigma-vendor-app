@@ -41,13 +41,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final phone = EgyptPhoneHelper.normalizeLocal(auth.phoneController.text);
     if (!auth.registrationPoliciesLoaded) {
       _warning('registration_policies_loading', 'جاري تحميل السياسات');
-    } else if (EmailChecker.isNotValid(auth.emailController.text.trim())) {
+    } else if (auth.emailController.text.trim().isNotEmpty &&
+        EmailChecker.isNotValid(auth.emailController.text.trim())) {
       _warning('email_is_ot_valid', 'أدخل بريدًا إلكترونيًا صحيحًا');
     } else if (!EgyptPhoneHelper.isValidLocal(phone)) {
       _warning('phone_number_is_not_valid', 'أدخل رقم هاتف مصري صحيحًا');
-    } else if (auth.passwordController.text.length < 8) {
+    } else if (auth.passwordController.text.length < 6) {
       _warning(
-          'password_minimum_length_is_6', 'كلمة المرور يجب ألا تقل عن 8 أحرف');
+          'password_minimum_length_is_6', 'كلمة المرور يجب ألا تقل عن 6 أحرف');
     } else if (auth.passwordController.text !=
         auth.confirmPasswordController.text) {
       _warning('password_is_mismatch', 'كلمتا المرور غير متطابقتين');
@@ -155,7 +156,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label(tr('email', 'البريد الإلكتروني')),
+                      _label('${tr('email', 'البريد الإلكتروني')} (اختياري)'),
                       CustomTextFieldWidget(
                           border: true,
                           prefixIconImage: 'assets/images/email_icon.png',
