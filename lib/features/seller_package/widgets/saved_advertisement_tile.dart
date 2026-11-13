@@ -125,12 +125,8 @@ class VendorProductViews extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ar = Localizations.localeOf(context).languageCode == 'ar';
-    final additions = int.tryParse('${data['administrative_view_additions']}') ?? 0;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('${ar ? 'عدد المشاهدات' : 'View count'}: ${data['product_view_count'] ?? 0}'),
-      if (additions > 0)
-        Text('${ar ? 'منها إضافات إدارية' : 'Including administrative additions'}: $additions',
-            style: Theme.of(context).textTheme.bodySmall),
     ]);
   }
 }

@@ -228,11 +228,6 @@ class _ProductHeader extends StatelessWidget {
                   '${getTranslated('product_views', context) ?? 'View count'}: ${product.productViewCount ?? 0}',
                   style: robotoRegular.copyWith(fontSize: 14),
                 ),
-                if (product.administrativeViewAdditions > 0)
-                  Text(
-                    '${getTranslated('administrative_view_additions', context) ?? 'Administrative additions'}: ${product.administrativeViewAdditions}',
-                    style: robotoRegular.copyWith(fontSize: 12),
-                  ),
                 Text(
                   PriceConverter.convertPrice(context, product.unitPrice),
                   style: robotoBold.copyWith(
