@@ -151,13 +151,6 @@ class _AddProductTabViewState extends State<AddProductTabView>
         ),
         body: Column(
           children: [
-            if (widget.product == null && widget.slotId == null)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(Localizations.localeOf(context).languageCode == 'ar'
-                    ? 'يمكنك إرسال المنتج دون باقة مدفوعة. ستراجعه الإدارة قبل نشره، ولن يشغل مساحة إعلانية.'
-                    : 'No paid package is needed. Administration reviews your product before publication; no advertising slot is assigned.'),
-              ),
             Container(
               padding: EdgeInsets.symmetric(
                   horizontal: Dimensions.paddingSizeDefault,

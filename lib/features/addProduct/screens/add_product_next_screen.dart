@@ -681,6 +681,7 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                                               ? 'quantity_packages'
                                                                               : 'quantity_pieces',
                                                                           context)!,
+                                                                      prefixIconImage: Images.restockIcon,
                                                                       formProduct:
                                                                           true,
                                                                     )
