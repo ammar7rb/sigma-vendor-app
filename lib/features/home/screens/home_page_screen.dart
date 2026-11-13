@@ -7,6 +7,8 @@ import 'package:sixvalley_vendor_app/features/profile/controllers/profile_contro
 import 'package:sixvalley_vendor_app/utill/images.dart';
 
 import 'package:sixvalley_vendor_app/features/home/widgets/seller_dashboard_overview_widget.dart';
+import 'package:sixvalley_vendor_app/features/home/widgets/vendor_welcome_banner.dart';
+import 'package:sixvalley_vendor_app/features/addProduct/screens/add_product_tab_view_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 
 import 'package:sixvalley_vendor_app/localization/controllers/localization_controller.dart';
@@ -125,6 +127,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 4),
+                  VendorWelcomeBanner(
+                      onAddProduct: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  const AddProductTabView(fromHome: true)))),
                   const SellerDashboardOverviewWidget(),
                   const SizedBox(height: 24),
                 ],
