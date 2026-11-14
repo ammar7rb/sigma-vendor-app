@@ -2282,6 +2282,8 @@ class AddProductScreenState extends State<AddProductScreen>
                                                                     existingCount,
                                                                 colorImageCount:
                                                                     colorImageCount,
+                                                                hasExistingThumbnail:
+                                                                    (widget.product?.thumbnailFullUrl?.path ?? '').isNotEmpty,
                                                               );
                                                             },
                                                             child: Stack(

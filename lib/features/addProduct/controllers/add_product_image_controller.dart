@@ -114,10 +114,12 @@ class AddProductImageController extends ChangeNotifier {
     required int existingCount,
     required int colorImageCount,
     int maxCount = 5,
+    bool hasExistingThumbnail = false,
   }) async {
     final availableSlots = maxCount - existingCount - colorImageCount - withoutColor.length;
+    final needsThumbnail = _selectedLogoFile == null && !hasExistingThumbnail;
 
-    if (availableSlots <= 0) {
+    if (availableSlots <= 0 && !needsThumbnail) {
       showCustomSnackBarWidget(
         '${getTranslated('can_not_select_more_than', Get.context!)} $maxCount',
         Get.context!,
@@ -126,15 +128,28 @@ class AddProductImageController extends ChangeNotifier {
       return;
     }
 
-    final selectedImages = await ImageValidationHelper.validateAndPickMultipleImages(
+    final selectedImages = List<XFile>.of(await ImageValidationHelper.validateAndPickMultipleImages(
       context: Get.context!,
-    );
+    ));
 
     if (selectedImages.isEmpty) {
       return;
     }
 
-    final imagesToAdd = selectedImages.take(availableSlots).toList();
+    // One step for up to 6 photos: the first becomes the product thumbnail
+    // when none is set yet, the rest fill the additional slots (max 5).
+    if (needsThumbnail) {
+      final first = selectedImages.removeAt(0);
+      _selectedLogoFile = first;
+      thumbnailImageModel = ImageModel(type: 'thumbnail', color: '', image: first);
+      if (_selectedMetaImageFile == null) {
+        _selectedMetaImageFile = first;
+        metaImageModel = ImageModel(type: 'meta', color: '', image: first);
+      }
+      totalSelectedImages++;
+    }
+
+    final imagesToAdd = selectedImages.take(availableSlots < 0 ? 0 : availableSlots).toList();
     withoutColor.addAll(imagesToAdd.map(
       (image) => ImageModel(image: image, type: 'product', color: ''),
     ));
