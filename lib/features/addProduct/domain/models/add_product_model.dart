@@ -10,6 +10,7 @@ class AddProductModel {
   List<String>? thumbnailList;
   String? videoUrl;
   String? brandName;
+  Map<String, XFile> mediaUploads = const {};
 
   AddProductModel(
       {this.titleList,

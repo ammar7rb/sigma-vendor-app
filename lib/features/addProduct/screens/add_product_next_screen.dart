@@ -36,7 +36,6 @@ import 'package:sixvalley_vendor_app/utill/dimensions.dart';
 import 'package:sixvalley_vendor_app/utill/images.dart';
 import 'package:sixvalley_vendor_app/utill/styles.dart';
 import 'package:sixvalley_vendor_app/common/basewidgets/custom_snackbar_widget.dart';
-import '../../auth/controllers/auth_controller.dart';
 
 class AddProductNextScreen extends StatefulWidget {
   final ValueChanged<bool>? isSelected;
@@ -2127,26 +2126,6 @@ class AddProductNextScreenState extends State<AddProductNextScreen>
                                                     // }
 
                                                     if (isValid) {
-                                                      if (resProvider
-                                                                  .productTypeIndex ==
-                                                              1 &&
-                                                          digitalProductController
-                                                                  .digitalProductTypeIndex ==
-                                                              1 &&
-                                                          digitalProductController
-                                                                  .selectedFileForImport !=
-                                                              null &&
-                                                          digitalProductController
-                                                              .selectedDigitalVariation
-                                                              .isEmpty) {
-                                                        digitalProductController
-                                                            .uploadDigitalProduct(
-                                                                Provider.of<AuthController>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .getUserToken());
-                                                      }
                                                       resProvider
                                                           .setSelectedPageIndex(
                                                               2,

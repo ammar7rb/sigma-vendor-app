@@ -351,9 +351,32 @@ class AddProductController extends ChangeNotifier {
       List<ColorImage> colorImageObjects =
           addProductImageController.colorImageObject;
 
-      String? digitalProductFileName =
-          Provider.of<DigitalProductController>(context, listen: false)
-              .digitalProductFileName;
+      final digitalFile = Provider.of<DigitalProductController>(
+        context, listen: false,
+      ).selectedFileForImport;
+      final media = <String, XFile>{};
+      final thumbnailFile = addProductImageController.selectedLogoFile;
+      final metaFile = addProductImageController.selectedMetaImageFile;
+      if (thumbnailFile != null) media['thumbnail_file'] = thumbnailFile;
+      if (metaFile != null) media['meta_image_file'] = metaFile;
+      for (final entry in addProductImageController.withoutColor.asMap().entries) {
+        final file = entry.value.image;
+        if (file != null) media['product_images[${entry.key}]'] = file;
+      }
+      for (final image in addProductImageController.imagesWithColor) {
+        final file = image.image;
+        final color = image.color?.replaceAll('#', '');
+        if (file != null && color != null && color.isNotEmpty) {
+          media['product_color_images[$color]'] = file;
+        }
+      }
+      if (product.productType == 'digital' &&
+          product.digitalProductType == 'ready_product' &&
+          !isDigitalVariationEmpty &&
+          digitalFile != null) {
+        media['digital_file_upload'] = XFile(digitalFile.path);
+      }
+      addProduct.mediaUploads = media;
 
       if (_productTypeIndex == 1) {
         digitalVariationModel =
@@ -379,13 +402,11 @@ class AddProductController extends ChangeNotifier {
           attributeList?.firstOrNull?.active ?? false,
           colorImageObjects,
           tags,
-          digitalProductFileName,
+          isAdd ? null : product.digitalFileReady,
           digitalVariationModel,
           isDigitalVariationEmpty,
           token);
       if (response.response != null && response.response?.statusCode == 200) {
-        await addProductImageController.onDeleteColorImages(product);
-
         _productCode.clear();
         Navigator.pushAndRemoveUntil(
             Get.context!,
@@ -410,8 +431,6 @@ class AddProductController extends ChangeNotifier {
         _isLoading = false;
         _metaSeoInfo = MetaSeoInfo();
       } else {
-        Provider.of<AddProductImageController>(Get.context!, listen: false)
-            .emptyWithColorImage();
         _isLoading = false;
         // Keep the backend's specific entitlement reason visible to the seller.
         ApiChecker.checkApi(response);

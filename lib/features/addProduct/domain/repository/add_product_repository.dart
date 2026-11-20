@@ -132,6 +132,7 @@ class AddProductRepository implements AddProductRepositoryInterface {
   void _setRequestHeaders(String? token) {
     dioClient!.dio!.options.headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
       'Authorization':
           'Bearer ${token ?? Provider.of<AuthController>(Get.context!, listen: false).getUserToken()}'
     };
@@ -206,7 +207,7 @@ class AddProductRepository implements AddProductRepositoryInterface {
       List<ColorImage> colorImageObject) {
     return colorImageObject
         .where((image) =>
-            image.imageName?.key != 'null' && image.imageName?.key != null)
+            image.imageName?.key != 'null' && image.imageName?.key?.isNotEmpty == true)
         .map((image) => {
               'color': image.color,
               'image_name': image.imageName?.key,
@@ -247,7 +248,7 @@ class AddProductRepository implements AddProductRepositoryInterface {
       'meta_description': product.metaDescription,
       'lang': jsonEncode(addProduct.languageList),
       'colors': jsonEncode(addProduct.colorCodeList),
-      'images': jsonEncode(productImages),
+      'images': jsonEncode(productImages?.where((image) => (image['image_name'] as String?)?.isNotEmpty == true).toList() ?? []),
       'thumbnail': thumbnail,
       'colors_active': isActiveColor,
       'video_url': addProduct.videoUrl,
@@ -376,32 +377,26 @@ class AddProductRepository implements AddProductRepositoryInterface {
       requestData['slot_reservation_token'] = addProduct.slotReservationToken;
     }
 
-    if (product.productType == 'digital') {
-      try {
-        List<MultipartWithKey> multiPartFiles =
-            await processItems(digitalVariationModel);
-
-        Response response = await dioClient!.postMultipart(
-          '${AppConstants.baseUrl}${isAdd ? AppConstants.addProductUri : '${AppConstants.updateProductUri}/${product.id}'}',
-          data: requestData,
-          files: multiPartFiles,
-        );
-
-        return ApiResponse.withSuccess(response);
-      } catch (e) {
-        return ApiResponse.withError(ApiErrorHandler.getMessage(e));
+    try {
+      final path = isAdd ? AppConstants.addProductUri : '${AppConstants.updateProductUri}/${product.id}';
+      final files = product.productType == 'digital'
+          ? await processItems(digitalVariationModel)
+          : <MultipartWithKey>[];
+      for (final entry in addProduct.mediaUploads.entries) {
+        files.add(MultipartWithKey(
+          key: entry.key,
+          multipartFile: MultipartFile.fromBytes(
+            await entry.value.readAsBytes(),
+            filename: entry.value.name,
+          ),
+        ));
       }
-    } else {
-      try {
-        Response response = await dioClient!.post(
-          '${AppConstants.baseUrl}${isAdd ? AppConstants.addProductUri : '${AppConstants.updateProductUri}/${product.id}'}',
-          data: requestData,
-        );
-
-        return ApiResponse.withSuccess(response);
-      } catch (e) {
-        return ApiResponse.withError(ApiErrorHandler.getMessage(e));
-      }
+      final response = files.isEmpty
+          ? await dioClient!.post(path, data: requestData)
+          : await dioClient!.postMultipart(path, data: requestData, files: files);
+      return ApiResponse.withSuccess(response);
+    } catch (e) {
+      return ApiResponse.withError(ApiErrorHandler.getMessage(e));
     }
   }
 
@@ -514,8 +509,11 @@ class AddProductRepository implements AddProductRepositoryInterface {
   Future<ApiResponse> deleteProductImage(
       String id, String name, String? color) async {
     try {
-      final response = await dioClient!.get(
-          "${AppConstants.deleteProductImage}?id=$id&name=$name&color=$color");
+      final response = await dioClient!.post(
+        AppConstants.deleteProductImage,
+        data: {'id': id, 'name': name, if (color != null) 'color': color},
+        options: Options(headers: {'Accept': 'application/json'}),
+      );
       return ApiResponse.withSuccess(response);
     } catch (e) {
       return ApiResponse.withError(ApiErrorHandler.getMessage(e));

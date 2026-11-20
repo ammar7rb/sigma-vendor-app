@@ -87,6 +87,13 @@ class ApiErrorHandler {
                 case 429:
                 //errorDescription = error.response!.statusMessage;
                   break;
+                case 422:
+                  final data = error.response?.data;
+                  final message = data is Map ? data['message'] : null;
+                  errorDescription = message is String
+                      ? message
+                      : 'Failed to validate request';
+                  break;
                 default:
                   ErrorResponse errorResponse = ErrorResponse.fromJson(error.response!.data);
                   if (errorResponse.errors != null && errorResponse.errors!.isNotEmpty) {
