@@ -2026,5 +2026,11 @@
     "order_notifications_hint": "Every new and pending order forwarded to you by administration.",
     "fixed": "Fixed",
     "flat": "Flat",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "technical_support": "Technical support",
+    "support_chat_hint": "Write your message to support",
+    "support_chat_empty": "Start a conversation with support; administration will reply here.",
+    "support_chat_load_error": "Could not load the chat. Tap to retry.",
+    "support_chat_send_error": "Could not send the message. Try again.",
+    "administration": "Administration"
 }

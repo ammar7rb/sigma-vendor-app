@@ -1,3 +1,4 @@
+import 'package:sixvalley_vendor_app/features/profile/screens/vendor_support_chat_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_account_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/vendor_invoices_screen.dart';
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_inbox_screen.dart';
@@ -53,6 +54,8 @@ class MenuBottomSheetWidget extends StatelessWidget {
                   () => _open(context, const SellerPackageScreen())),
               _MenuEntry(Icons.receipt_long_outlined, 'vendor_invoices',
                   () => _open(context, const VendorInvoicesScreen())),
+              _MenuEntry(Icons.support_agent_outlined, 'technical_support',
+                  () => _open(context, const VendorSupportChatScreen())),
               _MenuEntry(
                   Icons.mail_outline,
                   'administration_messages',
