@@ -24,6 +24,7 @@ import 'package:sixvalley_vendor_app/features/order/screens/order_screen.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
 import 'package:sixvalley_vendor_app/theme/app_design.dart';
+import 'package:sixvalley_vendor_app/common/basewidgets/vendor_motion.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen(
@@ -214,10 +215,11 @@ class VendorBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) => SafeArea(
         top: false,
         child: Container(
-          height: 78,
-          padding: const EdgeInsets.fromLTRB(6, 7, 6, 5),
+          height: 80,
+          padding: const EdgeInsets.fromLTRB(6, 8, 6, 6),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
             border:
                 Border(top: BorderSide(color: Theme.of(context).dividerColor)),
             boxShadow: AppDesign.softShadow(Theme.of(context).brightness),
@@ -227,20 +229,28 @@ class VendorBottomNavigation extends StatelessWidget {
               builder: (context, _) => Row(
                       children: List.generate(5, (index) {
                     final data = [
-                      (Icons.home_outlined, getTranslated('home', context)),
+                      (
+                        Icons.home_outlined,
+                        Icons.home_rounded,
+                        getTranslated('home', context)
+                      ),
                       (
                         Icons.account_balance_wallet_outlined,
+                        Icons.account_balance_wallet_rounded,
                         getTranslated('finance_my_wallet', context)
                       ),
                       (
                         Icons.inventory_2_outlined,
+                        Icons.inventory_2_rounded,
                         getTranslated('phase5_spaces', context)
                       ),
                       (
                         Icons.receipt_long_outlined,
+                        Icons.receipt_long_rounded,
                         getTranslated('my_order', context)
                       ),
                       (
+                        Icons.grid_view_outlined,
                         Icons.grid_view_rounded,
                         getTranslated('vendor_other', context)
                       ),
@@ -248,10 +258,11 @@ class VendorBottomNavigation extends StatelessWidget {
                     return Expanded(
                         child: _VendorNavItem(
                       icon: data.$1,
+                      selectedIcon: data.$2,
                       count: index == 3
-                          ? VendorWorkspace.instance.counts['orders']!
+                          ? VendorWorkspace.instance.counts['orders'] ?? 0
                           : 0,
-                      label: data.$2 ?? '',
+                      label: data.$3 ?? '',
                       selected: selectedIndex == index,
                       onTap: () => onSelected(index),
                     ));
@@ -260,53 +271,112 @@ class VendorBottomNavigation extends StatelessWidget {
       );
 }
 
-class _VendorNavItem extends StatelessWidget {
+/// One bottom bar destination: scales down while pressed, lifts on hover,
+/// fills its icon and slides in a highlight when selected, and pops the icon
+/// once each time it becomes selected.
+class _VendorNavItem extends StatefulWidget {
   final int count;
-  final IconData icon;
+  final IconData icon, selectedIcon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
   const _VendorNavItem(
       {this.count = 0,
       required this.icon,
+      required this.selectedIcon,
       required this.label,
       required this.selected,
       required this.onTap});
 
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: selected
-                  ? Theme.of(context).primaryColor
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Badge(
-                isLabelVisible: count > 0,
-                backgroundColor: AppDesign.danger,
-                label: Text('+$count'),
-                child: Icon(icon,
-                    size: 23,
-                    color:
-                        selected ? Colors.white : Theme.of(context).hintColor)),
+  State<_VendorNavItem> createState() => _VendorNavItemState();
+}
+
+class _VendorNavItemState extends State<_VendorNavItem>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pop = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 420));
+  late final Animation<double> _popScale = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 1, end: 1.22), weight: 35),
+    TweenSequenceItem(tween: Tween(begin: 1.22, end: .94), weight: 30),
+    TweenSequenceItem(tween: Tween(begin: .94, end: 1), weight: 35),
+  ]).animate(CurvedAnimation(parent: _pop, curve: Curves.easeOut));
+
+  @override
+  void didUpdateWidget(covariant _VendorNavItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selected && !oldWidget.selected && !reduceMotion(context)) {
+      _pop.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pop.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).primaryColor;
+    final hint = Theme.of(context).hintColor;
+    final selected = widget.selected;
+    return PressableScale(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        widget.onTap();
+      },
+      pressedScale: .88,
+      semanticLabel: widget.label,
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.symmetric(
+              horizontal: selected ? 18 : 12, vertical: 5),
+          decoration: BoxDecoration(
+            gradient: selected ? AppDesign.brandGradient : null,
+            color: selected ? null : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                        color: primary.withValues(alpha: .28),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4))
+                  ]
+                : const [],
           ),
-          const SizedBox(height: 3),
-          Text(label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  color: selected
-                      ? Theme.of(context).primaryColor
-                      : Theme.of(context).hintColor)),
-        ]),
-      );
+          child: ScaleTransition(
+            scale: _popScale,
+            child: Badge(
+                isLabelVisible: widget.count > 0,
+                backgroundColor: AppDesign.danger,
+                label: Text('+${widget.count}'),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(opacity: animation, child: child)),
+                  child: Icon(selected ? widget.selectedIcon : widget.icon,
+                      key: ValueKey(selected),
+                      size: 23,
+                      color: selected ? Colors.white : hint),
+                )),
+          ),
+        ),
+        const SizedBox(height: 4),
+        AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 220),
+          style: TextStyle(
+              fontFamily: DefaultTextStyle.of(context).style.fontFamily,
+              fontSize: selected ? 12.5 : 12,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+              color: selected ? primary : hint),
+          child: Text(widget.label,
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+      ]),
+    );
+  }
 }

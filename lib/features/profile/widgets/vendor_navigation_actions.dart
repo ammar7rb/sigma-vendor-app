@@ -10,40 +10,57 @@ class VendorNavigationActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: VendorWorkspace.instance,
-      builder: (context, _) => Row(mainAxisSize: MainAxisSize.min, children: [
-            for (final key in ['messages', 'notifications'])
-              IconButton(
-                  tooltip: getTranslated(
-                      key == 'messages'
-                          ? 'administration_messages'
-                          : 'notification',
-                      context),
-                  icon: Badge(
-                      isLabelVisible: VendorWorkspace.instance.counts[key]! > 0,
-                      backgroundColor: key == 'messages'
-                          ? AppDesign.success
-                          : AppDesign.danger,
-                      label: Text('+${VendorWorkspace.instance.counts[key]}'),
-                      child: Icon(
-                          key == 'messages'
-                              ? Icons.mail_outline
-                              : Icons.notifications_outlined,
-                          size: 20)),
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              VendorInboxScreen(messages: key == 'messages')))),
+      builder: (context, _) {
+        final workspace = VendorWorkspace.instance;
+        final entries = [
+          (
+            'messages',
+            Icons.mail_outline,
+            'administration_messages',
+            workspace.counts['messages']!,
+            AppDesign.success
+          ),
+          (
+            'orders',
+            Icons.shopping_bag_outlined,
+            'order_notifications',
+            workspace.counts['order_notifications']!,
+            const Color(0xFFEF6C00)
+          ),
+          (
+            'notifications',
+            Icons.notifications_outlined,
+            'notification',
+            workspace.generalNotifications,
+            AppDesign.danger
+          ),
+        ];
+        return Row(mainAxisSize: MainAxisSize.min, children: [
+          for (final (key, icon, label, count, color) in entries)
             IconButton(
-                tooltip: getTranslated('add_product', context),
-                icon: const Icon(Icons.add_box_outlined,
-                    color: AppDesign.primary),
+                tooltip: getTranslated(label, context),
+                icon: Badge(
+                    isLabelVisible: count > 0,
+                    backgroundColor: color,
+                    label: Text('+$count'),
+                    child: Icon(icon, size: 20)),
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            const AddProductTabView(fromHome: false)))),
-          ]));
+                        builder: (_) => VendorInboxScreen(
+                            messages: key == 'messages',
+                            ordersOnly: key == 'orders')))),
+          IconButton(
+              tooltip: getTranslated('add_product', context),
+              icon:
+                  const Icon(Icons.add_box_outlined, color: AppDesign.primary),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          const AddProductTabView(fromHome: false)))),
+        ]);
+      });
 }
 
 class VendorAddProductAction extends StatelessWidget {

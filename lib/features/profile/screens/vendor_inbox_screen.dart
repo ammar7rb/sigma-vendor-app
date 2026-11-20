@@ -11,8 +11,15 @@ import 'package:url_launcher/url_launcher.dart';
 class VendorInboxScreen extends StatefulWidget {
   final bool messages;
   final bool embedded;
+
+  /// Shows only order alerts. Otherwise the notification list leaves them out,
+  /// because orders have their own button.
+  final bool ordersOnly;
   const VendorInboxScreen(
-      {super.key, this.messages = false, this.embedded = false});
+      {super.key,
+      this.messages = false,
+      this.embedded = false,
+      this.ordersOnly = false});
   @override
   State<VendorInboxScreen> createState() => _VendorInboxScreenState();
 }
@@ -47,7 +54,9 @@ class _VendorInboxScreenState extends State<VendorInboxScreen> {
             : CustomAppBarWidget(
                 title: text(widget.messages
                     ? 'administration_messages'
-                    : 'notification')),
+                    : widget.ordersOnly
+                        ? 'order_notifications'
+                        : 'notification')),
         body: AnimatedBuilder(
             animation: workspace,
             builder: (context, _) {
@@ -64,7 +73,11 @@ class _VendorInboxScreenState extends State<VendorInboxScreen> {
               final items = (data[widget.messages ? 'threads' : 'notifications']
                           as List? ??
                       [])
-                  .cast<Map>();
+                  .cast<Map>()
+                  .where((item) =>
+                      widget.messages ||
+                      (item['kind'] == 'order_alert') == widget.ordersOnly)
+                  .toList();
               return RefreshIndicator(
                   onRefresh: workspace.refresh,
                   child: ListView(
@@ -73,7 +86,9 @@ class _VendorInboxScreenState extends State<VendorInboxScreen> {
                     children: [
                       Text(text(widget.messages
                           ? 'vendor_messages_hint'
-                          : 'vendor_notifications_hint')),
+                          : widget.ordersOnly
+                              ? 'order_notifications_hint'
+                              : 'vendor_notifications_hint')),
                       if (error != null)
                         Padding(
                             padding: const EdgeInsets.all(12),

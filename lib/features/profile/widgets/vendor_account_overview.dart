@@ -6,6 +6,8 @@ import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controll
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_finance_screen.dart';
 import 'package:sixvalley_vendor_app/helper/price_converter.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
+import 'package:sixvalley_vendor_app/common/basewidgets/vendor_motion.dart';
+import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 /// Shared by the profile and home. Content height follows text scaling.
 class VendorAccountOverview extends StatelessWidget {
@@ -79,6 +81,7 @@ class VendorAccountOverviewContent extends StatelessWidget {
           action: tr(subscription['active'] == true
               ? 'vendor_subscriptions'
               : 'phase5_renew_package'),
+          accent: const Color(0xFF7C4DFF),
           onTap: () => open('subscriptions')),
       _OverviewTile(
           icon: Icons.account_balance_wallet_outlined,
@@ -86,6 +89,7 @@ class VendorAccountOverviewContent extends StatelessWidget {
           value: money('available'),
           details: [tr('phase5_wallet_hint')],
           action: tr('phase5_view_details'),
+          accent: AppDesign.success,
           onTap: () => open('wallet')),
       _OverviewTile(
           icon: Icons.payments_outlined,
@@ -93,6 +97,7 @@ class VendorAccountOverviewContent extends StatelessWidget {
           value: money('operating'),
           details: [tr('phase5_payments_hint')],
           action: tr('phase5_view_details'),
+          accent: AppDesign.primary,
           onTap: () => open('payments')),
       _OverviewTile(
           icon: Icons.grid_view_outlined,
@@ -104,6 +109,7 @@ class VendorAccountOverviewContent extends StatelessWidget {
             '${tr('phase5_included')}: ${count('included')} · ${tr('phase5_additional')}: ${count('additional')}'
           ],
           action: tr('phase5_manage_spaces'),
+          accent: const Color(0xFF0288D1),
           onTap: () => open('spaces')),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -131,7 +137,10 @@ class VendorAccountOverviewContent extends StatelessWidget {
                   : 1;
           final width = (constraints.maxWidth - (columns - 1) * 12) / columns;
           return Wrap(spacing: 12, runSpacing: 12, children: [
-            for (final card in cards) SizedBox(width: width, child: card)
+            for (final (index, card) in cards.indexed)
+              SizedBox(
+                  width: width,
+                  child: FadeSlideIn(index: index, child: card))
           ]);
         }),
     ]);
@@ -143,59 +152,106 @@ class _OverviewTile extends StatelessWidget {
   final String label, value, action;
   final List<String> details;
   final VoidCallback onTap;
+  final Color accent;
   const _OverviewTile(
       {required this.icon,
       required this.label,
       required this.value,
       required this.details,
       required this.action,
-      required this.onTap});
+      required this.onTap,
+      this.accent = AppDesign.primary});
   @override
-  Widget build(BuildContext context) => Material(
-      color: Theme.of(context).cardColor,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Theme.of(context).dividerColor)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-            padding: const EdgeInsets.all(20),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      Text(label,
-                          style: Theme.of(context).textTheme.titleSmall),
-                      const SizedBox(height: 12),
-                      Text(value,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.w700)),
-                    ])),
-                const SizedBox(width: 16),
-                Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                        color: const Color(0xffedf2fb),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Icon(icon,
-                        color: Theme.of(context).colorScheme.primary)),
-              ]),
-              for (final detail in details)
-                Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(detail)),
-              const SizedBox(height: 16),
-              Text(action,
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w700)),
-            ])),
-      ));
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return PressableScale(
+      onTap: onTap,
+      pressedScale: .97,
+      semanticLabel: '$label $value',
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: accent.withValues(alpha: dark ? .35 : .18)),
+            boxShadow: AppDesign.softShadow(Theme.of(context).brightness)),
+        child: Stack(children: [
+          PositionedDirectional(
+              top: -28,
+              end: -28,
+              child: Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: accent.withValues(alpha: dark ? .14 : .07)))),
+          Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  begin: AlignmentDirectional.topStart,
+                                  end: AlignmentDirectional.bottomEnd,
+                                  colors: [
+                                    accent.withValues(alpha: .75),
+                                    accent
+                                  ]),
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: accent.withValues(alpha: .3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4))
+                              ]),
+                          child: Icon(icon, color: Colors.white, size: 25)),
+                      const SizedBox(width: 14),
+                      Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Text(label,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall
+                                    ?.copyWith(
+                                        color: Theme.of(context).hintColor)),
+                            const SizedBox(height: 6),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: Text(value,
+                                  key: ValueKey(value),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(fontWeight: FontWeight.w800)),
+                            ),
+                          ])),
+                    ]),
+                    for (final detail in details)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(detail,
+                              style: Theme.of(context).textTheme.bodySmall)),
+                    const SizedBox(height: 14),
+                    Row(children: [
+                      Text(action,
+                          style: TextStyle(
+                              color: accent, fontWeight: FontWeight.w800)),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_rounded,
+                          size: 18,
+                          color: accent,
+                          textDirection: Directionality.of(context)),
+                    ]),
+                  ])),
+        ]),
+      ),
+    );
+  }
 }

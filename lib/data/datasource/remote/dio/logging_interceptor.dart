@@ -7,13 +7,8 @@ class LoggingInterceptor extends InterceptorsWrapper {
   @override
   Future onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     if (kDebugMode) {
-      print("--> ${options.method} ${options.path}");
-    }
-    if (kDebugMode) {
-      // Authentication and support headers must never be logged.
-    }
-    if (kDebugMode) {
-      print("<-- END HTTP");
+      // Allowlist metadata only: URLs, headers and bodies can contain secrets.
+      debugPrint('--> ${options.method} HTTP');
     }
 
     return super.onRequest(options, handler);
@@ -22,8 +17,8 @@ class LoggingInterceptor extends InterceptorsWrapper {
   @override
   Future onResponse(Response response, ResponseInterceptorHandler handler) async {
     if (kDebugMode) {
-      print(
-        "<-- ${response.statusCode} ${response.requestOptions.method} ${response.requestOptions.path}");
+      debugPrint(
+        '<-- ${response.statusCode} ${response.requestOptions.method} HTTP');
     }
 
     return super.onResponse(response, handler);
@@ -32,7 +27,8 @@ class LoggingInterceptor extends InterceptorsWrapper {
   @override
   Future onError(DioException err, ErrorInterceptorHandler handler) async {
     if (kDebugMode) {
-      print("ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}");
+      debugPrint(
+        'ERROR[${err.response?.statusCode}] ${err.requestOptions.method} ${err.type.name}');
     }
     return super.onError(err, handler);
   }

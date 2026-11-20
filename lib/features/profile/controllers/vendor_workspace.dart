@@ -10,8 +10,15 @@ class VendorWorkspace extends ChangeNotifier {
   final Map<String, int> counts = {
     'orders': 0,
     'notifications': 0,
+    'order_notifications': 0,
     'messages': 0
   };
+
+  /// Unread alerts that are not about orders (orders have their own button).
+  int get generalNotifications =>
+      (counts['notifications']! - counts['order_notifications']!)
+          .clamp(0, 1 << 30)
+          .toInt();
   Map<String, dynamic>? inbox;
   Timer? _timer;
   bool _refreshing = false;

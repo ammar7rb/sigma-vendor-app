@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:sixvalley_vendor_app/features/wallet/controllers/wallet_controller.dart';
 import 'package:sixvalley_vendor_app/features/product/screens/product_list_screen.dart';
 import 'package:sixvalley_vendor_app/localization/language_constrants.dart';
+import 'package:sixvalley_vendor_app/common/basewidgets/vendor_motion.dart';
+import 'package:sixvalley_vendor_app/theme/app_design.dart';
 
 class SellerDashboardOverviewWidget extends StatelessWidget {
   const SellerDashboardOverviewWidget({super.key});
@@ -34,51 +36,37 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                   LayoutBuilder(
                       builder: (context, constraints) =>
                           Wrap(spacing: 12, runSpacing: 12, children: [
-                            for (final item in [
+                            for (final (index, item) in [
                               (
                                 'orders',
                                 sales['received_orders_count'],
-                                Icons.shopping_bag_outlined
+                                Icons.shopping_bag_rounded,
+                                const Color(0xFFEF6C00)
                               ),
                               (
                                 'phase5_spaces',
                                 capacity['total'],
-                                Icons.inventory_2_outlined
+                                Icons.inventory_2_rounded,
+                                AppDesign.primary
                               ),
                               (
                                 'sold_units',
                                 sales['sold_units'],
-                                Icons.bar_chart_outlined
+                                Icons.bar_chart_rounded,
+                                AppDesign.success
                               )
-                            ])
+                            ].indexed)
                               SizedBox(
                                   width: constraints.maxWidth >= 600
                                       ? (constraints.maxWidth - 24) / 3
                                       : constraints.maxWidth,
-                                  child: Card(
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Row(children: [
-                                            Icon(item.$3,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                                size: 28),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                  Text(tr(item.$1)),
-                                                  const SizedBox(height: 8),
-                                                  Text('${item.$2 ?? 0}',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .headlineMedium)
-                                                ]))
-                                          ]))))
+                                  child: FadeSlideIn(
+                                      index: index + 4,
+                                      child: _StatTile(
+                                          label: tr(item.$1),
+                                          value: num.tryParse('${item.$2 ?? 0}') ?? 0,
+                                          icon: item.$3,
+                                          accent: item.$4)))
                           ])),
                   const SizedBox(height: 20),
                   Card(
@@ -106,4 +94,55 @@ class SellerDashboardOverviewWidget extends StatelessWidget {
                       label: Text(tr('phase5_manage_spaces'))),
                 ]));
       });
+}
+
+
+class _StatTile extends StatelessWidget {
+  final String label;
+  final num value;
+  final IconData icon;
+  final Color accent;
+  const _StatTile(
+      {required this.label,
+      required this.value,
+      required this.icon,
+      required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: accent.withValues(alpha: dark ? .35 : .16)),
+          boxShadow: AppDesign.softShadow(Theme.of(context).brightness)),
+      child: Row(children: [
+        Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+                color: accent.withValues(alpha: dark ? .22 : .12),
+                borderRadius: BorderRadius.circular(16)),
+            child: Icon(icon, color: accent, size: 28)),
+        const SizedBox(width: 16),
+        Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label,
+              style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontWeight: FontWeight.w600)),
+          const SizedBox(height: 6),
+          AnimatedCount(
+              value: value,
+              format: (v) => '${v.round()}',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(fontWeight: FontWeight.w800)),
+        ])),
+      ]),
+    );
+  }
 }

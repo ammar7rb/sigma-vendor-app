@@ -5,6 +5,7 @@ import 'package:sixvalley_vendor_app/features/profile/controllers/vendor_workspa
 import 'package:sixvalley_vendor_app/features/profile/screens/vendor_withdrawal_methods_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/screens/seller_balance_funding_screen.dart';
 import 'package:sixvalley_vendor_app/features/wallet/widgets/vendor_finance_ui.dart';
+import 'package:sixvalley_vendor_app/features/wallet/widgets/withdrawal_details_sheet.dart';
 
 class SellerFinanceScreen extends StatefulWidget {
   final bool fromNotification;
@@ -110,9 +111,21 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
       if (!mounted) return;
       amount.clear();
       requestKey = withdrawalRequestKey();
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(tr('withdraw_request_submitted'))));
       await load();
+      if (!mounted) return;
+      await showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+                icon: const Icon(Icons.hourglass_top_rounded, size: 40),
+                title: Text(tr('withdraw_request_submitted')),
+                content: Text(tr('withdraw_review_message'),
+                    textAlign: TextAlign.center),
+                actions: [
+                  FilledButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(tr('close')))
+                ],
+              ));
     } catch (e) {
       if (mounted) setState(() => error = financeError(context, e));
     } finally {
@@ -346,9 +359,13 @@ class _SellerFinanceState extends State<SellerFinanceScreen>
                                       in withdrawals['data'] as List? ?? [])
                                     Card(
                                         child: ListTile(
+                                            onTap: () =>
+                                                showWithdrawalDetailsSheet(
+                                                    context, row as Map,
+                                                    money: money),
                                             title: Text(money(row['amount'])),
                                             subtitle: Text(
-                                                '${row['transaction_number'] ?? 'MP${row['id']}'} · ${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${tr('withdrawal_status_${row['approved']}')} · ${financeDate(context, row['created_at'])}'),
+                                                '${row['transaction_number'] ?? 'MP${row['id']}'} · ${row['withdrawal_method_fields']?['method_name'] ?? ''}\n${withdrawalStatusLabel(context, row as Map)} · ${financeDate(context, row['created_at'])}'),
                                             isThreeLine: true,
                                             trailing: row['approved'] == 0
                                                 ? TextButton(

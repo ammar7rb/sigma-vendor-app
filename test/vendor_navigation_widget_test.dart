@@ -100,11 +100,7 @@ void main() {
                     )))));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        await tester.tap(find
-            .ancestor(
-                of: find.byIcon(Icons.receipt_long_outlined),
-                matching: find.byType(InkWell))
-            .first);
+        await tester.tap(find.byIcon(Icons.receipt_long_outlined).first);
         expect(selected, 3);
         await tester.pumpAndSettle();
         Future<void> capture(String name) async {

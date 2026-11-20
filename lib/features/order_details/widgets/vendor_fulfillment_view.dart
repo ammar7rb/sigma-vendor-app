@@ -25,7 +25,7 @@ class VendorFulfillmentView extends StatefulWidget {
 class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
   bool busy = false;
   static const labels = {
-    'accept': 'قبول صريح للجزء',
+    'accept': 'قبول الطلب',
     'reject': 'رفض قبل القبول — دون غرامة',
     'preparing': 'بدء التجهيز',
     'ready': 'جاهز للشحن',
@@ -124,12 +124,20 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (action == 'accept')
-                            const Text(
-                              'راجعت تفاصيل هذا الجزء ومستحقاته، وأوافق على تنفيذه. يسجل القبول وتوقيته، ويخضع الإلغاء اللاحق لقاعدة الغرامة.',
+                            Text(
+                              'بقبول الطلب تُضاف مستحقاته (${money(portion['amount'])}) إلى حسابك ويتحول تلقائيًا إلى جارٍ التجهيز. يسجل القبول وتوقيته، ويخضع الإلغاء اللاحق لقاعدة الغرامة.',
                             ),
                           if (action == 'reject')
                             const Text(
                               'رفض هذا الجزء قبل القبول دون غرامة إلغاء، حتى بعد شراء الباقة أو تخصيص المساحة.',
+                            ),
+                          if (action == 'cancel')
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                'هل أنت متأكد من إلغاء هذا الطلب بعد قبوله؟ سيتم إبلاغ الإدارة بالإلغاء.',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
                             ),
                           if (action == 'cancel')
                             Text(
@@ -180,6 +188,16 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
             if (action == 'cancel') 'penalty_revision': penalty['revision'],
           },
         );
+        if (action == 'accept') {
+          // Accepting moves the order straight to preparing. If this second
+          // step fails the order simply stays accepted and can be advanced later.
+          try {
+            await VendorWorkspace.instance.client.post(
+              '/api/v3/seller/fulfillment-requests/${portion['id']}/decision',
+              data: {'action': 'preparing'},
+            );
+          } catch (_) {}
+        }
         await widget.onRefresh();
       });
 
@@ -264,7 +282,6 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
               ),
             for (final portion in portions)
               Card(
-                color: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -334,7 +351,15 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
                               'الكمية: ${line['qty']} — سعر التوريد: ${money(line['price'])}',
                             ),
                           ),
-                        for (final action in portion['actions'] as List? ?? [])
+                        if ((portion['actions'] as List? ?? [])
+                            .contains('accept'))
+                          _AcceptOrderPrompt(
+                            amount: money(portion['amount']),
+                            onAccept:
+                                busy ? null : () => decide(portion, 'accept'),
+                          ),
+                        for (final action in (portion['actions'] as List? ?? [])
+                            .where((action) => action != 'accept'))
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: OutlinedButton(
@@ -368,4 +393,51 @@ class _VendorFulfillmentViewState extends State<VendorFulfillmentView> {
       ),
     );
   }
+}
+
+
+/// Call to action shown while a portion waits for the vendor's acceptance.
+class _AcceptOrderPrompt extends StatelessWidget {
+  final String amount;
+  final VoidCallback? onAccept;
+  const _AcceptOrderPrompt({required this.amount, this.onAccept});
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(top: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF11875D).withValues(alpha: .08),
+          border: Border.all(
+              color: const Color(0xFF11875D).withValues(alpha: .35)),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text(
+            'قم بقبول الطلب لإضافة مستحقاته إلى حسابك',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 4),
+          Text(amount,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: Color(0xFF11875D),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF11875D),
+                minimumSize: const Size.fromHeight(50)),
+            onPressed: onAccept,
+            icon: const Icon(Icons.check_circle_rounded),
+            label: const Text('قبول الطلب',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          ),
+        ]),
+      );
 }

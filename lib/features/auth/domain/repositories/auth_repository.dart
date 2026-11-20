@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +16,10 @@ import 'package:http/http.dart' as http;
 class AuthRepository implements AuthRepositoryInterface{
   final DioClient? dioClient;
   final SharedPreferences? sharedPreferences;
-  AuthRepository({required this.dioClient, required this.sharedPreferences});
+  AuthRepository({required this.dioClient, required this.sharedPreferences}) {
+    // Sessions use tokens; remove passwords saved by older app versions.
+    sharedPreferences?.remove(AppConstants.userPassword).ignore();
+  }
 
   @override
   Future<ApiResponse> login({String? emailAddress, String? password}) async {
@@ -99,7 +103,7 @@ class AuthRepository implements AuthRepositoryInterface{
 
     if (deviceToken != null) {
       if (kDebugMode) {
-        print('--------Device Token---------- $deviceToken');
+        debugPrint('Device token acquired');
       }
     }
     return deviceToken;
@@ -137,13 +141,16 @@ class AuthRepository implements AuthRepositoryInterface{
         print("====Execption====>>$e");
       }
     }
-    return sharedPreferences!.remove(AppConstants.token);
+    final tokenRemoved = await sharedPreferences!.remove(AppConstants.token);
+    await sharedPreferences!.remove(AppConstants.userPassword);
+    return tokenRemoved;
   }
 
   @override
   Future<void> saveUserCredentials(String number, String password) async {
     try {
-      await sharedPreferences!.setString(AppConstants.userPassword, password);
+      // Remember only the email, never the password.
+      await sharedPreferences!.remove(AppConstants.userPassword);
       await sharedPreferences!.setString(AppConstants.userEmail, number);
     } catch (e) {
       rethrow;
@@ -157,7 +164,8 @@ class AuthRepository implements AuthRepositoryInterface{
 
   @override
   String getUserPassword() {
-    return sharedPreferences!.getString(AppConstants.userPassword) ?? "";
+    // Retain the synchronous API for callers without restoring credentials.
+    return "";
   }
 
   @override

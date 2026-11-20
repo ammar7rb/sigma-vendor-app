@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixvalley_vendor_app/data/datasource/remote/dio/logging_interceptor.dart';
 import 'package:sixvalley_vendor_app/utill/app_constants.dart';
@@ -19,9 +18,6 @@ class DioClient {
         required this.sharedPreferences,
       }) {
     token = sharedPreferences.getString(AppConstants.token);
-    if (kDebugMode) {
-      // Do not log session credentials.
-    }
     dio = dioC ?? Dio();
     dio!
       ..options.baseUrl = baseUrl
@@ -97,7 +93,6 @@ class DioClient {
     ProgressCallback? onReceiveProgress,
     Map<String, dynamic>? otherFiles
   }) async {
-    debugPrint('apiCall ==> url=> $uri \nparams---> $queryParameters\nheader=> ${dio!.options.headers}');
 
     try {
       // List<MultipartFile> fileList = [];
@@ -125,18 +120,12 @@ class DioClient {
       // }
 
     } catch(e) {
-      debugPrint('----exImage---$e-----');
       rethrow;
     }
 
     try {
 
 
-      for(int i=0; i<FormData.fromMap(data ?? {}).fields.length; i++){
-
-        debugPrint("=====FromData==$i=>>${FormData.fromMap(data ?? {}).fields[i]}");
-
-      }
 
 
       var response = await dio!.post(
