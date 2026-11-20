@@ -1079,7 +1079,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                                     child: IgnorePointer(
                                                         child: CustomTextFieldWidget(
                                                             formProduct: true,
-                                                            required: true,
+                                                            required: false,
                                                             border: true,
                                                             readOnly: true,
                                                             controller: resProvider
@@ -1100,7 +1100,7 @@ class AddProductScreenState extends State<AddProductScreen>
                                                     child: IgnorePointer(
                                                         child: CustomTextFieldWidget(
                                                             formProduct: true,
-                                                            required: true,
+                                                            required: false,
                                                             border: true,
                                                             readOnly: true,
                                                             controller: resProvider

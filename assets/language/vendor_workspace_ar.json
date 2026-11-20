@@ -2,7 +2,7 @@
     "order_reference": "مرجع الطلب",
     "payment_deadline": "مهلة الدفع",
     "admin_note": "ملاحظة الإدارة",
-    "pay_from_operating_balance": "الدفع من رصيد التشغيل",
+    "pay_from_operating_balance": "الدفع من رصيد المدفوعات",
     "pay_with": "الدفع بواسطة",
     "offline_payment": "الدفع بالتحويل",
     "pending_payment": "في انتظار الدفع",
